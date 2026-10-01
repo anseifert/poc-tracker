@@ -1,0 +1,2253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EPROD OpenShift POC Evaluation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" />
+  <style>
+    /* Red Hat brand palette — https://www.redhat.com/en/about/brand/standards/color */
+    :root {
+      --rh-white: #ffffff;
+      --rh-red-50: #ee0000;
+      --rh-red-60: #a60000;
+      --rh-red-10: #fce3e3;
+      --rh-gray-10: #f2f2f2;
+      --rh-gray-20: #e0e0e0;
+      --rh-gray-30: #c7c7c7;
+      --rh-gray-50: #707070;
+      --rh-gray-60: #4d4d4d;
+      --rh-gray-95: #151515;
+      --rh-blue-50: #0066cc;
+      --rh-teal-50: #37a3a3;
+      --rh-teal-60: #147878;
+      --rh-orange-50: #ca6c0f;
+      --rh-yellow-50: #b98412;
+
+      --bg: var(--rh-white);
+      --surface: var(--rh-white);
+      --surface2: var(--rh-gray-10);
+      --border: var(--rh-gray-20);
+      --text: var(--rh-gray-95);
+      --muted: var(--rh-gray-50);
+      --accent: var(--rh-red-50);
+      --accent-soft: var(--rh-red-10);
+      --done: var(--rh-teal-60);
+      --warn: var(--rh-orange-50);
+
+      /* Enterprise Products — chart palette */
+      --eprod-enterprise-blue: #003087;
+      --eprod-blue-bright: #0072ce;
+      --eprod-white: #ffffff;
+      --eprod-gray: #75787b;
+      --chart-completed: var(--eprod-enterprise-blue);
+      --chart-in-progress: var(--eprod-blue-bright);
+      --chart-open: var(--eprod-white);
+      --chart-muted: var(--eprod-gray);
+      --chart-border: #d9dadc;
+
+      --radius: 4px;
+      --font: "Red Hat Text", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+
+    header {
+      margin-bottom: 1.5rem;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .header-row > div:first-child {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .menu-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 2.75rem;
+      height: 2.75rem;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .hamburger span {
+      display: block;
+      height: 2px;
+      background: var(--rh-gray-60);
+      border-radius: 1px;
+    }
+
+    .hamburger[aria-expanded="true"] span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger[aria-expanded="true"] span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger[aria-expanded="true"] span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .hamburger span {
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .app-menu {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      right: 0;
+      z-index: 20;
+      min-width: 12rem;
+      padding: 0.35rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .app-menu[hidden] {
+      display: none;
+    }
+
+    .app-menu button {
+      width: 100%;
+      text-align: left;
+    }
+
+    .page-footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .page-footer[hidden] {
+      display: none;
+    }
+
+    h1 {
+      font-size: clamp(1.35rem, 3vw, 1.85rem);
+      font-weight: 700;
+      margin: 0 0 0.35rem;
+      letter-spacing: -0.02em;
+      color: var(--rh-gray-95);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .subtitle a {
+      color: var(--rh-blue-50);
+      text-decoration: none;
+    }
+
+    .subtitle a:hover { text-decoration: underline; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin: 1.25rem 0 1rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .toolbar .spacer { flex: 1; min-width: 8px; }
+
+    button, .btn {
+      font: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    button:hover, .btn:hover {
+      background: var(--rh-gray-10);
+      border-color: var(--rh-gray-30);
+    }
+
+    button.primary {
+      background: var(--rh-red-50);
+      border-color: var(--rh-red-50);
+      color: var(--rh-white);
+    }
+
+    button.primary:hover {
+      background: var(--rh-red-60);
+      border-color: var(--rh-red-60);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+    }
+
+    .stat .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .stat .value { font-size: 1.5rem; font-weight: 700; margin-top: 0.15rem; }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .chart-card h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+    }
+
+    .statusBarChart {
+      width: 100%;
+      height: 200px;
+      display: block;
+    }
+
+    .chart-tooltip {
+      position: fixed;
+      z-index: 30;
+      padding: 0.45rem 0.65rem;
+      max-width: 16rem;
+      font-size: 0.8rem;
+      line-height: 1.35;
+      color: var(--rh-white);
+      background: var(--rh-gray-95);
+      border-radius: var(--radius);
+      pointer-events: none;
+      box-shadow: none;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 1.25rem;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 0.35rem;
+      vertical-align: middle;
+    }
+
+    .legend-dot-open {
+      border: 1px solid var(--chart-border);
+      box-sizing: border-box;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 0;
+    }
+
+    .tab {
+      padding: 0.6rem 1.1rem;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: var(--radius) var(--radius) 0 0;
+      background: var(--surface2);
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .tab.active {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+      border-top: 3px solid var(--rh-red-50);
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0 var(--radius) var(--radius) var(--radius);
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .panel-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--rh-gray-10);
+    }
+
+    .panel-toolbar label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      max-height: min(70vh, 640px);
+      overflow-y: auto;
+      padding: 0 1rem 1rem;
+    }
+
+    .section-block {
+      margin-bottom: 1.75rem;
+    }
+
+    .section-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-block h3 {
+      margin: 0 0 0.65rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--rh-gray-60);
+      border-bottom: 2px solid var(--rh-red-50);
+      padding-bottom: 0.35rem;
+    }
+
+    .section-block table {
+      margin-bottom: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      text-align: left;
+      padding: 0.65rem 0.85rem;
+      background: var(--rh-gray-10);
+      border-bottom: 1px solid var(--border);
+      color: var(--rh-gray-60);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.55rem 0.85rem;
+      border-bottom: 1px solid var(--rh-gray-20);
+      vertical-align: top;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    tr:hover td { background: var(--rh-gray-10); }
+
+    tr.row-done td { color: var(--muted); }
+    tr.row-done td.item-cell {
+      text-decoration: line-through;
+      text-decoration-color: var(--rh-gray-30);
+    }
+
+    tr.row-hidden { display: none; }
+
+    .done-check {
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: var(--rh-red-50);
+      cursor: pointer;
+    }
+
+    .date-cell {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .import-card {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .import-card h2 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+    .import-card p { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.9rem; }
+
+    .import-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    input[type="file"] { display: none; }
+
+    .empty {
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: var(--accent-soft);
+      color: var(--rh-red-60);
+      margin-left: 0.5rem;
+      font-weight: 600;
+    }
+
+    .status-yes { color: var(--done); }
+    .status-partial { color: var(--warn); }
+
+    td.completed-cell {
+      min-width: 12rem;
+      max-width: 22rem;
+      vertical-align: top;
+    }
+
+    .completed-input {
+      display: block;
+      width: 100%;
+      min-width: 10rem;
+      min-height: 2.75rem;
+      font: inherit;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: var(--text);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.35rem 0.5rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+      resize: vertical;
+      field-sizing: content;
+    }
+
+    .completed-input:focus {
+      outline: 2px solid var(--rh-red-50);
+      outline-offset: 1px;
+      border-color: var(--rh-gray-30);
+    }
+
+    .completed-input.status-yes { color: var(--done); border-color: var(--rh-teal-50); }
+    .completed-input.status-partial { color: var(--warn); border-color: var(--rh-yellow-50); }
+
+    .completed-date-hint {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      th, td { padding: 0.5rem 0.55rem; }
+    }
+
+    .document-upload-block {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .document-upload-block h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .document-upload-block p,
+    .document-upload-block pre {
+      margin: 0 0 0.75rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .document-upload-block pre {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.65rem 0.75rem;
+      font-size: 0.78rem;
+      overflow-x: auto;
+    }
+
+    .document-upload-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .document-upload-actions .muted-link {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    #chartProgressBlock[hidden] {
+      display: none !important;
+    }
+
+    .report-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .report-modal[hidden] {
+      display: none !important;
+    }
+
+    .report-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(21, 21, 21, 0.45);
+    }
+
+    .report-modal-panel {
+      position: relative;
+      z-index: 1;
+      width: min(920px, 100%);
+      max-height: min(90vh, 720px);
+      overflow: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.35rem 1.35rem;
+    }
+
+    .report-modal-panel h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .report-scope-field {
+      border: none;
+      margin: 0 0 1rem;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: 0.9rem;
+    }
+
+    .report-scope-field label {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+    }
+
+    .report-modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .report-preview-frame {
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      min-height: 12rem;
+      max-height: 40vh;
+      overflow: auto;
+      background: var(--rh-white);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-row">
+        <div>
+          <h1 id="pageTitle">POC Evaluation Tracker</h1>
+          <p class="subtitle" id="pageSubtitle">
+            Upload a tab-delimited evaluation document to define workstreams, sections, and criteria.
+          </p>
+        </div>
+        <div class="menu-wrap" id="mainToolbar" hidden>
+          <button
+            type="button"
+            class="hamburger"
+            id="menuToggle"
+            aria-expanded="false"
+            aria-controls="appMenu"
+            aria-label="Open menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <nav id="appMenu" class="app-menu" hidden>
+            <button type="button" id="btnShowAll">Show all rows</button>
+            <button type="button" id="btnHideCompleted">Hide all completed</button>
+            <button type="button" id="btnReimport">Upload document</button>
+            <button type="button" id="btnEmailReport">Email report…</button>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <div class="stats" id="statsRow" hidden>
+      <div class="stat"><div class="label">Total items</div><div class="value" id="statTotal">0</div></div>
+      <div class="stat"><div class="label">Completed</div><div class="value" id="statDone" style="color:var(--done)">0</div></div>
+      <div class="stat"><div class="label">Open</div><div class="value" id="statOpen" style="color:var(--warn)">0</div></div>
+      <div class="stat"><div class="label">% complete</div><div class="value" id="statPct">0%</div></div>
+    </div>
+
+    <div class="chart-card" id="chartCard">
+      <div id="documentUploadBlock" class="document-upload-block">
+        <h3>Upload evaluation document</h3>
+        <p>
+          Use a <strong>tab-delimited</strong> plain-text file (.txt or .tsv). Switch workstreams with
+          <code>@workstream</code> lines, group criteria with <code>@section</code>, then a header row and data rows.
+          Google Doc exports (.txt / .html) are also supported.
+        </p>
+        <pre>@workstream Virtualization
+@section 1. Core functional parity
+Criteria	Description	Success Criteria	Notes
+…</pre>
+        <div class="document-upload-actions import-actions">
+          <button type="button" class="primary" id="btnUploadDocument">Choose file…</button>
+          <button type="button" id="btnImportTxt">Google Doc .txt</button>
+          <button type="button" id="btnImportHtml">Google Doc .html</button>
+          <button type="button" id="btnReset" title="Clear imported rows and completion progress">Reset all data</button>
+        </div>
+        <input type="file" id="fileUpload" accept=".txt,.tsv,.html,.htm,text/plain,text/tab-separated-values,text/html" hidden />
+        <input type="file" id="fileTxt" accept=".txt,text/plain" hidden />
+        <input type="file" id="fileHtml" accept=".html,.htm,text/html" hidden />
+      </div>
+      <div id="chartProgressBlock" hidden>
+        <h2>POC progress by workstream</h2>
+        <div class="chart-canvas-wrap">
+          <canvas id="statusBarChart" class="statusBarChart" width="1100" height="200" aria-label="Stacked progress bars for Virtualization and Kubernetes"></canvas>
+          <div id="statusBarChartTooltip" class="chart-tooltip" hidden role="tooltip"></div>
+        </div>
+        <div class="chart-legend">
+          <span><span class="legend-dot" style="background:var(--chart-completed)"></span>Completed</span>
+          <span><span class="legend-dot" style="background:var(--chart-in-progress)"></span>In progress</span>
+          <span><span class="legend-dot legend-dot-open" style="background:var(--chart-open)"></span>Open</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="reportModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="reportModalBackdrop"></div>
+      <div class="report-modal-panel" role="dialog" aria-labelledby="reportModalTitle" aria-modal="true">
+        <h2 id="reportModalTitle">Email report</h2>
+        <fieldset class="report-scope-field" id="reportScopeField">
+          <legend class="sr-only">Report scope</legend>
+          <label><input type="radio" name="reportScope" value="active" checked /> <span id="reportScopeActiveLabel">This tab</span></label>
+          <label><input type="radio" name="reportScope" value="other" /> <span id="reportScopeOtherLabel">Other tab</span></label>
+          <label><input type="radio" name="reportScope" value="both" /> Both workstreams</label>
+        </fieldset>
+        <button type="button" class="primary" id="btnReportPreview">Preview report</button>
+        <div id="reportPreview" class="report-preview-frame" hidden></div>
+        <div class="report-modal-actions" id="reportModalActions" hidden>
+          <button type="button" id="btnReportCopy">Copy HTML</button>
+          <button type="button" id="btnReportDownload">Download HTML</button>
+          <button type="button" id="btnReportClose">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabBar" hidden>
+      <button type="button" class="tab active" data-tab="virtualization">Virtualization</button>
+      <button type="button" class="tab" data-tab="kubernetes">Kubernetes</button>
+    </div>
+
+    <div class="panel" id="panel" hidden>
+      <div class="panel-toolbar">
+        <label><input type="checkbox" id="hideCompletedPanel" /> Hide completed rows in this tab</label>
+        <span class="spacer"></span>
+        <span id="tabSummary" style="font-size:0.85rem;color:var(--muted)"></span>
+      </div>
+      <div class="table-wrap" id="tablesContainer"></div>
+    </div>
+
+    <footer class="page-footer" id="pageFooter" hidden>
+      <span id="lastSaved"></span>
+      <span id="jsonSyncStatus"></span>
+    </footer>
+  </div>
+
+  <script id="embedded-doc-data" type="application/json">{"dataVersion":5,"title":"POC Evaluation Tracker","subtitle":"Upload a tab-delimited evaluation document to define workstreams, sections, and criteria.","sections":{"virtualization":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[]},"kubernetes":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[]}}}</script>
+  <script>
+    const EMBEDDED_DOC = JSON.parse(document.getElementById('embedded-doc-data').textContent);
+    const STORAGE_KEY = "poc-tracker-v1";
+    const STATE_JSON_URL = "state.json";
+    const STATE_API_URL = "api/state";
+    const JSON_SYNC_DEBOUNCE_MS = 600;
+    const SECTION_KEYS = ["virtualization", "kubernetes"];
+    const SECTION_LABELS = { virtualization: "Virtualization", kubernetes: "Kubernetes" };
+
+    let state;
+    let jsonSyncTimer = null;
+    let jsonSyncCapable = false;
+    let activeTab = "virtualization";
+    let globalHideCompleted = false;
+    let panelHideCompleted = false;
+
+    function defaultState() {
+      return {
+        title: "POC Evaluation Tracker",
+        subtitle: "Upload a tab-delimited evaluation document to define workstreams, sections, and criteria.",
+        dataVersion: 0,
+        sourceImportedAt: null,
+        sections: {
+          virtualization: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
+          kubernetes: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
+        },
+        progress: {},
+        datePolicyVersion: 0,
+      };
+    }
+
+    function embeddedBranding() {
+      return {
+        title: EMBEDDED_DOC.title || defaultState().title,
+        subtitle: EMBEDDED_DOC.subtitle || defaultState().subtitle,
+      };
+    }
+
+    function applyEmbeddedBranding(target) {
+      const branding = embeddedBranding();
+      target.title = branding.title;
+      target.subtitle = branding.subtitle;
+      return target;
+    }
+
+    function stateFromEmbedded() {
+      const base = defaultState();
+      applyEmbeddedBranding(base);
+      base.dataVersion = EMBEDDED_DOC.dataVersion;
+      base.sections = { ...base.sections, ...EMBEDDED_DOC.sections };
+      base.sourceImportedAt = new Date().toISOString();
+      return base;
+    }
+
+    function loadStateFromLocalStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return stateFromEmbedded();
+        const parsed = JSON.parse(raw);
+        if (!parsed.dataVersion || parsed.dataVersion < EMBEDDED_DOC.dataVersion) {
+          const merged = stateFromEmbedded();
+          merged.progress = parsed.progress || {};
+          merged.updatedAt = parsed.updatedAt;
+          merged.datePolicyVersion = parsed.datePolicyVersion ?? 0;
+          merged.sections = mergeSectionRows(stateFromEmbedded().sections, parsed.sections);
+          return merged;
+        }
+        const merged = { ...defaultState(), ...parsed, sections: { ...defaultState().sections, ...parsed.sections } };
+        merged.sections = mergeSectionRows(stateFromEmbedded().sections, merged.sections);
+        return merged;
+      } catch {
+        return stateFromEmbedded();
+      }
+    }
+
+    function mergeSectionRows(baseSections, overlaySections) {
+      if (!overlaySections) return baseSections;
+      const out = { ...baseSections };
+      SECTION_KEYS.forEach((key) => {
+        const base = baseSections[key];
+        const overlay = overlaySections[key];
+        if (!overlay?.rows?.length) {
+          out[key] = base;
+          return;
+        }
+        out[key] = {
+          headers: base.headers,
+          rows: base.rows.map((row, i) => ({ ...row, ...(overlay.rows[i] || {}) })),
+        };
+      });
+      return out;
+    }
+
+    function mergeRemotePayload(remote) {
+      const base = stateFromEmbedded();
+      const merged = {
+        ...base,
+        progress: remote.progress || {},
+        datePolicyVersion: remote.datePolicyVersion ?? 0,
+        title: base.title,
+        subtitle: base.subtitle,
+        updatedAt: remote.updatedAt,
+        sourceImportedAt: remote.sourceImportedAt ?? base.sourceImportedAt,
+      };
+      merged.sections = mergeSectionRows(base.sections, remote.sections);
+      merged.dataVersion = EMBEDDED_DOC.dataVersion;
+      return merged;
+    }
+
+    function isTimestampNewer(a, b) {
+      if (!a) return false;
+      if (!b) return true;
+      return Date.parse(a) > Date.parse(b);
+    }
+
+    async function loadStateAsync() {
+      let local = loadStateFromLocalStorage();
+      let remote = null;
+      try {
+        const res = await fetch(STATE_JSON_URL, { cache: "no-store" });
+        if (res.ok) remote = await res.json();
+      } catch (_) {
+        /* static hosting or offline */
+      }
+
+      if (!remote) return local;
+
+      const remoteTime = remote.updatedAt;
+      const localTime = local.updatedAt;
+      if (isTimestampNewer(remoteTime, localTime)) {
+        return mergeRemotePayload(remote);
+      }
+      return local;
+    }
+
+    function stateToJsonPayload() {
+      return {
+        version: 1,
+        updatedAt: state.updatedAt || new Date().toISOString(),
+        dataVersion: state.dataVersion,
+        datePolicyVersion: state.datePolicyVersion ?? 0,
+        title: state.title,
+        subtitle: state.subtitle,
+        progress: state.progress,
+        sections: state.sections,
+        sourceImportedAt: state.sourceImportedAt,
+      };
+    }
+
+    function setSyncStatus(mode) {
+      const el = document.getElementById("jsonSyncStatus");
+      if (!el) return;
+      const labels = {
+        synced: "state.json synced",
+        saving: "Saving state.json…",
+        pending: "Pending save…",
+        local: "state.json read-only (use npm start for auto-save)",
+        error: "state.json save failed — using browser cache",
+      };
+      el.textContent = labels[mode] || "";
+    }
+
+    async function probeJsonSyncApi() {
+      if (location.protocol === "file:") return false;
+      try {
+        const res = await fetch(STATE_API_URL, { method: "GET" });
+        return res.ok;
+      } catch {
+        return false;
+      }
+    }
+
+    async function pushStateToJsonApi() {
+      if (!jsonSyncCapable) return;
+      setSyncStatus("saving");
+      const body = JSON.stringify(stateToJsonPayload(), null, 2) + "\n";
+      try {
+        const res = await fetch(STATE_API_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body,
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        setSyncStatus("synced");
+      } catch (_) {
+        setSyncStatus("error");
+      }
+    }
+
+    function scheduleJsonSync() {
+      if (!jsonSyncCapable) return;
+      clearTimeout(jsonSyncTimer);
+      setSyncStatus("pending");
+      jsonSyncTimer = setTimeout(() => pushStateToJsonApi(), JSON_SYNC_DEBOUNCE_MS);
+    }
+
+    function saveState() {
+      state.updatedAt = new Date().toISOString();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const el = document.getElementById("lastSaved");
+      if (el) el.textContent = "Saved " + new Date().toLocaleString();
+      scheduleJsonSync();
+    }
+
+    async function boot() {
+      state = await loadStateAsync();
+      applyEmbeddedBranding(state);
+      jsonSyncCapable = await probeJsonSyncApi();
+      if (migrateNotesYesToCompleted()) saveState();
+      if (normalizeTrackerSchema()) saveState();
+      if (syncCompletionDates()) saveState();
+      renderAll();
+      if (jsonSyncCapable) {
+        if (!state.updatedAt || state.updatedAt === "1970-01-01T00:00:00.000Z") {
+          saveState();
+        } else {
+          setSyncStatus("synced");
+        }
+      } else {
+        setSyncStatus("local");
+      }
+    }
+
+    function rowId(section, index) {
+      return section + "::" + index;
+    }
+
+    function getProgress(id) {
+      return state.progress[id] || { completed: false, completedAt: null };
+    }
+
+    function hashString(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+      }
+      return Math.abs(h);
+    }
+
+    function tuesdayThursdayDatesLastTwoWeeks() {
+      const dates = [];
+      const anchor = new Date();
+      anchor.setHours(12, 0, 0, 0);
+      for (let offset = 0; offset < 14; offset++) {
+        const d = new Date(anchor);
+        d.setDate(anchor.getDate() - offset);
+        const weekday = d.getDay();
+        if (weekday === 2 || weekday === 4) dates.push(d);
+      }
+      return dates;
+    }
+
+    function isoAtNoon(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0).toISOString();
+    }
+
+    function tuesdayThursdayIsoForId(id) {
+      const options = tuesdayThursdayDatesLastTwoWeeks();
+      if (!options.length) return new Date().toISOString();
+      return isoAtNoon(options[hashString(id) % options.length]);
+    }
+
+    function randomTuesdayThursdayIso() {
+      const options = tuesdayThursdayDatesLastTwoWeeks();
+      if (!options.length) return new Date().toISOString();
+      return isoAtNoon(options[Math.floor(Math.random() * options.length)]);
+    }
+
+    function syncCompletionDates() {
+      const reassignAll = (state.datePolicyVersion || 0) < 1;
+      let changed = false;
+
+      SECTION_KEYS.forEach((sec) => {
+        state.sections[sec].rows.forEach((row, i) => {
+          const id = rowId(sec, i);
+          if (!isRowMarkedComplete(sec, i, row)) return;
+
+          const p = getProgress(id);
+          let completedAt = p.completedAt;
+
+          if (reassignAll || !completedAt) {
+            completedAt = reassignAll ? tuesdayThursdayIsoForId(id) : randomTuesdayThursdayIso();
+            state.progress[id] = { completed: true, completedAt };
+            changed = true;
+          } else if (!p.completed) {
+            state.progress[id] = { completed: true, completedAt };
+            changed = true;
+          }
+        });
+      });
+
+      if (reassignAll) {
+        state.datePolicyVersion = 1;
+        changed = true;
+      }
+      return changed;
+    }
+
+    function refreshCompletionViews() {
+      updateStats();
+      drawChart();
+    }
+
+    function effectiveCompletedDate(section, index, row) {
+      const id = rowId(section, index);
+      const p = getProgress(id);
+      if (p.completedAt) return p.completedAt.slice(0, 10);
+      const fromDoc = parseDocDate(row.notes ?? row.completed);
+      if (fromDoc && isRowDocComplete(row)) return fromDoc;
+      return null;
+    }
+
+    function isNotesColumn(header) {
+      const h = String(header).toLowerCase();
+      return h === "notes" || h.includes("complete");
+    }
+
+    function docCompletedValue(row) {
+      return (row.notes ?? row.completed ?? row.status ?? "").trim();
+    }
+
+    function isExactYesNotes(value) {
+      const s = String(value).trim();
+      return /^yes$/i.test(s) || /^y$/i.test(s);
+    }
+
+    function normalizeNotesText(value) {
+      if (isExactYesNotes(value)) return "Completed";
+      return value;
+    }
+
+    function displayNotesValue(row) {
+      return normalizeNotesText(docCompletedValue(row));
+    }
+
+    function sectionDisplayTitle(sectionLabel) {
+      return String(sectionLabel || "Other").replace(/^\d+\.\s*/, "").trim();
+    }
+
+    function normalizeTrackerSchema() {
+      let changed = false;
+      const virt = state.sections.virtualization;
+      const k8s = state.sections.kubernetes;
+      const virtHeaders = ["Criteria", "Description", "Success Criteria", "Notes"];
+      const k8sHeaders = ["Criteria", "Description", "Success Criteria", "Notes"];
+      if (JSON.stringify(virt.headers) !== JSON.stringify(virtHeaders)) {
+        virt.headers = virtHeaders;
+        changed = true;
+      }
+      if (JSON.stringify(k8s.headers) !== JSON.stringify(k8sHeaders)) {
+        k8s.headers = k8sHeaders;
+        changed = true;
+      }
+      virt.rows.forEach((row) => {
+        if (row.objective && !row.criteria) {
+          row.criteria = row.objective;
+          changed = true;
+        }
+      });
+      k8s.rows.forEach((row) => {
+        if (row.objective && !row.criteria) {
+          row.criteria = row.objective;
+          changed = true;
+        }
+      });
+      return changed;
+    }
+
+    function getDisplayHeaders(sec) {
+      return state.sections[sec].headers;
+    }
+
+    function cellValueForHeader(row, header) {
+      const key = headerToKey(header);
+      if (key === "criteria") return row.criteria ?? row.objective ?? row.item ?? "";
+      if (key === "section") return null;
+      return row[key] ?? "";
+    }
+
+    function criteriaLabel(row) {
+      return row.criteria ?? row.objective ?? row.item ?? "row";
+    }
+
+    function groupRowsBySection(sec) {
+      const rows = state.sections[sec].rows;
+      const groups = [];
+      const indexByKey = new Map();
+      rows.forEach((row, index) => {
+        const key = row.section || "Other";
+        if (!indexByKey.has(key)) {
+          const group = {
+            key,
+            title: sectionDisplayTitle(key),
+            items: [],
+          };
+          indexByKey.set(key, group);
+          groups.push(group);
+        }
+        indexByKey.get(key).items.push({ row, index });
+      });
+      return groups;
+    }
+
+    function migrateNotesYesToCompleted() {
+      let changed = false;
+      SECTION_KEYS.forEach((sec) => {
+        state.sections[sec].rows.forEach((row) => {
+          ["notes", "completed", "status"].forEach((key) => {
+            if (row[key] !== undefined && isExactYesNotes(row[key])) {
+              row[key] = "Completed";
+              changed = true;
+            }
+          });
+        });
+      });
+      return changed;
+    }
+
+    function autoResizeNotesField(el) {
+      if (!el) return;
+      el.style.height = "auto";
+      el.style.height = Math.max(el.scrollHeight, 44) + "px";
+    }
+
+    function isCompleteStatus(status) {
+      if (!status) return false;
+      const s = String(status).trim().toLowerCase();
+      if (!s) return false;
+      if (s === "completed" || s === "yes" || s === "y") return true;
+      if (s === "no" || s === "n") return false;
+      if (/need|testing|progress|more completion|partial|in progress/i.test(s)) return false;
+      return false;
+    }
+
+    function isRowDocComplete(row) {
+      return isCompleteStatus(docCompletedValue(row));
+    }
+
+    function isRowMarkedComplete(sec, index, row) {
+      const id = rowId(sec, index);
+      const p = getProgress(id);
+      return p.completed || isRowDocComplete(row);
+    }
+
+    function updateNotesDateHint(td, id) {
+      if (!td) return;
+      const tracked = getProgress(id).completedAt;
+      let hint = td.querySelector(".completed-date-hint");
+      if (tracked) {
+        if (!hint) {
+          hint = document.createElement("span");
+          hint.className = "completed-date-hint";
+          td.appendChild(hint);
+        }
+        hint.textContent = "Tracked: " + tracked.slice(0, 10);
+      } else if (hint) {
+        hint.remove();
+      }
+    }
+
+    function setRowCompletedText(sec, index, value) {
+      const row = state.sections[sec].rows[index];
+      const id = rowId(sec, index);
+      const normalized = normalizeNotesText(value);
+      row.notes = normalized;
+      row.completed = normalized;
+      if (row.status !== undefined) row.status = normalized;
+
+      const p = getProgress(id);
+      if (isCompleteStatus(normalized)) {
+        state.progress[id] = {
+          completed: true,
+          completedAt: p.completedAt || randomTuesdayThursdayIso(),
+        };
+      } else {
+        state.progress[id] = { completed: false, completedAt: null };
+      }
+      saveState();
+      refreshCompletionViews();
+    }
+
+    function applyCompletedInputStyle(input, row) {
+      const docVal = docCompletedValue(row);
+      input.classList.remove("status-yes", "status-partial");
+      if (isRowDocComplete(row)) input.classList.add("status-yes");
+      else if (docVal) input.classList.add("status-partial");
+    }
+
+    function parseDocDate(val) {
+      if (!val || !String(val).trim()) return null;
+      const s = String(val).trim();
+      const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (iso) return iso[0];
+      const us = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+      if (us) {
+        let y = parseInt(us[3], 10);
+        if (y < 100) y += 2000;
+        const m = String(us[1]).padStart(2, "0");
+        const d = String(us[2]).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+      }
+      const parsed = Date.parse(s);
+      if (!Number.isNaN(parsed)) return new Date(parsed).toISOString().slice(0, 10);
+      return null;
+    }
+
+    function hasData() {
+      return SECTION_KEYS.some((k) => state.sections[k].rows.length > 0);
+    }
+
+    function setUiVisibility() {
+      const show = hasData();
+      ["mainToolbar", "statsRow", "tabBar", "panel", "pageFooter"].forEach((id) => {
+        document.getElementById(id).hidden = !show;
+      });
+      const progress = document.getElementById("chartProgressBlock");
+      const upload = document.getElementById("documentUploadBlock");
+      if (progress) progress.hidden = !show;
+      if (upload) upload.style.borderBottom = show ? "" : "none";
+    }
+
+    function countStats() {
+      let total = 0;
+      let done = 0;
+      SECTION_KEYS.forEach((sec) => {
+        state.sections[sec].rows.forEach((row, i) => {
+          total++;
+          const id = rowId(sec, i);
+          const p = getProgress(id);
+          const completed = p.completed || isRowDocComplete(row);
+          if (completed) done++;
+        });
+      });
+      return { total, done, open: total - done, pct: total ? Math.round((done / total) * 100) : 0 };
+    }
+
+    function updateStats() {
+      const { total, done, open, pct } = countStats();
+      document.getElementById("statTotal").textContent = total;
+      document.getElementById("statDone").textContent = done;
+      document.getElementById("statOpen").textContent = open;
+      document.getElementById("statPct").textContent = pct + "%";
+    }
+
+    function chartStatusColors() {
+      const root = getComputedStyle(document.documentElement);
+      return {
+        completed: root.getPropertyValue("--chart-completed").trim() || "#003087",
+        inProgress: root.getPropertyValue("--chart-in-progress").trim() || "#0072ce",
+        open: root.getPropertyValue("--chart-open").trim() || "#ffffff",
+      };
+    }
+
+    function chartTheme() {
+      const root = getComputedStyle(document.documentElement);
+      return {
+        muted: root.getPropertyValue("--chart-muted").trim() || "#75787b",
+        border: root.getPropertyValue("--chart-border").trim() || "#d9dadc",
+        label: root.getPropertyValue("--text").trim() || "#151515",
+        emptyBar: root.getPropertyValue("--surface2").trim() || "#f2f2f2",
+      };
+    }
+
+    const CHART_WORKSTREAM_LABELS = {
+      virtualization: "Virtualization",
+      kubernetes: "Kubernetes",
+    };
+
+    const CHART_WORKSTREAM_ORDER = ["virtualization", "kubernetes"];
+
+    const CHART_STATUS_LABELS = {
+      completed: "Completed",
+      inProgress: "In progress",
+      open: "Open",
+    };
+
+    let chartBarHitRegions = [];
+
+    function rowStatusCategory(sec, row, index) {
+      const id = rowId(sec, index);
+      const p = getProgress(id);
+      if (p.completed || isRowDocComplete(row)) return "completed";
+      if (docCompletedValue(row)) return "inProgress";
+      return "open";
+    }
+
+    function workstreamStatusCounts(sec) {
+      const counts = { completed: 0, inProgress: 0, open: 0 };
+      state.sections[sec].rows.forEach((row, i) => {
+        counts[rowStatusCategory(sec, row, i)]++;
+      });
+      return counts;
+    }
+
+    function setupCanvas(canvas) {
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      return { ctx, W: rect.width, H: rect.height };
+    }
+
+    function drawEmptyChartMessage(ctx, W, H, message) {
+      ctx.fillStyle = chartTheme().muted;
+      ctx.font = "14px Red Hat Text, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(message, W / 2, H / 2);
+    }
+
+    function drawStackedBarRow(ctx, y, barX, barW, barH, counts, label, hitRegions) {
+      const total = counts.completed + counts.inProgress + counts.open;
+      const segments = [
+        { key: "completed", n: counts.completed },
+        { key: "inProgress", n: counts.inProgress },
+        { key: "open", n: counts.open },
+      ];
+
+      const colors = chartStatusColors();
+      const theme = chartTheme();
+
+      ctx.fillStyle = theme.label;
+      ctx.font = "12px Red Hat Text, system-ui, sans-serif";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, barX - 10, y + barH / 2);
+
+      ctx.strokeStyle = theme.border;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(barX, y, barW, barH);
+
+      if (!total) {
+        ctx.fillStyle = theme.emptyBar;
+        ctx.fillRect(barX + 1, y + 1, barW - 2, barH - 2);
+        return;
+      }
+
+      let x = barX + 1;
+      const innerW = barW - 2;
+      segments.forEach((seg) => {
+        if (!seg.n) return;
+        const w = (seg.n / total) * innerW;
+        const segY = y + 1;
+        const segH = barH - 2;
+        ctx.fillStyle = colors[seg.key];
+        ctx.fillRect(x, segY, w, segH);
+        hitRegions.push({
+          x,
+          y: segY,
+          w,
+          h: segH,
+          workstream: label,
+          statusLabel: CHART_STATUS_LABELS[seg.key],
+          count: seg.n,
+          total,
+        });
+        x += w;
+      });
+
+      const pct = Math.round((counts.completed / total) * 100);
+      ctx.fillStyle = theme.muted;
+      ctx.font = "11px Red Hat Text, system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(`${counts.completed}/${total} (${pct}%)`, barX + barW + 8, y + barH / 2);
+    }
+
+    function drawStatusBarChart() {
+      const canvas = document.getElementById("statusBarChart");
+      if (!canvas) return;
+      const { ctx, W, H } = setupCanvas(canvas);
+
+      const pad = { l: 108, r: 88, t: 8, b: 8 };
+      const barX = pad.l;
+      const barW = W - pad.l - pad.r;
+      const rowH = 36;
+      const gap = 20;
+      const rows = CHART_WORKSTREAM_ORDER.length;
+      const blockH = rows * rowH + (rows - 1) * gap;
+      let y0 = (H - blockH) / 2;
+
+      let hasRows = false;
+      CHART_WORKSTREAM_ORDER.forEach((sec) => {
+        if (state.sections[sec].rows.length) hasRows = true;
+      });
+      chartBarHitRegions = [];
+
+      if (!hasRows) {
+        drawEmptyChartMessage(ctx, W, H, "No criteria loaded yet.");
+        return;
+      }
+
+      CHART_WORKSTREAM_ORDER.forEach((sec) => {
+        const counts = workstreamStatusCounts(sec);
+        drawStackedBarRow(
+          ctx,
+          y0,
+          barX,
+          barW,
+          rowH,
+          counts,
+          CHART_WORKSTREAM_LABELS[sec],
+          chartBarHitRegions
+        );
+        y0 += rowH + gap;
+      });
+    }
+
+    function bindStatusBarChartHover() {
+      const canvas = document.getElementById("statusBarChart");
+      const tip = document.getElementById("statusBarChartTooltip");
+      if (!canvas || !tip || canvas.dataset.hoverBound) return;
+      canvas.dataset.hoverBound = "1";
+
+      canvas.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const hit = chartBarHitRegions.find(
+          (r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h
+        );
+        if (hit) {
+          canvas.style.cursor = "pointer";
+          tip.hidden = false;
+          const pct = hit.total ? Math.round((hit.count / hit.total) * 100) : 0;
+          tip.textContent = `${hit.statusLabel} — ${hit.workstream}: ${hit.count} of ${hit.total} (${pct}%)`;
+          tip.style.left = `${e.clientX + 12}px`;
+          tip.style.top = `${e.clientY + 12}px`;
+        } else {
+          canvas.style.cursor = "";
+          tip.hidden = true;
+        }
+      });
+
+      canvas.addEventListener("mouseleave", () => {
+        canvas.style.cursor = "";
+        tip.hidden = true;
+      });
+    }
+
+    function drawChart() {
+      drawStatusBarChart();
+    }
+
+    function createDataTableElement(displayHeaders) {
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      ["Done", ...displayHeaders].forEach((h) => {
+        const th = document.createElement("th");
+        th.textContent = h;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+      const tbody = document.createElement("tbody");
+      table.appendChild(tbody);
+      return { table, tbody };
+    }
+
+    function appendDataRow(sec, rowIndex, row, displayHeaders, tbody) {
+      const id = rowId(sec, rowIndex);
+      const p = getProgress(id);
+      const docDone = isRowDocComplete(row);
+      const completed = p.completed || docDone;
+      const hide = (globalHideCompleted || panelHideCompleted) && completed;
+
+      const tr = document.createElement("tr");
+      if (completed) tr.classList.add("row-done");
+      if (hide) tr.classList.add("row-hidden");
+
+      const checkTd = document.createElement("td");
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.className = "done-check";
+      cb.checked = completed;
+      cb.addEventListener("change", () => {
+        if (cb.checked) {
+          if (!docCompletedValue(row)) {
+            row.notes = "Completed";
+            row.completed = "Completed";
+            if (row.status !== undefined) row.status = "Completed";
+          }
+          state.progress[id] = {
+            completed: true,
+            completedAt: p.completedAt || randomTuesdayThursdayIso(),
+          };
+        } else {
+          state.progress[id] = { completed: false, completedAt: null };
+        }
+        saveState();
+        refreshRowDoneState(tr, sec, rowIndex, cb);
+        document.getElementById("tabSummary").textContent = tabSummaryText(sec);
+        refreshCompletionViews();
+        const notesEl = tr.querySelector(".completed-input");
+        if (notesEl) {
+          notesEl.value = displayNotesValue(row);
+          autoResizeNotesField(notesEl);
+          applyCompletedInputStyle(notesEl, row);
+        }
+        updateNotesDateHint(tr.querySelector("td.completed-cell"), id);
+      });
+      checkTd.appendChild(cb);
+      tr.appendChild(checkTd);
+
+      displayHeaders.forEach((h) => {
+        const td = document.createElement("td");
+        const val = cellValueForHeader(row, h);
+        const hLow = h.toLowerCase();
+        if (isNotesColumn(h)) {
+          td.classList.add("completed-cell");
+          const input = document.createElement("textarea");
+          input.className = "completed-input";
+          input.value = displayNotesValue(row);
+          input.placeholder = "e.g. Completed, In progress…";
+          input.setAttribute("aria-label", "Notes for " + criteriaLabel(row));
+          applyCompletedInputStyle(input, row);
+          autoResizeNotesField(input);
+          input.addEventListener("input", () => autoResizeNotesField(input));
+          input.addEventListener("change", () => {
+            const normalized = normalizeNotesText(input.value);
+            if (normalized !== input.value) input.value = normalized;
+            setRowCompletedText(sec, rowIndex, input.value);
+            applyCompletedInputStyle(input, state.sections[sec].rows[rowIndex]);
+            refreshRowDoneState(tr, sec, rowIndex, cb);
+            document.getElementById("tabSummary").textContent = tabSummaryText(sec);
+            updateNotesDateHint(td, rowId(sec, rowIndex));
+            autoResizeNotesField(input);
+          });
+          td.appendChild(input);
+          const tracked = getProgress(rowId(sec, rowIndex)).completedAt;
+          if (tracked) {
+            const hint = document.createElement("span");
+            hint.className = "completed-date-hint";
+            hint.textContent = "Tracked: " + tracked.slice(0, 10);
+            td.appendChild(hint);
+          }
+        } else if (hLow === "criteria" || hLow === "objective") {
+          td.classList.add("item-cell");
+          td.textContent = val;
+        } else {
+          td.textContent = val ?? "";
+        }
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+      return { completed, hidden: hide };
+    }
+
+    function renderTable() {
+      const sec = activeTab;
+      const section = state.sections[sec];
+      const mount = document.getElementById("tablesContainer");
+      mount.innerHTML = "";
+      const columnHeaders = getDisplayHeaders(sec);
+
+      if (!section.rows.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = "No rows for this tab. Re-import the document export.";
+        mount.appendChild(empty);
+        document.getElementById("tabSummary").textContent = "";
+        return;
+      }
+
+      if (sec === "virtualization") {
+        const groups = groupRowsBySection(sec);
+        groups.forEach((group) => {
+          const block = document.createElement("section");
+          block.className = "section-block";
+          const heading = document.createElement("h3");
+          heading.textContent = group.title;
+          block.appendChild(heading);
+          const { table, tbody } = createDataTableElement(columnHeaders);
+          group.items.forEach(({ row, index }) => {
+            appendDataRow(sec, index, row, columnHeaders, tbody);
+          });
+          block.appendChild(table);
+          mount.appendChild(block);
+        });
+      } else {
+        const block = document.createElement("section");
+        block.className = "section-block";
+        const { table, tbody } = createDataTableElement(columnHeaders);
+        section.rows.forEach((row, i) => {
+          appendDataRow(sec, i, row, columnHeaders, tbody);
+        });
+        block.appendChild(table);
+        mount.appendChild(block);
+      }
+
+      document.getElementById("tabSummary").textContent = tabSummaryText(sec);
+    }
+
+    function refreshRowDoneState(tr, sec, index, checkbox) {
+      const row = state.sections[sec].rows[index];
+      const id = rowId(sec, index);
+      const p = getProgress(id);
+      const completed = p.completed || isRowDocComplete(row);
+      checkbox.checked = completed;
+      tr.classList.toggle("row-done", completed);
+      const hide = (globalHideCompleted || panelHideCompleted) && completed;
+      tr.classList.toggle("row-hidden", hide);
+    }
+
+    function tabSummaryText(sec) {
+      const section = state.sections[sec];
+      let visible = 0;
+      let doneCount = 0;
+      section.rows.forEach((row, i) => {
+        const id = rowId(sec, i);
+        const p = getProgress(id);
+        const completed = p.completed || isRowDocComplete(row);
+        if (completed) doneCount++;
+        const hide = (globalHideCompleted || panelHideCompleted) && completed;
+        if (!hide) visible++;
+      });
+      return `${visible} shown · ${doneCount}/${section.rows.length} complete in ${SECTION_LABELS[sec]}`;
+    }
+
+    function headerToKey(h) {
+      return String(h).toLowerCase().replace(/\s+/g, "_").replace(/[^\w]/g, "");
+    }
+
+    let lastReportHtml = "";
+
+    function otherWorkstreamKey(tab) {
+      return tab === "virtualization" ? "kubernetes" : "virtualization";
+    }
+
+    function workstreamsForReportScope(scope) {
+      if (scope === "both") return [...SECTION_KEYS];
+      if (scope === "other") return [otherWorkstreamKey(activeTab)];
+      return [activeTab];
+    }
+
+    function reportRowStatusLabel(sec, index, row) {
+      const cat = rowStatusCategory(sec, row, index);
+      return CHART_STATUS_LABELS[cat];
+    }
+
+    function reportIncludeRow(sec, index, row) {
+      return !isRowMarkedComplete(sec, index, row);
+    }
+
+    function buildReportRowGroups(sec) {
+      const section = state.sections[sec];
+      const headers = getDisplayHeaders(sec);
+      const groups = [];
+
+      if (sec === "virtualization") {
+        const bySection = groupRowsBySection(sec);
+        bySection.forEach((group) => {
+          const rows = [];
+          group.items.forEach(({ index, row }) => {
+            if (reportIncludeRow(sec, index, row)) rows.push({ index, row });
+          });
+          if (rows.length) groups.push({ title: group.title, headers, rows });
+        });
+        return groups;
+      }
+
+      const rows = [];
+      section.rows.forEach((row, i) => {
+        if (reportIncludeRow(sec, i, row)) rows.push({ index: i, row });
+      });
+      if (rows.length) groups.push({ title: null, headers, rows });
+      return groups;
+    }
+
+    function buildReportHtml(scope) {
+      const tabs = workstreamsForReportScope(scope);
+      const title = escapeHtml(state.title || embeddedBranding().title);
+      const subtitle = escapeHtml(state.subtitle || "");
+      const generated = new Date().toLocaleString();
+      const parts = [];
+
+      parts.push(`<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#151515;line-height:1.45;margin:0;padding:16px;">`);
+      parts.push(`<h1 style="color:#003087;font-size:22px;margin:0 0 8px;">${title}</h1>`);
+      if (subtitle) parts.push(`<p style="color:#75787b;margin:0 0 16px;">${subtitle}</p>`);
+      parts.push(`<p style="color:#75787b;font-size:13px;margin:0 0 20px;">Generated ${escapeHtml(generated)} · Open and in-progress items only</p>`);
+
+      tabs.forEach((sec) => {
+        const groups = buildReportRowGroups(sec);
+        if (!groups.length) return;
+        parts.push(`<h2 style="color:#0072ce;font-size:18px;margin:28px 0 12px;border-bottom:1px solid #d9dadc;padding-bottom:6px;">${escapeHtml(SECTION_LABELS[sec] || sec)}</h2>`);
+        groups.forEach((group) => {
+          if (group.title) {
+            parts.push(`<h3 style="font-size:15px;margin:18px 0 8px;">${escapeHtml(group.title)}</h3>`);
+          }
+          parts.push(`<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;">`);
+          parts.push(`<thead><tr>`);
+          parts.push(`<th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">Status</th>`);
+          group.headers.forEach((h) => {
+            parts.push(`<th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">${escapeHtml(h)}</th>`);
+          });
+          parts.push(`</tr></thead><tbody>`);
+          group.rows.forEach(({ index, row }) => {
+            parts.push(`<tr>`);
+            parts.push(`<td style="border:1px solid #d9dadc;padding:8px;vertical-align:top;">${escapeHtml(reportRowStatusLabel(sec, index, row))}</td>`);
+            group.headers.forEach((h) => {
+              const val = cellValueForHeader(row, h);
+              const notes = isNotesColumn(h) ? displayNotesValue(row) : val;
+              parts.push(`<td style="border:1px solid #d9dadc;padding:8px;vertical-align:top;">${escapeHtml(notes ?? "")}</td>`);
+            });
+            parts.push(`</tr>`);
+          });
+          parts.push(`</tbody></table>`);
+        });
+      });
+
+      parts.push(`</body></html>`);
+      return parts.join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function openReportModal() {
+      const modal = document.getElementById("reportModal");
+      document.getElementById("reportScopeActiveLabel").textContent =
+        `This tab (${SECTION_LABELS[activeTab]})`;
+      document.getElementById("reportScopeOtherLabel").textContent =
+        `Other tab (${SECTION_LABELS[otherWorkstreamKey(activeTab)]})`;
+      document.getElementById("reportPreview").hidden = true;
+      document.getElementById("reportModalActions").hidden = true;
+      lastReportHtml = "";
+      modal.hidden = false;
+    }
+
+    function closeReportModal() {
+      document.getElementById("reportModal").hidden = true;
+    }
+
+    function selectedReportScope() {
+      const picked = document.querySelector('input[name="reportScope"]:checked');
+      return picked ? picked.value : "active";
+    }
+
+    async function copyReportHtml(html) {
+      try {
+        if (navigator.clipboard.write && window.ClipboardItem) {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              "text/html": new Blob([html], { type: "text/html" }),
+              "text/plain": new Blob([html], { type: "text/plain" }),
+            }),
+          ]);
+          return;
+        }
+      } catch (_) {
+        /* fallback */
+      }
+      await navigator.clipboard.writeText(html);
+    }
+
+    function downloadReportHtml(html) {
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function renderAll() {
+      document.getElementById("pageTitle").textContent = state.title || defaultState().title;
+      const sub = document.getElementById("pageSubtitle");
+      if (sub && state.subtitle) {
+        const link = sub.querySelector("a");
+        sub.textContent = state.subtitle + " ";
+        if (link) sub.appendChild(link);
+      }
+      setUiVisibility();
+      updateStats();
+      drawChart();
+      renderTable();
+      saveState();
+    }
+
+    function detectSection(line) {
+      const t = line.trim().toLowerCase();
+      if (/virtualization/.test(t) && /poc|doc/.test(t)) return "virtualization";
+      if (/^virtualization\b/.test(t) || t === "virtualization") return "virtualization";
+      if (/kubernetes/.test(t) && /poc|doc/.test(t)) return "kubernetes";
+      if (/^kubernetes\b/.test(t) || t === "kubernetes" || /^k8s\b/.test(t)) return "kubernetes";
+      return null;
+    }
+
+    function parseWorkstreamDirective(line) {
+      const m = line.match(/^@(?:workstream|tab)\s+(.+)$/i);
+      if (!m) return null;
+      const label = m[1].trim();
+      const direct = detectSection(label);
+      if (direct) return direct;
+      const t = label.toLowerCase();
+      if (/virt|kubevirt|ove/.test(t)) return "virtualization";
+      if (/k8s|kubernetes|oke/.test(t)) return "kubernetes";
+      return null;
+    }
+
+    function parseSectionDirective(line) {
+      const m = line.match(/^@section\s+(.+)$/i);
+      return m ? m[1].trim() : null;
+    }
+
+    function parseCheckboxLine(line) {
+      const m = line.match(/^[\s]*(?:[\u2610\u2611\u2713\u2714]|\[[ xX]\]|[-*•])\s*(.+)$/);
+      if (!m) return null;
+      const rest = m[1].trim();
+      const done = /^[\u2611\u2713\u2714]/.test(line) || /^\[[xX]\]/.test(line);
+      return { item: rest, status: done ? "Complete" : "" };
+    }
+
+    function splitRow(line) {
+      if (line.includes("\t")) return line.split("\t").map((c) => c.trim());
+      if (line.includes("|")) {
+        const parts = line.split("|").map((c) => c.trim());
+        if (parts[0] === "") parts.shift();
+        if (parts[parts.length - 1] === "") parts.pop();
+        return parts;
+      }
+      return null;
+    }
+
+    function normalizeHeaders(cells) {
+      return cells.map((c, i) => {
+        const t = c.trim();
+        if (!t) return `Column ${i + 1}`;
+        return t;
+      });
+    }
+
+    function cellsToRow(headers, cells) {
+      const row = { cells };
+      headers.forEach((h, i) => {
+        row[headerToKey(h)] = cells[i] ?? "";
+      });
+      const itemKey = headerToKey(headers[0]);
+      if (!row.item && row[itemKey]) row.item = row[itemKey];
+      return row;
+    }
+
+    function parsePlainText(text) {
+      const lines = text.split(/\r?\n/);
+      let title = null;
+      const sections = {
+        virtualization: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
+        kubernetes: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
+      };
+      let current = null;
+      let headers = null;
+      let currentRowSection = null;
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        const workstream = parseWorkstreamDirective(trimmed);
+        if (workstream) {
+          current = workstream;
+          headers = null;
+          currentRowSection = null;
+          continue;
+        }
+
+        const sectionTag = parseSectionDirective(trimmed);
+        if (sectionTag) {
+          currentRowSection = sectionTag;
+          if (!current) current = "virtualization";
+          continue;
+        }
+
+        if (!title && trimmed.length < 120 && !trimmed.includes("\t") && !/^\d+\./.test(trimmed)) {
+          const sec = detectSection(trimmed);
+          if (!sec) {
+            title = trimmed;
+            continue;
+          }
+        }
+
+        const secSwitch = detectSection(trimmed);
+        if (secSwitch) {
+          current = secSwitch;
+          headers = null;
+          continue;
+        }
+
+        if (!current) continue;
+
+        const cols = splitRow(line);
+        if (cols && cols.length >= 2) {
+          const maybeHeader = cols.every((c) => c.length < 40) &&
+            cols.some((c) => /owner|status|item|task|notes|complete|due|date/i.test(c));
+          if (maybeHeader && !headers) {
+            headers = normalizeHeaders(cols);
+            sections[current].headers = headers;
+            continue;
+          }
+          const useHeaders = headers || sections[current].headers;
+          const row = cellsToRow(useHeaders, cols);
+          if (currentRowSection) row.section = currentRowSection;
+          sections[current].rows.push(row);
+          continue;
+        }
+
+        const chk = parseCheckboxLine(line);
+        if (chk) {
+          const useHeaders = sections[current].headers;
+          const cells = [chk.item, "", chk.status, "", chk.status === "Complete" ? new Date().toISOString().slice(0, 10) : ""];
+          const row = cellsToRow(useHeaders, cells);
+          if (currentRowSection) row.section = currentRowSection;
+          sections[current].rows.push(row);
+        }
+      }
+
+      return { title, sections };
+    }
+
+    function parseHtmlExport(html) {
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const titleEl = doc.querySelector("title");
+      let title = titleEl ? titleEl.textContent.trim() : null;
+
+      const sections = {
+        virtualization: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
+        kubernetes: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
+      };
+
+      let current = null;
+      const elements = [...doc.body.querySelectorAll("h1,h2,h3,h4,p,table")];
+
+      for (const el of elements) {
+        const text = (el.textContent || "").trim();
+        if (!text) continue;
+        const tag = el.tagName.toLowerCase();
+        if (tag.startsWith("h") || (tag === "p" && text.length < 80)) {
+          const sec = detectSection(text);
+          if (sec) {
+            current = sec;
+            if (!title && tag === "h1") title = text;
+            continue;
+          }
+        }
+        if (!current || el.tagName !== "TABLE") continue;
+
+        const rows = [...el.querySelectorAll("tr")];
+        if (!rows.length) continue;
+        let headers = null;
+        rows.forEach((tr, ri) => {
+          const cells = [...tr.querySelectorAll("td,th")].map((c) => c.textContent.trim());
+          if (!cells.length) return;
+          const isHeaderRow = ri === 0 && [...tr.querySelectorAll("th")].length > 0;
+          if (isHeaderRow || (ri === 0 && cells.some((c) => /owner|status|item|complete/i.test(c)))) {
+            headers = normalizeHeaders(cells);
+            sections[current].headers = headers;
+            return;
+          }
+          const useHeaders = headers || sections[current].headers;
+          sections[current].rows.push(cellsToRow(useHeaders, cells));
+        });
+      }
+
+      if (!sections.virtualization.rows.length && !sections.kubernetes.rows.length) {
+        const tables = [...doc.querySelectorAll("table")];
+        if (tables.length >= 2) {
+          current = "virtualization";
+          tables.forEach((table, ti) => {
+            current = ti === 0 ? "virtualization" : "kubernetes";
+            if (ti > 1) return;
+            let headers = null;
+            [...table.querySelectorAll("tr")].forEach((tr, ri) => {
+              const cells = [...tr.querySelectorAll("td,th")].map((c) => c.textContent.trim());
+              if (!cells.length) return;
+              if (ri === 0) {
+                headers = normalizeHeaders(cells);
+                sections[current].headers = headers;
+                return;
+              }
+              sections[current].rows.push(cellsToRow(headers || sections[current].headers, cells));
+            });
+          });
+          if (tables.length > 1) {
+            current = "kubernetes";
+            let headers = null;
+            [...tables[1].querySelectorAll("tr")].forEach((tr, ri) => {
+              const cells = [...tr.querySelectorAll("td,th")].map((c) => c.textContent.trim());
+              if (!cells.length) return;
+              if (ri === 0) {
+                headers = normalizeHeaders(cells);
+                sections.kubernetes.headers = headers;
+                return;
+              }
+              sections.kubernetes.rows.push(cellsToRow(headers || sections.kubernetes.headers, cells));
+            });
+          }
+        }
+      }
+
+      return { title, sections };
+    }
+
+    function applyImport(result) {
+      if (result.title) {
+        state.title = result.title.replace(/\s*-\s*Google Docs\s*$/i, "").trim();
+        if (!/virtualization|kubernetes|workstream|tracker|migration|platform/i.test(state.title)) {
+          state.title = result.title + " — Workstream Tracker";
+        }
+      }
+      SECTION_KEYS.forEach((k) => {
+        if (result.sections[k].rows.length) {
+          state.sections[k] = result.sections[k];
+        }
+      });
+      state.sourceImportedAt = new Date().toISOString();
+      saveState();
+      renderAll();
+    }
+
+    function handleFile(file, kind) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = reader.result;
+        const result = kind === "html" ? parseHtmlExport(text) : parsePlainText(text);
+        const count = SECTION_KEYS.reduce((n, k) => n + result.sections[k].rows.length, 0);
+        if (!count) {
+          alert("No Virtualization or Kubernetes tables found. Export the full doc (all tabs) and try again.");
+          return;
+        }
+        applyImport(result);
+      };
+      reader.readAsText(file);
+    }
+
+    function pickImportKind(file) {
+      const name = (file.name || "").toLowerCase();
+      if (name.endsWith(".html") || name.endsWith(".htm")) return "html";
+      return "txt";
+    }
+
+    document.getElementById("btnUploadDocument").addEventListener("click", () => {
+      document.getElementById("fileUpload").click();
+    });
+    document.getElementById("btnImportTxt").addEventListener("click", () => document.getElementById("fileTxt").click());
+    document.getElementById("btnImportHtml").addEventListener("click", () => document.getElementById("fileHtml").click());
+    document.getElementById("fileUpload").addEventListener("change", (e) => {
+      const f = e.target.files[0];
+      if (f) handleFile(f, pickImportKind(f));
+      e.target.value = "";
+    });
+    document.getElementById("fileTxt").addEventListener("change", (e) => {
+      const f = e.target.files[0];
+      if (f) handleFile(f, "txt");
+      e.target.value = "";
+    });
+    document.getElementById("fileHtml").addEventListener("change", (e) => {
+      const f = e.target.files[0];
+      if (f) handleFile(f, "html");
+      e.target.value = "";
+    });
+
+    document.getElementById("btnReset").addEventListener("click", () => {
+      if (!confirm("Clear all imported rows and completion progress in this browser?")) return;
+      state = stateFromEmbedded();
+      saveState();
+      renderAll();
+    });
+
+    function closeAppMenu() {
+      const toggle = document.getElementById("menuToggle");
+      const menu = document.getElementById("appMenu");
+      if (!toggle || !menu) return;
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Open menu");
+      menu.hidden = true;
+    }
+
+    function openAppMenu() {
+      const toggle = document.getElementById("menuToggle");
+      const menu = document.getElementById("appMenu");
+      toggle.setAttribute("aria-expanded", "true");
+      toggle.setAttribute("aria-label", "Close menu");
+      menu.hidden = false;
+    }
+
+    document.getElementById("menuToggle").addEventListener("click", (e) => {
+      e.stopPropagation();
+      const expanded = document.getElementById("menuToggle").getAttribute("aria-expanded") === "true";
+      if (expanded) closeAppMenu();
+      else openAppMenu();
+    });
+
+    document.addEventListener("click", (e) => {
+      const wrap = document.querySelector(".menu-wrap");
+      if (wrap && !wrap.contains(e.target)) closeAppMenu();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeAppMenu();
+    });
+
+    document.getElementById("btnShowAll").addEventListener("click", () => {
+      globalHideCompleted = false;
+      panelHideCompleted = false;
+      document.getElementById("hideCompletedPanel").checked = false;
+      renderTable();
+      closeAppMenu();
+    });
+
+    document.getElementById("btnHideCompleted").addEventListener("click", () => {
+      globalHideCompleted = true;
+      panelHideCompleted = true;
+      document.getElementById("hideCompletedPanel").checked = true;
+      renderTable();
+      closeAppMenu();
+    });
+
+    document.getElementById("hideCompletedPanel").addEventListener("change", (e) => {
+      panelHideCompleted = e.target.checked;
+      renderTable();
+    });
+
+    document.getElementById("btnReimport").addEventListener("click", () => {
+      closeAppMenu();
+      document.getElementById("documentUploadBlock").scrollIntoView({ behavior: "smooth" });
+    });
+
+    document.getElementById("btnEmailReport").addEventListener("click", () => {
+      closeAppMenu();
+      openReportModal();
+    });
+
+    document.getElementById("btnReportPreview").addEventListener("click", () => {
+      lastReportHtml = buildReportHtml(selectedReportScope());
+      const preview = document.getElementById("reportPreview");
+      if (!lastReportHtml.includes("<table")) {
+        preview.textContent = "No open or in-progress items for this scope.";
+        lastReportHtml = "";
+      } else {
+        preview.innerHTML = lastReportHtml;
+      }
+      preview.hidden = false;
+      document.getElementById("reportModalActions").hidden = false;
+    });
+
+    document.getElementById("btnReportCopy").addEventListener("click", async () => {
+      if (!lastReportHtml) return;
+      try {
+        await copyReportHtml(lastReportHtml);
+      } catch {
+        alert("Could not copy to clipboard. Try Download HTML instead.");
+      }
+    });
+
+    document.getElementById("btnReportDownload").addEventListener("click", () => {
+      if (!lastReportHtml) return;
+      downloadReportHtml(lastReportHtml);
+    });
+
+    document.getElementById("btnReportClose").addEventListener("click", closeReportModal);
+    document.getElementById("reportModalBackdrop").addEventListener("click", closeReportModal);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !document.getElementById("reportModal").hidden) closeReportModal();
+    });
+
+    document.querySelectorAll(".tab").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        btn.classList.add("active");
+        activeTab = btn.dataset.tab;
+        renderTable();
+      });
+    });
+
+    window.addEventListener("resize", () => drawChart());
+
+    bindStatusBarChartHover();
+    boot();
+  </script>
+</body>
+</html>

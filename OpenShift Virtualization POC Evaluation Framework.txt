@@ -1,0 +1,548 @@
+﻿POC Doc - Kubernetes
+OpenShift POC Evaluation Framework - Kubernetes
+This Proof of Concept (POC) evaluation framework guides the validation of OpenShift Kubernetes Engine (OKE). The goal is to prove functional parity, operational readiness, performance, and enterprise viability.
+
+
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+ 
+	Infrastructure Management
+	Deploy an OpenShift cluster on Bare Metal utilizing IPI or Assisted installer methodology. Deliver hands-on Knowledge Transfer and Mentoring to EPROD staff as part of the Installation Process. Customize OpenShift configuration suitable to meet EPOD internal requirements for the POC.
+	Working Openshift Cluster running on bare metal, based on OCP 4.latest release. Knowledge transfer on using OpenShift IPI or Assisted Installer installation.
+	Yes
+	Self-service provisioning and management
+	End Users will be able to provision virtual machines for the use of Cluster Control Nodes by provisioning their own Virtual Machines using OpenShift Console. Users will only be able to see and control workloads in their own namespaces.
+	Provision a virtual machine on Red Hat OpenShift for the purpose of a cluster control node for additional OpenShift clusters. Demonstrate isolation between OpenShift Namespaces.
+	
+
+	Deploy and Configure Advanced Cluster Management
+	End users will be able to deploy Advanced Cluster Management in OpenShift which in turn will assist in provisioning new clusters in the OpenShift environment.
+	Demonstrate cluster management capabilities with Advanced Cluster Management.
+	Yes
+	Networking Validation
+	Administration of the network stack in OpenShift to validate integration with current networking schema, VLANs, etc. Validation of traffic in and out of current networking. Users will validate VLAN-backed networks, IP retention, north-south/east-west traffic, and load balancer/DNS integration.
+	Ability to create and understand network stack in OpenShift. Validation of network communication in and out of the OpenShift cluster from current networking schema. DNS and load balancer configuration works as intended within customer's network.
+	Needs more completion - testing app access
+	Storage Validation
+	Users will test storage classes, persistent volume behavior, snapshots, cloning.
+	Backend storage successfully integrates with OpenShift. Storage classes successfully created and used in the environment.
+	Yes
+	High Availability and Resiliency Test
+	Users will test node failures, VM restart behaviors, live migrations, and pod/VM rescheduling.
+	OpenShift is able to withstand a node failure. OpenShift successfully moves pods from one node to another on necessity. OpenShift can live migrate workloads from one node to another.
+	
+
+	Day 2 Operations
+	Users will test the day 2 operations of OpenShift to validate required company policies are within standard operating procedure.
+	Validate the lifecycle for control planes. Monitoring and centralized logging. RBAC requirements for the cluster. Security context constraints. AD/LDAP integration.
+	
+
+	Cost and Resource Efficiency
+	Evaluate compute density capabilities.
+	OpenShift works within a 4 to 1 ratio of compute overcommit.
+	
+
+	Replication / DR Testing
+	Replication set up on Storage Arrays / Successful testing of moving a target from “Prod” environment to “DR”.
+	The target is seen, started, and validated to run correctly on the “DR” environment
+	Yes
+	
+
+	
+
+	
+
+	
+
+	POC Doc - Virtualization
+OpenShift Virtualization POC Evaluation Framework
+This Proof of Concept (POC) evaluation framework guides the migration validation from VMware vSphere to OpenShift Virtualization (KubeVirt). The goal is to prove functional parity, operational readiness, performance, and enterprise viability.
+1. Core Functional Parity
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	VM Workload Import
+	Import and execute virtual machines from VMware using Migration Toolkit for Virtualization (MTV).
+	VM boots cleanly post-migration without manual intervention.
+	yes
+	Workload Type Validation
+	Validate support for Windows, Linux, RDS/VDI-type workloads, and high-IO SQL deployments.
+	Applications run without modification, performance degradation, or database errors.
+	no
+	Storage & Drive Handling
+	Validate multi-disk management (adding, removing, expanding) and pulling encrypted keys for Windows drives.
+	Multi-disk configurations expand gracefully; encrypted drives mount successfully post-migration.
+	Need to test encryption and VMs with RDMs.
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Migration Process Validation (MTV / Forklift)
+
+
+Objective
+	Description
+	Success Criteria
+	completed
+	Migration Execution Types
+	Test and evaluate cold and warm (incremental) migration workflows.
+	Data sync completes accurately with predictable execution timelines.
+	Yes 
+	Bulk Migration & Parallelism
+	Run parallel migration jobs for batch VM transfers.
+	Parallel migrations complete without cluster resource exhaustion or job failures.
+	Yes
+	
+
+
+
+3. Networking Equivalency - Next week targets (sept 30)
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	L2 & Multi-NIC Topologies
+	Validate VLAN-backed networks, multiple NICs per VM
+NOTE: specialized traffic modes (e.g., promiscuous mode, forged transmits, or port mirroring) needs a conversation.
+	Network segmentation behaves as expected with no packet loss or unexpected dropped frames.
+	yes
+	Traffic Flow & Routing
+	Test North-South external access paths and East-West VM-to-VM/VM-to-Pod traffic.
+	Applications remain reachable on existing IP schemes without anomalous network latency.
+	no
+	Infrastructure Integration
+	Integrate VMs with external infrastructure services including enterprise load balancers, DNS, and firewalls.
+	External routes and firewall rules route traffic seamlessly to migrated VMs.
+	yes
+	4. Storage Validation
+
+
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	Storage Class Compatibility
+	Validate Block storage behavior 
+	Stable disk persistence across pod/VM restarts and host reboots.
+	yes
+	Snapshot & Volume Lifecycle
+	Run VM-level snapshots, volume cloning, and restore workflows.
+	Snapshot creation and restoration operate reliably without volume corruption.
+	Snapshots need more testing
+
+
+	Enterprise Backup Integration
+	Evaluate third-party backup platform integrations (e.g., Cohesity) leveraging Changed Block Tracking (CBT).
+	Backups complete efficiently with full VM and file-level recovery options verified.
+	Yes - needs more testing - in progress
+	5. High Availability & Resiliency
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	Node Failure Recovery
+	Simulate hard node failure (power off) to evaluate automatic VM restart behavior on surviving nodes.
+	Automatic VM restart succeeds within SLA timeframes without data corruption.
+	
+
+	Live Migration & Evacuation
+	Evaluate live migration capabilities during scheduled node maintenance or manual evacuation.
+	Live migration completes without dropped connections or state loss.
+	
+
+	Resource Balancing & Placement
+	Run VM scheduling, node labels/selectors, resource limits/requests, and the Descheduler for load balancing.
+	Pod/VM rescheduling balances cluster density efficiently while honoring affinity rules.
+	
+
+	6. Day-2 Operations & Management
+
+
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	VM Lifecycle & Patching
+	Validate standard administrative workflows (create, resize, delete) alongside OS and cluster patching.
+	Routine operations complete cleanly without impacting running workloads.
+	
+
+	Observability & Logging
+	Validate native Prometheus/Grafana metrics monitoring and centralized logging integration.
+	Operational visibility matches or exceeds legacy vCenter metrics and alert coverage.
+	
+
+	Role-Based Access Control
+	Implement RBAC policies separating cluster administration from tenant workload management.
+	Users access only permitted namespaces and resources with zero privilege escalation risks.
+	
+
+	________________
+7. Automation, API, & Scripting
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	Command Line & API Control
+	Run VM lifecycle operations via command line (oc, virtctl) and Kubernetes REST APIs.
+	APIs respond consistently and enable scriptable infrastructure management.
+	
+
+	Enterprise Automation
+	Integrate VM management into automated orchestrators (e.g., Ansible Automation Platform).
+	End-to-end VM provisioning and management workflows run without manual intervention.
+	
+
+	8. Security & Compliance
+
+
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	Network Security Policies
+	Validate network isolation policies between namespaces, tenants, and external networks.
+	Micro-segmentation blocks unauthorized traffic between workloads.
+	
+
+	Identity & Access Management
+	Integrate OpenShift with corporate Active Directory/LDAP directory services.
+	Authenticated users map to proper cluster roles and namespace permissions seamlessly.
+	
+
+	9. Cost & Resource Efficiency
+
+
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	Workload Density
+	Evaluate node-level VM capacity, memory overcommit ratios, and CPU allocation efficiency.
+	Resource utilization improves compared to legacy vSphere density metrics.
+	
+
+	TCO Justification
+	Compare hardware and licensing footprint requirements against business outcomes.
+	Measurable reduction or optimization in overall licensing and operational footprint.
+	
+
+	________________
+10. Admin Enablement & Usability
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	Skill Baseline & Gap Assessment
+	Identify existing Kubernetes knowledge gaps across current vSphere administrators.
+	Training needs are identified and documented with clear enablement paths.
+	
+
+	Ease of Use & Runbook Creation
+	Work directly with admins to simplify day-to-day operations and develop standard operating runbooks.
+	Admin team manages, troubleshoots, and operates OpenShift Virtualization without external help.
+	
+
+	11. POC Exit Criteria
+
+
+Objective
+	Description
+	Success Criteria
+	Completed
+	Workload Migration Target
+	Successfully migrate a representative subset of targeted production-style workloads.
+	90–95% of target workloads run stably in OpenShift Virtualization.
+	
+
+	Operational Sign-Off
+	Gain complete sign-off across HA, disaster recovery, backup/restore, monitoring, and security.
+	Ops and Security teams formally sign off on manageability and compliance.
+	
+
+	
+
+VMware description table
+
+
+VMware (vSphere)
+	OpenShift Virtualization (KubeVirt)
+	Notes / Key Differences
+	vCenter Server
+	OpenShift API Server + Web Console
+	Central control plane; OpenShift is Kubernetes-native and API-driven
+	ESXi Host
+	Kubernetes Worker Node
+	Nodes run both containers and VMs
+	Cluster (vSphere)
+	OpenShift Cluster
+	No strict separation of compute types (containers + VMs share cluster)
+	Resource Pool
+	Namespace / Project + ResourceQuota
+	Resource control via quotas and limits instead of hierarchical pools
+	Virtual Machine (VM)
+	VirtualMachine (VM CRD)
+	Declarative YAML object; backed by a VirtualMachineInstance
+	Running VM Instance
+	VirtualMachineInstance (VMI)
+	Equivalent to powered-on VM
+	vCPU / Memory تخصيص
+	CPU/Memory Requests & Limits
+	Scheduled via Kubernetes scheduler; overcommit behavior differs
+	VM Template
+	Template / VM YAML / Golden Image
+	OpenShift templates or GitOps-managed YAML
+	OVA/OVF Templates
+	CDI (Containerized Data Importer) + Images
+	Images imported into PVCs
+	vMotion
+	Live Migration
+	Supported, but requires shared storage and config
+	Storage vMotion
+	Not directly equivalent
+	Requires re-provisioning via PVC/storage class change
+	Datastore (VMFS/NFS/vSAN)
+	PersistentVolume (PV) via StorageClass
+	Backed by Ceph, NFS, iSCSI, etc.
+	VMDK File
+	PVC-backed disk (volume)
+	Abstracted—no direct disk file management
+	Snapshot (VMware)
+	VolumeSnapshot / VM Snapshot
+	Depends on CSI driver support
+	Linked Clone
+	Clone via PVC / Golden Image
+	No direct linked clone; cloning is storage-driven
+	Instant Clone (Horizon)
+	Not native
+	Requires automation/pipelines; no direct equivalent today
+	VM Network (Port Group)
+	NetworkAttachmentDefinition (Multus)
+	Supports multiple networks per VM
+	Distributed vSwitch (DVS)
+	OVN-Kubernetes / Multus CNI
+	Software-defined networking managed by Kubernetes
+	NSX-T
+	OVN-Kubernetes + NetworkPolicies
+	No full 1:1 NSX feature parity (e.g., microseg advanced features differ)
+	Firewall Rules (NSX)
+	Kubernetes NetworkPolicies
+	Layer 3/4 policies; less granular than NSX in some areas
+	Load Balancer (NSX/AVI)
+	OpenShift Routes / Services / External LB
+	Often integrates with F5, MetalLB, or cloud LB
+	VMware Tools
+	qemu-guest-agent + cloud-init
+	Required for guest interaction
+	Customization Spec
+	cloud-init / ignition
+	Used for VM initialization
+	DRS (Distributed Resource Scheduler)
+	Kubernetes Scheduler
+	Placement based on resources and policies, less VM-aware tuning
+	Affinity / Anti-Affinity Rules
+	NodeAffinity / PodAffinity / VM scheduling rules
+	Achieves similar placement control
+	HA (vSphere HA)
+	Kubernetes rescheduling + VM restart
+	No exact equivalent; relies on K8s self-healing
+	DR (SRM)
+	OpenShift DR tools (ODF DR, ACM)
+	Different tooling and workflows
+	vSAN
+	OpenShift Data Foundation (Ceph)
+	Hyperconverged storage equivalent
+	vRealize Operations
+	Prometheus + Grafana + OpenShift Monitoring
+	Metrics-focused; less VM-centric by default
+	vRealize Automation (vRA)
+	OpenShift Pipelines / GitOps (ArgoCD) / Ansible
+	Infrastructure as Code replaces GUI workflows
+	PowerCLI
+	oc CLI / kubectl + REST API
+	Strong API-first automation model
+	vCenter Roles & Permissions
+	RBAC (RoleBindings, ClusterRoles)
+	Fine-grained but different operational model
+	Folders (VM organization)
+	Namespaces / Labels
+	Logical grouping via labels and projects
+	Tags
+	Labels / Annotations
+	Used heavily for automation and selection
+	Alarms (vCenter)
+	Alertmanager (Prometheus Alerts)
+	Alerting pipeline is metric-based
+	Lifecycle Manager (LCM)
+	OpenShift Operator Lifecycle Manager (OLM)
+	Handles cluster/operator updates
+	
+
+
+
+
+
+
+
+
+
+Key Conceptual Differences (Important for POC)
+
+
+1. VMs are not first-class—Kubernetes objects are
+VMware = VM-centric
+OpenShift = API-driven, declarative infrastructure
+Everything is YAML-backed
+
+
+
+Storage abstraction is much stronger
+No direct disk/file manipulation (like VMDK)
+Everything = Persistent Volumes via StorageClasses
+ 
+3. Networking is CNI-based
+Multus enables multi-NIC VMs
+No direct “port group” mindset—network definitions are declarative
+ 
+4. Scheduling model is different
+VMware DRS = VM-aware placement
+Kubernetes = resource-based scheduling (CPU/memory, affinity rules)
+ 
+5. Automation replaces GUI workflows
+Given your PowerCLI background, this is critical:
+govc / PowerCLI → oc / kubectl + API + GitOps
+Expect to shift to: 
+YAML definitions
+CI/CD pipelines
+Declarative infra
+ 
+⚠️ Gaps / Things to Validate in Your POC
+Based on real-world migrations, pay attention to:
+❗ No direct equivalent to Instant Clone (Horizon)
+❗ Limited NSX feature parity (especially microsegmentation depth)
+❗ Storage vMotion–like capabilities are not native
+❗ DRS-like optimization is simpler
+❗ Operational complexity shifts to Kubernetes skillset
+
+
+Key Concepts
+OpenShift Virtualization vs. VMware: Architectural & Operational Framework
+This document outlines the core paradigm shifts and platform gaps when transitioning from VMware vSphere to OpenShift Virtualization (KubeVirt). It establishes the evaluation criteria required to validate operational readiness and architecture alignment during the Proof of Concept (POC).
+1. Architectural & Conceptual Paradigm Shifts
+Understand the core operational changes when moving from traditional virtualization to container-native infrastructure.
+
+
+Concept
+	Description
+	Success Criteria
+	Object Primitives
+	Infrastructure shifts from VM-centric constructs to API-driven, declarative Kubernetes objects backed by YAML definitions.
+	Infrastructure is managed completely via declarative YAML manifests and versioned configuration files.
+	Storage Abstraction
+	Eliminates direct virtual disk manipulation (e.g., VMDK editing) in favor of StorageClass-driven Persistent Volume Claims (PVCs).
+	Disk provisioning and attachment occur seamlessly through Kubernetes StorageClasses without manual host-level file intervention.
+	CNI Networking
+	Replaces vSphere port groups with Container Network Interface (CNI) abstractions and Multus for multi-NIC VM attachments.
+	Declarative NetworkAttachmentDefinitions route traffic to secondary and primary VM interfaces without packet drop.
+	Scheduling Dynamics
+	Shifts from VMware Distributed Resource Scheduler (DRS) logic to Kubernetes resource-based placement utilizing CPU/RAM requests, limits, and affinity rules.
+	Node placement, taints, and tolerations correctly distribute VM workloads across cluster nodes.
+	Automation Model
+	Replaces vSphere GUI, govc, and PowerCLI workflows with oc/kubectl CLI tools, REST APIs, and GitOps pipelines.
+	Day-to-day VM lifecycle management is fully automated via GitOps and scriptable API calls.
+	2. Platform Gaps & POC Validation Objectives
+Specific functional areas where OpenShift Virtualization differs from vSphere, requiring validation during the POC.
+
+
+Evaluation Area
+	Description
+	Success Criteria
+	VDI & Instant Clones
+	Assess non-persistent desktop and rapid cloning capabilities, as there is no direct native equivalent to VMware Horizon Instant Clones.
+	Alternative provisioning strategies (e.g., CSI cloning, templates, or AAP workflows) meet speed and scale requirements.
+	Microsegmentation Depth
+	Evaluate native OVN-Kubernetes network policies against legacy VMware NSX security capabilities.
+	Enterprise security isolation rules can be enforced effectively using native Kubernetes NetworkPolicies or service meshes.
+	Live Storage Migration
+	Test storage mobility and volume migration options, as native, real-time Storage vMotion equivalent capabilities differ.
+	Storage re-allocation or volume cloning workflows satisfy maintenance SLAs without unacceptable application downtime.
+	Dynamic Workload Balancing
+	Test node rebalancing and resource optimization using the Kubernetes Descheduler in place of VMware DRS.
+	Cluster automatically reschedules and rebalances VM pods across available nodes during resource contention.
+	Admin Skill Alignment
+	Transition existing VMware admin operations to a declarative Kubernetes-centric operational model.
+	Operations team establishes functional proficiency with Kubernetes concepts, runbooks, and troubleshooting procedures.
+	
+
+VDI / Cirtix stuff
+VDI / Cirtix stuff
+
+
+https://docs.citrix.com/en-us/citrix-virtual-apps-desktops/install-configure/install-prepare/red-hat-open-shift.html
+
+
+https://docs.google.com/document/d/1SIaB_eOvisyq1zDlq40bBiPEf8btluDGzijDmD2AWMs/edit?usp=sharing
+
+
+Notes
+Notes
+
+
+* CBT is not enabled by default - theyre going to have to enable this through change controls
+* Work with app teams and jeremy to script and enable
+
+
+* Cohesity with CBT is already in testing
+* Warm migrations - 
+   * Cold migrations are faster due to networking speeds 
+   * Documentation states this is better anyways 
+      * Time is in converting the disk
+* Need to pull in windows isos
+*

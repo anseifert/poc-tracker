@@ -1,0 +1,8 @@
+{
+  "name": "poc-tracker",
+  "private": true,
+  "scripts": {
+    "postinstall": "node scripts/ensure-state.mjs",
+    "start": "node server.mjs"
+  }
+}

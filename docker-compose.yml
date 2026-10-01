@@ -1,0 +1,14 @@
+services:
+  poc-tracker:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DATA_DIR: /data
+      PORT: 8080
+    volumes:
+      - poc_tracker_state:/data
+    restart: unless-stopped
+
+volumes:
+  poc_tracker_state:

@@ -24,6 +24,22 @@ const MIME = {
   ".txt": "text/plain; charset=utf-8",
 };
 
+function extractGoogleDocId(url) {
+  const s = String(url || "").trim();
+  const m1 = s.match(/\/document\/d\/([a-zA-Z0-9_-]+)/);
+  if (m1) return m1[1];
+  const m2 = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m2) return m2[1];
+  return null;
+}
+
+async function readJsonBody(req) {
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const body = Buffer.concat(chunks).toString("utf8");
+  return JSON.parse(body);
+}
+
 function safePath(urlPath) {
   const rel = urlPath === "/" ? INDEX : decodeURIComponent(urlPath).replace(/^\/+/, "");
   const resolved = path.resolve(ROOT, rel);
@@ -52,19 +68,56 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (url.pathname === "/api/state" && req.method === "PUT") {
-    const chunks = [];
-    for await (const chunk of req) chunks.push(chunk);
-    const body = Buffer.concat(chunks).toString("utf8");
+  if (url.pathname === "/api/import-google-doc" && req.method === "POST") {
+    let payload;
     try {
-      JSON.parse(body);
+      payload = await readJsonBody(req);
+    } catch {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Invalid JSON body" }));
+      return;
+    }
+    const docId = extractGoogleDocId(payload.url);
+    if (!docId) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Could not read a Google Doc ID from that URL." }));
+      return;
+    }
+    const exportUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+    try {
+      const upstream = await fetch(exportUrl, { redirect: "follow" });
+      if (!upstream.ok) {
+        res.writeHead(502, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            error:
+              "Could not download the document. Share it as “Anyone with the link can view” and try again.",
+          })
+        );
+        return;
+      }
+      const text = await upstream.text();
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ text }));
+    } catch {
+      res.writeHead(502, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Network error while fetching Google Doc export." }));
+    }
+    return;
+  }
+
+  if (url.pathname === "/api/state" && req.method === "PUT") {
+    let payload;
+    try {
+      payload = await readJsonBody(req);
     } catch {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Invalid JSON" }));
       return;
     }
+    const body = JSON.stringify(payload, null, 2) + "\n";
     await fs.mkdir(DATA_DIR, { recursive: true });
-    await fs.writeFile(STATE_FILE, body.endsWith("\n") ? body : body + "\n");
+    await fs.writeFile(STATE_FILE, body);
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ ok: true }));
     return;

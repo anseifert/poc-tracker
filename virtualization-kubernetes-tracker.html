@@ -141,7 +141,8 @@
       top: calc(100% + 0.35rem);
       right: 0;
       z-index: 20;
-      min-width: 12rem;
+      min-width: 15rem;
+      max-width: min(20rem, 92vw);
       padding: 0.35rem;
       background: var(--surface);
       border: 1px solid var(--border);
@@ -153,6 +154,24 @@
 
     .app-menu[hidden] {
       display: none;
+    }
+
+    .app-menu-help {
+      margin: 0.15rem 0.5rem 0.35rem;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .app-menu-help code {
+      font-size: 0.72rem;
+    }
+
+    .app-menu-divider {
+      height: 1px;
+      margin: 0.25rem 0.35rem;
+      background: var(--border);
+      border: none;
     }
 
     .app-menu button {
@@ -528,48 +547,94 @@
       th, td { padding: 0.5rem 0.55rem; }
     }
 
-    .document-upload-block {
+    .import-source-block {
+      padding: 0.25rem 0 0.5rem;
+    }
+
+    .import-mode-tabs {
+      display: flex;
+      gap: 0.35rem;
       margin-bottom: 1rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
     }
 
-    .document-upload-block h3 {
-      margin: 0 0 0.5rem;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .document-upload-block p,
-    .document-upload-block pre {
-      margin: 0 0 0.75rem;
-      color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.5;
-    }
-
-    .document-upload-block pre {
-      background: var(--surface2);
+    .import-mode {
+      padding: 0.45rem 0.85rem;
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 0.65rem 0.75rem;
-      font-size: 0.78rem;
-      overflow-x: auto;
+      background: var(--surface2);
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
     }
 
-    .document-upload-actions {
+    .import-mode.active {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--rh-gray-30);
+      box-shadow: inset 0 -2px 0 var(--eprod-enterprise-blue, #003087);
+    }
+
+    .import-panel label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .import-panel input[type="url"] {
+      width: 100%;
+      font: inherit;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+    }
+
+    .import-panel textarea {
+      width: 100%;
+      font: inherit;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.65rem;
+      resize: vertical;
+      min-height: 10rem;
+    }
+
+    .import-hint,
+    .import-status {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 0 0 0.75rem;
+      line-height: 1.45;
+    }
+
+    .import-status.error {
+      color: var(--rh-red-60);
+    }
+
+    .import-panel-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
       align-items: center;
-    }
-
-    .document-upload-actions .muted-link {
-      font-size: 0.85rem;
-      color: var(--muted);
+      margin-top: 0.15rem;
     }
 
     #chartProgressBlock[hidden] {
+      display: none !important;
+    }
+
+    #tabBar[hidden],
+    #tabBar:not(.has-workstreams) {
       display: none !important;
     }
 
@@ -652,10 +717,10 @@
         <div>
           <h1 id="pageTitle">POC Evaluation Tracker</h1>
           <p class="subtitle" id="pageSubtitle">
-            Upload a tab-delimited evaluation document to define workstreams, sections, and criteria.
+            Import a Google Doc or markdown evaluation framework to get started.
           </p>
         </div>
-        <div class="menu-wrap" id="mainToolbar" hidden>
+        <div class="menu-wrap" id="mainToolbar">
           <button
             type="button"
             class="hamburger"
@@ -669,10 +734,11 @@
             <span></span>
           </button>
           <nav id="appMenu" class="app-menu" hidden>
-            <button type="button" id="btnShowAll">Show all rows</button>
-            <button type="button" id="btnHideCompleted">Hide all completed</button>
-            <button type="button" id="btnReimport">Upload document</button>
-            <button type="button" id="btnEmailReport">Email report…</button>
+            <button type="button" id="btnReset" title="Clear imported rows and completion progress">Reset all data</button>
+            <div class="app-menu-divider" id="appMenuDataDivider" hidden role="separator"></div>
+            <button type="button" id="btnShowAll" data-requires-data hidden>Show all rows</button>
+            <button type="button" id="btnHideCompleted" data-requires-data hidden>Hide all completed</button>
+            <button type="button" id="btnEmailReport" data-requires-data hidden>Email report…</button>
           </nav>
         </div>
       </div>
@@ -686,26 +752,45 @@
     </div>
 
     <div class="chart-card" id="chartCard">
-      <div id="documentUploadBlock" class="document-upload-block">
-        <h3>Upload evaluation document</h3>
-        <p>
-          Use a <strong>tab-delimited</strong> plain-text file (.txt or .tsv). Switch workstreams with
-          <code>@workstream</code> lines, group criteria with <code>@section</code>, then a header row and data rows.
-          Google Doc exports (.txt / .html) are also supported.
-        </p>
-        <pre>@workstream Virtualization
-@section 1. Core functional parity
-Criteria	Description	Success Criteria	Notes
-…</pre>
-        <div class="document-upload-actions import-actions">
-          <button type="button" class="primary" id="btnUploadDocument">Choose file…</button>
-          <button type="button" id="btnImportTxt">Google Doc .txt</button>
-          <button type="button" id="btnImportHtml">Google Doc .html</button>
-          <button type="button" id="btnReset" title="Clear imported rows and completion progress">Reset all data</button>
+      <div id="importSourceBlock" class="import-source-block">
+        <div class="import-mode-tabs" role="tablist" aria-label="Import source">
+          <button type="button" class="import-mode active" data-import-mode="gdoc" role="tab" aria-selected="true">Google Doc</button>
+          <button type="button" class="import-mode" data-import-mode="markdown" role="tab" aria-selected="false">Markdown</button>
         </div>
-        <input type="file" id="fileUpload" accept=".txt,.tsv,.html,.htm,text/plain,text/tab-separated-values,text/html" hidden />
-        <input type="file" id="fileTxt" accept=".txt,text/plain" hidden />
-        <input type="file" id="fileHtml" accept=".html,.htm,text/html" hidden />
+        <div id="importPanelGdoc" class="import-panel" role="tabpanel">
+          <label for="googleDocUrl">Google Doc URL</label>
+          <input
+            type="url"
+            id="googleDocUrl"
+            name="googleDocUrl"
+            placeholder="https://docs.google.com/document/d/…/edit"
+            autocomplete="off"
+          />
+          <p class="import-hint">
+            Paste the share link to your evaluation doc. The doc must be shared so
+            <strong>anyone with the link can view</strong> (the app downloads the plain-text export via the server).
+            Use <code>npm start</code> or Docker — opening the HTML file directly cannot import from Google.
+          </p>
+          <button type="button" class="primary" id="btnImportGoogleDoc">Import from Google Doc</button>
+          <p id="importGoogleDocStatus" class="import-status" hidden></p>
+        </div>
+        <div id="importPanelMarkdown" class="import-panel" role="tabpanel" hidden>
+          <label for="markdownSource">Markdown</label>
+          <textarea
+            id="markdownSource"
+            placeholder="## Virtualization&#10;### 1. Core functional parity&#10;| Criteria | Description | Success Criteria | Notes |&#10;| --- | --- | --- | --- |&#10;| VM import | … | … | … |"
+          ></textarea>
+          <p class="import-hint">
+            Paste below or choose a <code>.md</code> file (see <code>example-evaluation.md</code> in the repo).
+            Use <code>##</code> for workstreams, <code>###</code> for sections, and tables for criteria.
+          </p>
+          <div class="import-panel-actions">
+            <button type="button" class="primary" id="btnImportMarkdown">Import pasted markdown</button>
+            <button type="button" id="btnChooseMarkdownFile">Choose .md file…</button>
+          </div>
+          <input type="file" id="fileMarkdown" accept=".md,.markdown,text/markdown,text/plain" hidden />
+          <p id="importMarkdownStatus" class="import-status" hidden></p>
+        </div>
       </div>
       <div id="chartProgressBlock" hidden>
         <h2>POC progress by workstream</h2>
@@ -761,7 +846,7 @@ Criteria	Description	Success Criteria	Notes
     </footer>
   </div>
 
-  <script id="embedded-doc-data" type="application/json">{"dataVersion":5,"title":"POC Evaluation Tracker","subtitle":"Upload a tab-delimited evaluation document to define workstreams, sections, and criteria.","sections":{"virtualization":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[]},"kubernetes":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[]}}}</script>
+  <script id="embedded-doc-data" type="application/json">{"dataVersion":5,"title":"POC Evaluation Tracker","subtitle":"Import a Google Doc or markdown evaluation framework to get started.","sections":{"virtualization":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[]},"kubernetes":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[]}}}</script>
   <script>
     const EMBEDDED_DOC = JSON.parse(document.getElementById('embedded-doc-data').textContent);
     const STORAGE_KEY = "poc-tracker-v1";
@@ -781,7 +866,7 @@ Criteria	Description	Success Criteria	Notes
     function defaultState() {
       return {
         title: "POC Evaluation Tracker",
-        subtitle: "Upload a tab-delimited evaluation document to define workstreams, sections, and criteria.",
+        subtitle: "Import a Google Doc or markdown evaluation framework to get started.",
         dataVersion: 0,
         sourceImportedAt: null,
         sections: {
@@ -812,7 +897,6 @@ Criteria	Description	Success Criteria	Notes
       applyEmbeddedBranding(base);
       base.dataVersion = EMBEDDED_DOC.dataVersion;
       base.sections = { ...base.sections, ...EMBEDDED_DOC.sections };
-      base.sourceImportedAt = new Date().toISOString();
       return base;
     }
 
@@ -969,6 +1053,7 @@ Criteria	Description	Success Criteria	Notes
     async function boot() {
       state = await loadStateAsync();
       applyEmbeddedBranding(state);
+      setUiVisibility();
       jsonSyncCapable = await probeJsonSyncApi();
       if (migrateNotesYesToCompleted()) saveState();
       if (normalizeTrackerSchema()) saveState();
@@ -1272,15 +1357,54 @@ Criteria	Description	Success Criteria	Notes
       return SECTION_KEYS.some((k) => state.sections[k].rows.length > 0);
     }
 
+    function workstreamsWithData() {
+      return SECTION_KEYS.filter((k) => state.sections[k].rows.length > 0);
+    }
+
+    function syncTabBar() {
+      const tabBar = document.getElementById("tabBar");
+      const withData = workstreamsWithData();
+      const showTabs = withData.length > 0;
+      tabBar.hidden = !showTabs;
+      tabBar.classList.toggle("has-workstreams", showTabs);
+
+      document.querySelectorAll("#tabBar .tab").forEach((btn) => {
+        const key = btn.dataset.tab;
+        const visible = withData.includes(key);
+        btn.hidden = !visible;
+        btn.style.display = visible ? "" : "none";
+      });
+
+      if (!showTabs) return;
+
+      if (!withData.includes(activeTab)) {
+        activeTab = withData[0];
+      }
+      document.querySelectorAll("#tabBar .tab").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tab === activeTab);
+      });
+    }
+
+    function syncAppMenuForData() {
+      const show = hasData();
+      document.querySelectorAll("[data-requires-data]").forEach((el) => {
+        el.hidden = !show;
+      });
+      const divider = document.getElementById("appMenuDataDivider");
+      if (divider) divider.hidden = !show;
+    }
+
     function setUiVisibility() {
       const show = hasData();
-      ["mainToolbar", "statsRow", "tabBar", "panel", "pageFooter"].forEach((id) => {
+      ["statsRow", "panel", "pageFooter"].forEach((id) => {
         document.getElementById(id).hidden = !show;
       });
+      syncTabBar();
+      syncAppMenuForData();
       const progress = document.getElementById("chartProgressBlock");
-      const upload = document.getElementById("documentUploadBlock");
+      const importBlock = document.getElementById("importSourceBlock");
       if (progress) progress.hidden = !show;
-      if (upload) upload.style.borderBottom = show ? "" : "none";
+      if (importBlock) importBlock.hidden = show;
     }
 
     function countStats() {
@@ -1614,6 +1738,10 @@ Criteria	Description	Success Criteria	Notes
     }
 
     function renderTable() {
+      if (!hasData()) {
+        document.getElementById("tablesContainer").innerHTML = "";
+        return;
+      }
       const sec = activeTab;
       const section = state.sections[sec];
       const mount = document.getElementById("tablesContainer");
@@ -2088,49 +2216,190 @@ Criteria	Description	Success Criteria	Notes
       renderAll();
     }
 
-    function handleFile(file, kind) {
+    function importResultRowCount(result) {
+      return SECTION_KEYS.reduce((n, k) => n + result.sections[k].rows.length, 0);
+    }
+
+    function setImportStatus(el, message, isError) {
+      if (!el) return;
+      if (!message) {
+        el.hidden = true;
+        el.textContent = "";
+        el.classList.remove("error");
+        return;
+      }
+      el.hidden = false;
+      el.textContent = message;
+      el.classList.toggle("error", Boolean(isError));
+    }
+
+    function tryApplyImport(result, statusEl) {
+      if (!importResultRowCount(result)) {
+        setImportStatus(
+          statusEl,
+          "No Virtualization or Kubernetes criteria found. Check workstream headings and tables.",
+          true
+        );
+        return false;
+      }
+      setImportStatus(statusEl, "", false);
+      applyImport(result);
+      return true;
+    }
+
+    function parseMarkdown(text) {
+      const lines = String(text).split(/\r?\n/);
+      let docTitle = null;
+      const out = [];
+      let tableActive = false;
+
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t) {
+          tableActive = false;
+          continue;
+        }
+        if (/^#\s+/.test(t) && !/^##/.test(t)) {
+          docTitle = t.replace(/^#\s+/, "").trim();
+          tableActive = false;
+          continue;
+        }
+        if (/^##\s+/.test(t)) {
+          tableActive = false;
+          out.push(t.replace(/^##\s+/, "").trim());
+          continue;
+        }
+        if (/^###\s+/.test(t)) {
+          tableActive = false;
+          out.push("@section " + t.replace(/^###\s+/, "").trim());
+          continue;
+        }
+        if (/^@(?:workstream|tab|section)\b/i.test(t)) {
+          tableActive = false;
+          out.push(t);
+          continue;
+        }
+        if (t.includes("|")) {
+          if (/^[\s|:\-]+$/.test(t.replace(/\|/g, ""))) continue;
+          const cells = t
+            .split("|")
+            .map((c) => c.trim())
+            .filter((c, i, arr) => !(i === 0 && c === "") && !(i === arr.length - 1 && c === ""));
+          if (cells.length >= 2) {
+            out.push(cells.join("\t"));
+            tableActive = true;
+          }
+          continue;
+        }
+        if (t.includes("\t")) {
+          tableActive = false;
+          out.push(t);
+        }
+      }
+
+      const result = parsePlainText(out.join("\n"));
+      if (docTitle && !result.title) result.title = docTitle;
+      return result;
+    }
+
+    async function importGoogleDocFromUrl() {
+      const status = document.getElementById("importGoogleDocStatus");
+      const url = document.getElementById("googleDocUrl").value.trim();
+      if (!url) {
+        setImportStatus(status, "Paste a Google Doc URL.", true);
+        return;
+      }
+      if (location.protocol === "file:") {
+        setImportStatus(status, "Run npm start or Docker to import from Google Docs.", true);
+        return;
+      }
+      setImportStatus(status, "Fetching document…", false);
+      const btn = document.getElementById("btnImportGoogleDoc");
+      if (btn) btn.disabled = true;
+      try {
+        const res = await fetch("/api/import-google-doc", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Import failed");
+        tryApplyImport(parsePlainText(data.text), status);
+      } catch (err) {
+        setImportStatus(status, err.message || "Import failed.", true);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function importMarkdownContent(raw) {
+      const status = document.getElementById("importMarkdownStatus");
+      const text = String(raw || "").trim();
+      if (!text) {
+        setImportStatus(status, "Paste markdown or choose a .md file to import.", true);
+        return;
+      }
+      tryApplyImport(parseMarkdown(text), status);
+    }
+
+    function importMarkdownFromTextarea() {
+      importMarkdownContent(document.getElementById("markdownSource").value);
+    }
+
+    function setImportMode(mode) {
+      const gdoc = mode === "gdoc";
+      document.getElementById("importPanelGdoc").hidden = !gdoc;
+      document.getElementById("importPanelMarkdown").hidden = gdoc;
+      document.querySelectorAll(".import-mode").forEach((btn) => {
+        const active = btn.dataset.importMode === mode;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-selected", active ? "true" : "false");
+      });
+    }
+
+    document.querySelectorAll(".import-mode").forEach((btn) => {
+      btn.addEventListener("click", () => setImportMode(btn.dataset.importMode));
+    });
+
+    document.getElementById("btnImportGoogleDoc").addEventListener("click", () => {
+      importGoogleDocFromUrl();
+    });
+
+    document.getElementById("btnImportMarkdown").addEventListener("click", () => {
+      importMarkdownFromTextarea();
+    });
+
+    document.getElementById("btnChooseMarkdownFile").addEventListener("click", () => {
+      document.getElementById("fileMarkdown").click();
+    });
+
+    document.getElementById("fileMarkdown").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      e.target.value = "";
+      if (!file) return;
+      const status = document.getElementById("importMarkdownStatus");
       const reader = new FileReader();
       reader.onload = () => {
         const text = reader.result;
-        const result = kind === "html" ? parseHtmlExport(text) : parsePlainText(text);
-        const count = SECTION_KEYS.reduce((n, k) => n + result.sections[k].rows.length, 0);
-        if (!count) {
-          alert("No Virtualization or Kubernetes tables found. Export the full doc (all tabs) and try again.");
-          return;
-        }
-        applyImport(result);
+        document.getElementById("markdownSource").value = text;
+        setImportStatus(status, `Loaded ${file.name} — importing…`, false);
+        importMarkdownContent(text);
+      };
+      reader.onerror = () => {
+        setImportStatus(status, "Could not read that file.", true);
       };
       reader.readAsText(file);
-    }
+    });
 
-    function pickImportKind(file) {
-      const name = (file.name || "").toLowerCase();
-      if (name.endsWith(".html") || name.endsWith(".htm")) return "html";
-      return "txt";
-    }
-
-    document.getElementById("btnUploadDocument").addEventListener("click", () => {
-      document.getElementById("fileUpload").click();
-    });
-    document.getElementById("btnImportTxt").addEventListener("click", () => document.getElementById("fileTxt").click());
-    document.getElementById("btnImportHtml").addEventListener("click", () => document.getElementById("fileHtml").click());
-    document.getElementById("fileUpload").addEventListener("change", (e) => {
-      const f = e.target.files[0];
-      if (f) handleFile(f, pickImportKind(f));
-      e.target.value = "";
-    });
-    document.getElementById("fileTxt").addEventListener("change", (e) => {
-      const f = e.target.files[0];
-      if (f) handleFile(f, "txt");
-      e.target.value = "";
-    });
-    document.getElementById("fileHtml").addEventListener("change", (e) => {
-      const f = e.target.files[0];
-      if (f) handleFile(f, "html");
-      e.target.value = "";
+    document.getElementById("googleDocUrl").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        importGoogleDocFromUrl();
+      }
     });
 
     document.getElementById("btnReset").addEventListener("click", () => {
+      closeAppMenu();
       if (!confirm("Clear all imported rows and completion progress in this browser?")) return;
       state = stateFromEmbedded();
       saveState();
@@ -2189,11 +2458,6 @@ Criteria	Description	Success Criteria	Notes
     document.getElementById("hideCompletedPanel").addEventListener("change", (e) => {
       panelHideCompleted = e.target.checked;
       renderTable();
-    });
-
-    document.getElementById("btnReimport").addEventListener("click", () => {
-      closeAppMenu();
-      document.getElementById("documentUploadBlock").scrollIntoView({ behavior: "smooth" });
     });
 
     document.getElementById("btnEmailReport").addEventListener("click", () => {

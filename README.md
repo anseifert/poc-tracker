@@ -32,20 +32,36 @@ On the empty home screen, set an optional **POC title**, then choose one of thre
 1. **Import from URL** — paste the Google Doc share link and click **Import from URL**. Requires `npm start` or Docker (the server fetches a **Markdown** export). The doc must be shared so **anyone with the link can view**.
 2. **Upload from computer** — in Google Docs use **File → Download → Markdown**, then **Upload from computer…** and choose the `.md` file. Works without the import API (static hosting is read-only for progress).
 
-After import, the **Approve workstreams** dialog lists each detected workstream (tab/heading). Check or uncheck tabs, edit names, then **Import selected**.
+After import, the **Approve workstreams** dialog lists each detected workstream. Check or uncheck entries, edit names, then **Import selected**.
+
+**How Google Doc tabs map to workstreams:** File → Download → Markdown produces a **single** `.md` file. Multi-tab docs usually repeat a top-level `#` heading per tab. The importer recognizes that pattern automatically:
+
+| In the downloaded `.md` | Becomes |
+|-------------------------|---------|
+| `# POC Doc - Kubernetes` (or `- Virtualization`, etc.) | Workstream named after the suffix (**Kubernetes**, **Virtualization**, …) |
+| `# OpenShift … Evaluation Framework - …` immediately under a POC Doc line | Document subtitle only (not a separate workstream) |
+| Other `# …` headings (e.g. appendix tabs) | Workstreams named from the heading text |
+| `##` / `###` under a tab | **Sections** inside the current workstream |
+| Tables | Criteria rows (headers taken from the table; **Objective** maps to **Criteria**, **Completed** to **Notes**) |
+
+URL import uses the same Markdown parser as upload.
 
 ### Markdown
 
 Switch to the **Markdown** tab, paste content (or choose a `.md` file), and click **Import pasted markdown**. Same approval step for workstreams.
 
-Document shape:
+**Classic markdown** (single workstream doc, e.g. `example-evaluation.md`):
 
-- `#` title (optional)
-- `##` headings → workstreams (any names; not limited to Virtualization/Kubernetes)
-- `###` headings → sections within a workstream
-- Markdown tables → criteria rows (column headers come from the table; common columns are Criteria, Description, Success Criteria, Notes)
+- One `#` line → document title only
+- `##` → workstreams
+- `###` → sections
+- Tables → criteria rows
 
-See `example-evaluation.md` for a sample file.
+**Google-style tabbed markdown** (multiple `#` lines or `# POC Doc - …`):
+
+- Rules in the table above apply; `##` / `###` are sections, not extra workstream tabs.
+
+See `example-evaluation.md` for classic markdown. Use your Google Doc **Download → Markdown** export to exercise tab detection.
 
 ### Build here
 

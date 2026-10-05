@@ -3482,9 +3482,50 @@
         .trim();
     }
 
+    function pocDocTabLabelFromHeading(heading) {
+      const m = String(heading).match(/^POC\s+Doc\s*[-–—:]\s*(.+)$/i);
+      return m ? m[1].trim() : null;
+    }
+
+    function isOpenShiftFrameworkSubtitleHeading(heading) {
+      const h = String(heading);
+      return /^openshift\s+/i.test(h) && /\bframework\b/i.test(h);
+    }
+
+    function isNumberedSectionHeading(heading) {
+      return /^\d+[\s.\)\\]/.test(String(heading).trim());
+    }
+
+    function pushMarkdownWorkstream(out, label) {
+      const norm = stripMarkdownInline(String(label || "").trim());
+      if (!norm) return;
+      out.push("@workstream " + norm);
+    }
+
+    function pushMarkdownSection(out, label) {
+      const norm = normalizeSectionLabel(stripMarkdownInline(String(label || "").trim()));
+      if (!norm) return;
+      out.push("@section " + norm);
+    }
+
+    function isGoogleTabbedMarkdownSource(lines) {
+      let h1Count = 0;
+      let pocDocTabs = 0;
+      for (const line of lines) {
+        const t = stripMarkdownInline(line.trim());
+        if (!/^#\s+/.test(t) || /^##/.test(t)) continue;
+        h1Count++;
+        const heading = stripMarkdownInline(t.replace(/^#\s+/, "").trim());
+        if (pocDocTabLabelFromHeading(heading)) pocDocTabs++;
+      }
+      return pocDocTabs > 0 || h1Count >= 2;
+    }
+
     function parseMarkdown(text) {
       const lines = String(text).split(/\r?\n/);
+      const googleTabbed = isGoogleTabbedMarkdownSource(lines);
       let docTitle = null;
+      let frameworkTitle = null;
       const out = [];
       let tableActive = false;
 
@@ -3495,22 +3536,41 @@
           continue;
         }
         if (/^#\s+/.test(t) && !/^##/.test(t)) {
-          docTitle = stripMarkdownInline(t.replace(/^#\s+/, "").trim());
           tableActive = false;
+          const heading = stripMarkdownInline(t.replace(/^#\s+/, "").trim());
+          if (!googleTabbed) {
+            docTitle = heading;
+            continue;
+          }
+          const pocTab = pocDocTabLabelFromHeading(heading);
+          if (pocTab) {
+            pushMarkdownWorkstream(out, pocTab);
+            if (!docTitle) docTitle = heading;
+            continue;
+          }
+          if (isOpenShiftFrameworkSubtitleHeading(heading)) {
+            if (!frameworkTitle) frameworkTitle = heading;
+            if (!docTitle) docTitle = heading;
+            continue;
+          }
+          pushMarkdownWorkstream(out, heading);
+          if (!docTitle) docTitle = heading;
           continue;
         }
         if (/^##\s+/.test(t)) {
           tableActive = false;
-          out.push(
-            "@workstream " + stripMarkdownInline(t.replace(/^##\s+/, "").trim())
-          );
+          const heading = stripMarkdownInline(t.replace(/^##\s+/, "").trim());
+          if (!heading) continue;
+          if (isNumberedSectionHeading(heading) || googleTabbed) {
+            pushMarkdownSection(out, heading);
+          } else {
+            pushMarkdownWorkstream(out, heading);
+          }
           continue;
         }
         if (/^###\s+/.test(t)) {
           tableActive = false;
-          out.push(
-            "@section " + normalizeSectionLabel(stripMarkdownInline(t.replace(/^###\s+/, "").trim()))
-          );
+          pushMarkdownSection(out, t.replace(/^###\s+/, "").trim());
           continue;
         }
         if (/^@(?:workstream|tab|section)\b/i.test(t)) {
@@ -3537,7 +3597,8 @@
       }
 
       const result = parsePlainText(out.join("\n"));
-      if (docTitle && !result.title) result.title = docTitle;
+      const importTitle = frameworkTitle || docTitle;
+      if (importTitle && !result.title) result.title = importTitle;
       return result;
     }
 

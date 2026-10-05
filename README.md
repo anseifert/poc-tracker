@@ -1,6 +1,6 @@
 # POC Evaluation Tracker
 
-A single-page app for tracking proof-of-concept evaluation criteria: import from a **Google Doc** or **markdown**, mark progress on two workstreams, view a progress chart, and generate HTML reports for email.
+A single-page app for tracking proof-of-concept evaluation criteria: **import** from a Google Doc or markdown file, **build** a framework in the browser, mark progress by workstream, view charts and a **completion timegraph**, and generate HTML reports for email.
 
 ## Quick start
 
@@ -23,40 +23,71 @@ docker compose up --build
 
 Progress is stored in the named volume `poc_tracker_state` (mounted at `/data` inside the container).
 
-## Importing criteria
+## Getting criteria into the app
+
+On the empty home screen, set an optional **POC title**, then choose one of three tabs.
 
 ### Google Doc (default)
 
-On the **Google Doc** tab you can either:
+1. **Import from URL** — paste the Google Doc share link and click **Import from URL**. Requires `npm start` or Docker (the server fetches a **Markdown** export). The doc must be shared so **anyone with the link can view**.
+2. **Upload from computer** — in Google Docs use **File → Download → Markdown**, then **Upload from computer…** and choose the `.md` file. Works without the import API (static hosting is read-only for progress).
 
-1. **Import from URL** — paste the share link (server downloads the plain-text export). Requires `npm start` or Docker. The doc must be shared so **anyone with the link can view**.
-2. **Upload from computer** — use **File → Download → Plain text (.txt)** or **Web page (.html)** in Google Docs, then **Upload from computer…** (works without the import API).
+After import, the **Approve workstreams** dialog lists each detected workstream (tab/heading). Check or uncheck tabs, edit names, then **Import selected**.
 
 ### Markdown
 
-Switch to the **Markdown** tab, paste content, and click **Import markdown**.
+Switch to the **Markdown** tab, paste content (or choose a `.md` file), and click **Import pasted markdown**. Same approval step for workstreams.
 
-- `##` headings → workstreams (e.g. Virtualization, Kubernetes)
+Document shape:
+
+- `#` title (optional)
+- `##` headings → workstreams (any names; not limited to Virtualization/Kubernetes)
 - `###` headings → sections within a workstream
-- Markdown tables → criteria rows (Criteria, Description, Success Criteria, Notes)
+- Markdown tables → criteria rows (column headers come from the table; common columns are Criteria, Description, Success Criteria, Notes)
 
-## Features
+See `example-evaluation.md` for a sample file.
 
-- Two workstreams (Virtualization and Kubernetes) as tabs after import
-- Section grouping within Virtualization
-- Progress chart by workstream
-- Email report (hamburger menu): preview HTML, copy, or download
-- Shared state via `state.json` when using `npm start` or Docker
+### Build here
 
-`state.json` is **gitignored**. Each clone gets a fresh file from `state.json.example` on `npm install` or server startup.
+Switch to **Build here** → **Start building POC…** to create workstreams, sections, and tables in a full-screen editor (add/rename workstreams, sections, columns, and rows; drag to reorder). **Save** loads the normal tracker UI.
+
+After data exists, use the hamburger menu → **Edit POC structure…** to change the framework (with a warning if completion progress already exists).
+
+## Using the tracker
+
+- **Workstream tabs** appear for each workstream that has rows.
+- **Sections** group rows under headings (default section title **General** when none is set).
+- Check **Done** on a row to record a **timestamp**; unchecking and checking again sets a new completion time. Notes can also mark items complete.
+- **POC progress by workstream** chart on the main page.
+- Hamburger menu:
+  - **View timegraph…** — timeline of check-offs; download completion log as JSON or CSV
+  - **Email report…** — HTML preview, copy, or download (open / in-progress items)
+  - **Download backup (JSON)** / **Restore from backup…** — full app state (criteria + progress), for moving machines or recovering after clearing browser data
+  - **Reset all data** — clears criteria and progress
+
+## Persistence and backups
+
+| Mechanism | What it does |
+|-----------|----------------|
+| **Browser `localStorage`** | Always used while you work |
+| **`state.json`** | Written when using `npm start` or Docker (`PUT /api/state`); reloaded on next visit if the browser cache was cleared |
+| **`state.json.backup`** | Server copies `state.json` over this file every **5 minutes** (same folder as `state.json`) |
+| **`poc-tracker-backup.json`** | Manual export from the menu (same payload shape as `state.json`) |
+
+`state.json` and `state.json.backup` are **gitignored**. Each clone gets a fresh `state.json` from `state.json.example` on `npm install` or server startup.
+
+To restore from `state.json.backup` on the server: stop writes if needed, then `cp state.json.backup state.json` in `DATA_DIR` (or `/data` in Docker) and refresh the app.
+
+The timegraph **Download JSON/CSV** files are completion **logs only**; use **Download backup (JSON)** or `state.json` for a full restore.
 
 ## Project layout
 
 | File | Purpose |
 |------|---------|
 | `virtualization-kubernetes-tracker.html` | App UI and logic |
-| `server.mjs` | Static server, `PUT /api/state`, `POST /api/import-google-doc` |
+| `server.mjs` | Static server, `GET/PUT /api/state`, `GET /state.json`, `POST /api/import-google-doc`, periodic `state.json` backup |
 | `scripts/ensure-state.mjs` | Creates `state.json` when missing |
+| `example-evaluation.md` | Sample markdown import |
 | `Dockerfile` / `docker-compose.yml` | Container deployment |
 
 ## Environment
@@ -65,3 +96,4 @@ Switch to the **Markdown** tab, paste content, and click **Import markdown**.
 |----------|---------|-------------|
 | `PORT` | `8081` | HTTP port |
 | `DATA_DIR` | project root | Directory containing `state.json` (use `/data` in Docker) |
+| `BACKUP_INTERVAL_MS` | `300000` (5 min) | How often the server overwrites `state.json.backup` |

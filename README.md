@@ -13,7 +13,7 @@ npm install   # creates state.json from state.json.example if missing
 npm start
 ```
 
-Open [http://localhost:8080](http://localhost:8080) (or the port shown in the console).
+Open [http://localhost:8081](http://localhost:8081) (or the port shown in the console).
 
 ### Docker Compose
 
@@ -27,9 +27,10 @@ Progress is stored in the named volume `poc_tracker_state` (mounted at `/data` i
 
 ### Google Doc (default)
 
-On the main page, paste the document URL and click **Import from Google Doc**. The server downloads Google’s plain-text export (`/export?format=txt`).
+On the **Google Doc** tab you can either:
 
-The doc must be shared so **anyone with the link can view**. Private docs will fail unless you change sharing. Import requires `npm start` or Docker (not `file://`).
+1. **Import from URL** — paste the share link (server downloads the plain-text export). Requires `npm start` or Docker. The doc must be shared so **anyone with the link can view**.
+2. **Upload from computer** — use **File → Download → Plain text (.txt)** or **Web page (.html)** in Google Docs, then **Upload from computer…** (works without the import API).
 
 ### Markdown
 
@@ -62,5 +63,5 @@ Switch to the **Markdown** tab, paste content, and click **Import markdown**.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PORT` | `8080` | HTTP port |
+| `PORT` | `8081` | HTTP port |
 | `DATA_DIR` | project root | Directory containing `state.json` (use `/data` in Docker) |

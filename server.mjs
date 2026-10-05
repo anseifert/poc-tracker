@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Serves the tracker and persists state.json on PUT /api/state.
- * Run: node server.mjs  →  http://localhost:8080
+ * Run: node server.mjs  →  http://localhost:8081
  * Docker: set DATA_DIR=/data for persistent state volume.
  */
 import http from "node:http";
@@ -12,9 +12,35 @@ import { ensureStateFile } from "./scripts/ensure-state.mjs";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = process.env.DATA_DIR || ROOT;
-const PORT = Number(process.env.PORT) || 8080;
+const PORT = Number(process.env.PORT) || 8081;
 const STATE_FILE = path.join(DATA_DIR, "state.json");
+const STATE_BACKUP_FILE = path.join(DATA_DIR, "state.json.backup");
+const BACKUP_INTERVAL_MS = Number(process.env.BACKUP_INTERVAL_MS) || 5 * 60 * 1000;
 const INDEX = "virtualization-kubernetes-tracker.html";
+
+let backupInFlight = false;
+
+async function backupStateFile() {
+  if (backupInFlight) return;
+  backupInFlight = true;
+  try {
+    await fs.access(STATE_FILE);
+    await fs.copyFile(STATE_FILE, STATE_BACKUP_FILE);
+  } catch (err) {
+    if (err?.code !== "ENOENT") {
+      console.error("state.json backup failed:", err.message || err);
+    }
+  } finally {
+    backupInFlight = false;
+  }
+}
+
+function startStateBackupJob() {
+  void backupStateFile();
+  return setInterval(() => {
+    void backupStateFile();
+  }, BACKUP_INTERVAL_MS);
+}
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -83,9 +109,14 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify({ error: "Could not read a Google Doc ID from that URL." }));
       return;
     }
-    const exportUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+    const exportUrl = `https://docs.google.com/document/d/${docId}/export?format=md`;
     try {
-      const upstream = await fetch(exportUrl, { redirect: "follow" });
+      const upstream = await fetch(exportUrl, {
+        redirect: "follow",
+        headers: {
+          "User-Agent": "poc-tracker/1.0 (+https://github.com/anseifert/poc-tracker)",
+        },
+      });
       if (!upstream.ok) {
         res.writeHead(502, { "Content-Type": "application/json" });
         res.end(
@@ -123,6 +154,12 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (url.pathname.startsWith("/api/")) {
+    res.writeHead(404, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: `Unknown API route: ${url.pathname}` }));
+    return;
+  }
+
   const filePath = safePath(url.pathname);
   if (!filePath) {
     res.writeHead(403);
@@ -136,7 +173,7 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { "Content-Type": MIME[ext] || "application/octet-stream" });
     res.end(data);
   } catch {
-    res.writeHead(404);
+    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
     res.end("Not found");
   }
 });
@@ -144,7 +181,19 @@ const server = http.createServer(async (req, res) => {
 await fs.mkdir(DATA_DIR, { recursive: true });
 await ensureStateFile(DATA_DIR);
 
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(`Port ${PORT} is already in use.`);
+    console.error(`  Stop the other process, or run: PORT=${PORT + 1} npm start`);
+    console.error(`  macOS: lsof -i :${PORT} -sTCP:LISTEN`);
+    process.exit(1);
+  }
+  throw err;
+});
+
 server.listen(PORT, () => {
   console.log(`POC tracker: http://localhost:${PORT}`);
   console.log(`State file: ${STATE_FILE}`);
+  console.log(`State backup: ${STATE_BACKUP_FILE} (every ${BACKUP_INTERVAL_MS / 1000}s)`);
+  startStateBackupJob();
 });

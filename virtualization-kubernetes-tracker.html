@@ -541,6 +541,63 @@
       margin-top: 0.25rem;
       font-size: 0.72rem;
       color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .timegraph-panel {
+      width: min(960px, 100%);
+    }
+
+    .timegraph-canvas-wrap {
+      position: relative;
+      width: 100%;
+      margin: 0.75rem 0 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface2);
+      min-height: 220px;
+    }
+
+    .timegraph-canvas-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 280px;
+    }
+
+    .timegraph-summary {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 0 0 0.75rem;
+      line-height: 1.45;
+    }
+
+    .timegraph-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .timegraph-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .timegraph-legend .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--eprod-enterprise-blue, #003087);
+    }
+
+    .timegraph-legend .dot.line {
+      border-radius: 1px;
+      width: 18px;
+      height: 3px;
+      background: var(--eprod-blue-bright, #0072ce);
     }
 
     @media (max-width: 600px) {
@@ -576,6 +633,18 @@
       box-shadow: inset 0 -2px 0 var(--eprod-enterprise-blue, #003087);
     }
 
+    .import-panel-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.15rem 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .import-panel-box .import-hint:last-child {
+      margin-bottom: 0;
+    }
+
     .import-panel label {
       display: block;
       font-size: 0.8rem;
@@ -586,7 +655,8 @@
       letter-spacing: 0.04em;
     }
 
-    .import-panel input[type="url"] {
+    .import-panel input[type="url"],
+    .import-panel input[type="text"] {
       width: 100%;
       font: inherit;
       font-size: 0.95rem;
@@ -594,6 +664,16 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       margin-bottom: 0.5rem;
+      background: var(--surface);
+      color: var(--text);
+      box-sizing: border-box;
+    }
+
+    .import-panel input[type="url"]:focus,
+    .import-panel input[type="text"]:focus {
+      outline: 2px solid var(--rh-red-50);
+      outline-offset: 1px;
+      border-color: var(--rh-gray-30);
     }
 
     .import-panel textarea {
@@ -638,6 +718,192 @@
       display: none !important;
     }
 
+    .structure-editor-panel {
+      width: min(1100px, 100%);
+      max-height: min(92vh, 900px);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .structure-editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .structure-editor-header h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .structure-editor-body {
+      flex: 1;
+      overflow: auto;
+      padding: 1rem 1.25rem 1.25rem;
+    }
+
+    .structure-ws-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+
+    .structure-ws-tab {
+      padding: 0.4rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface2);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    .structure-ws-tab.active {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--rh-gray-30);
+      box-shadow: inset 0 -2px 0 var(--eprod-enterprise-blue, #003087);
+    }
+
+    .structure-section-block {
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .structure-section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 0.65rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .structure-section-head input {
+      flex: 1;
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 0.35rem 0.5rem;
+      background: transparent;
+    }
+
+    .structure-section-head input:focus {
+      border-color: var(--border);
+      background: var(--surface);
+      outline: none;
+    }
+
+    .structure-edit-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .structure-edit-table th,
+    .structure-edit-table td {
+      border: 1px solid var(--border);
+      padding: 0.35rem;
+      vertical-align: top;
+    }
+
+    .structure-edit-table th input,
+    .structure-edit-table td textarea {
+      width: 100%;
+      font: inherit;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.35rem 0.45rem;
+      resize: vertical;
+      min-height: 2.25rem;
+      box-sizing: border-box;
+    }
+
+    .structure-edit-table .drag-col {
+      width: 2rem;
+      text-align: center;
+      color: var(--muted);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .structure-edit-table tr.dragging {
+      opacity: 0.45;
+    }
+
+    .structure-edit-table .structure-row-actions {
+      width: 1%;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .structure-edit-table .structure-row-actions button {
+      white-space: nowrap;
+      font: inherit;
+      font-size: 0.82rem;
+      padding: 0.35rem 0.55rem;
+    }
+
+    .structure-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+
+    .structure-toolbar .spacer {
+      flex: 1;
+    }
+
+    .workstream-approve-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin: 0 0 1rem;
+      max-height: 50vh;
+      overflow: auto;
+    }
+
+    .workstream-approve-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface2);
+    }
+
+    .workstream-approve-item input[type="text"] {
+      flex: 1;
+      font: inherit;
+      padding: 0.4rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .workstream-approve-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
     .report-modal {
       position: fixed;
       inset: 0;
@@ -673,6 +939,13 @@
     .report-modal-panel h2 {
       margin: 0 0 0.75rem;
       font-size: 1.1rem;
+    }
+
+    .report-modal-panel p {
+      margin: 0 0 1rem;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: var(--muted);
     }
 
     .report-scope-field {
@@ -739,6 +1012,12 @@
             <button type="button" id="btnShowAll" data-requires-data hidden>Show all rows</button>
             <button type="button" id="btnHideCompleted" data-requires-data hidden>Hide all completed</button>
             <button type="button" id="btnEmailReport" data-requires-data hidden>Email report…</button>
+            <button type="button" id="btnEditStructure" data-requires-data hidden>Edit POC structure…</button>
+            <button type="button" id="btnViewTimegraph" data-requires-data hidden>View timegraph…</button>
+            <div class="app-menu-divider" role="separator"></div>
+            <button type="button" id="btnDownloadBackup">Download backup (JSON)</button>
+            <button type="button" id="btnRestoreBackup">Restore from backup…</button>
+            <p class="app-menu-help">After clearing browser data, use <strong>Restore from backup</strong> or reopen the app with <code>npm start</code> if <code>state.json</code> was synced on the server.</p>
           </nav>
         </div>
       </div>
@@ -753,11 +1032,23 @@
 
     <div class="chart-card" id="chartCard">
       <div id="importSourceBlock" class="import-source-block">
+        <div class="import-panel import-panel-box poc-title-panel">
+          <label for="pocTitleInput">POC title</label>
+          <input
+            type="text"
+            id="pocTitleInput"
+            name="pocTitle"
+            placeholder="e.g. EPROD OpenShift POC Evaluation"
+            autocomplete="off"
+          />
+          <p class="import-hint">Shown at the top of the tracker and in email reports. Leave blank to use the default template title.</p>
+        </div>
         <div class="import-mode-tabs" role="tablist" aria-label="Import source">
           <button type="button" class="import-mode active" data-import-mode="gdoc" role="tab" aria-selected="true">Google Doc</button>
           <button type="button" class="import-mode" data-import-mode="markdown" role="tab" aria-selected="false">Markdown</button>
+          <button type="button" class="import-mode" data-import-mode="build" role="tab" aria-selected="false">Build here</button>
         </div>
-        <div id="importPanelGdoc" class="import-panel" role="tabpanel">
+        <div id="importPanelGdoc" class="import-panel import-panel-box" role="tabpanel">
           <label for="googleDocUrl">Google Doc URL</label>
           <input
             type="url"
@@ -767,14 +1058,24 @@
             autocomplete="off"
           />
           <p class="import-hint">
-            Paste the share link to your evaluation doc. The doc must be shared so
-            <strong>anyone with the link can view</strong> (the app downloads the plain-text export via the server).
-            Use <code>npm start</code> or Docker — opening the HTML file directly cannot import from Google.
+            <strong>From URL:</strong> paste the share link and import (requires <code>npm start</code> or Docker).
+            The doc must be shared so <strong>anyone with the link can view</strong>.
+            <strong>From computer:</strong> upload a Google Doc export —
+            <strong>File → Download → Markdown.</strong>
           </p>
-          <button type="button" class="primary" id="btnImportGoogleDoc">Import from Google Doc</button>
+          <div class="import-panel-actions">
+            <button type="button" class="primary" id="btnImportGoogleDoc">Import from URL</button>
+            <button type="button" id="btnChooseGoogleDocFile">Upload from computer…</button>
+          </div>
+          <input
+            type="file"
+            id="fileGoogleDocExport"
+            accept=".md,.markdown,text/markdown"
+            hidden
+          />
           <p id="importGoogleDocStatus" class="import-status" hidden></p>
         </div>
-        <div id="importPanelMarkdown" class="import-panel" role="tabpanel" hidden>
+        <div id="importPanelMarkdown" class="import-panel import-panel-box" role="tabpanel" hidden>
           <label for="markdownSource">Markdown</label>
           <textarea
             id="markdownSource"
@@ -791,6 +1092,14 @@
           <input type="file" id="fileMarkdown" accept=".md,.markdown,text/markdown,text/plain" hidden />
           <p id="importMarkdownStatus" class="import-status" hidden></p>
         </div>
+        <div id="importPanelBuild" class="import-panel import-panel-box" role="tabpanel" hidden>
+          <p class="import-hint" style="margin-top:0">
+            Create workstreams, sections, and criteria tables in the app. Same layout as imported docs — use sections to group rows under each workstream tab.
+          </p>
+          <div class="import-panel-actions">
+            <button type="button" class="primary" id="btnStartBuild">Start building POC…</button>
+          </div>
+        </div>
       </div>
       <div id="chartProgressBlock" hidden>
         <h2>POC progress by workstream</h2>
@@ -806,6 +1115,84 @@
       </div>
     </div>
 
+    <div id="resetModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="resetModalBackdrop"></div>
+      <div class="report-modal-panel" role="dialog" aria-labelledby="resetModalTitle" aria-modal="true">
+        <h2 id="resetModalTitle">Are you sure?</h2>
+        <p>
+          This will remove all imported criteria and clear every completion checkbox and note.
+          Your progress cannot be recovered from this app after reset.
+        </p>
+        <div class="report-modal-actions">
+          <button type="button" class="primary" id="btnResetConfirm">Yes, reset all data</button>
+          <button type="button" id="btnResetCancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="workstreamApproveModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="workstreamApproveBackdrop"></div>
+      <div class="report-modal-panel" role="dialog" aria-labelledby="workstreamApproveTitle" aria-modal="true">
+        <h2 id="workstreamApproveTitle">Approve workstreams</h2>
+        <p>Each detected tab or workstream is listed below. Uncheck any you do not want to import, and edit names before continuing.</p>
+        <div id="workstreamApproveList" class="workstream-approve-list"></div>
+        <div class="report-modal-actions">
+          <button type="button" class="primary" id="btnWorkstreamApproveConfirm">Import selected</button>
+          <button type="button" id="btnWorkstreamApproveCancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="structureWarnModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="structureWarnBackdrop"></div>
+      <div class="report-modal-panel" role="dialog" aria-labelledby="structureWarnTitle" aria-modal="true">
+        <h2 id="structureWarnTitle">Save structure changes?</h2>
+        <p id="structureWarnMessage">
+          You have completion progress on this POC. Changing, reordering, or deleting rows can misalign checkboxes and notes. Continue?
+        </p>
+        <div class="report-modal-actions">
+          <button type="button" class="primary" id="btnStructureWarnConfirm">Save anyway</button>
+          <button type="button" id="btnStructureWarnCancel">Go back</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="structureEditorModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="structureEditorBackdrop"></div>
+      <div class="report-modal-panel structure-editor-panel" role="dialog" aria-labelledby="structureEditorTitle" aria-modal="true">
+        <div class="structure-editor-header">
+          <h2 id="structureEditorTitle">POC structure</h2>
+          <div class="report-modal-actions" style="margin:0">
+            <button type="button" class="primary" id="btnStructureSave">Save</button>
+            <button type="button" id="btnStructureCancel">Cancel</button>
+          </div>
+        </div>
+        <div class="structure-editor-body" id="structureEditorBody"></div>
+      </div>
+    </div>
+
+    <div id="timegraphModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="timegraphModalBackdrop"></div>
+      <div class="report-modal-panel timegraph-panel" role="dialog" aria-labelledby="timegraphModalTitle" aria-modal="true">
+        <h2 id="timegraphModalTitle">Completion timegraph</h2>
+        <p class="timegraph-summary" id="timegraphSummary">
+          Each check-off is recorded with a timestamp. Unchecking and checking again updates the completion time and adds to the log.
+        </p>
+        <div class="timegraph-legend">
+          <span><span class="dot line"></span>Cumulative completions</span>
+          <span><span class="dot"></span>Individual check-offs</span>
+        </div>
+        <div class="timegraph-canvas-wrap">
+          <canvas id="timegraphCanvas" aria-label="Timeline of completed criteria"></canvas>
+        </div>
+        <div class="report-modal-actions">
+          <button type="button" id="btnTimegraphDownloadJson">Download JSON</button>
+          <button type="button" id="btnTimegraphDownloadCsv">Download CSV</button>
+          <button type="button" id="btnTimegraphClose">Close</button>
+        </div>
+      </div>
+    </div>
+
     <div id="reportModal" class="report-modal" hidden>
       <div class="report-modal-backdrop" id="reportModalBackdrop"></div>
       <div class="report-modal-panel" role="dialog" aria-labelledby="reportModalTitle" aria-modal="true">
@@ -813,8 +1200,7 @@
         <fieldset class="report-scope-field" id="reportScopeField">
           <legend class="sr-only">Report scope</legend>
           <label><input type="radio" name="reportScope" value="active" checked /> <span id="reportScopeActiveLabel">This tab</span></label>
-          <label><input type="radio" name="reportScope" value="other" /> <span id="reportScopeOtherLabel">Other tab</span></label>
-          <label><input type="radio" name="reportScope" value="both" /> Both workstreams</label>
+          <label><input type="radio" name="reportScope" value="all" /> All workstreams</label>
         </fieldset>
         <button type="button" class="primary" id="btnReportPreview">Preview report</button>
         <div id="reportPreview" class="report-preview-frame" hidden></div>
@@ -826,10 +1212,7 @@
       </div>
     </div>
 
-    <div class="tabs" id="tabBar" hidden>
-      <button type="button" class="tab active" data-tab="virtualization">Virtualization</button>
-      <button type="button" class="tab" data-tab="kubernetes">Kubernetes</button>
-    </div>
+    <div class="tabs" id="tabBar" hidden></div>
 
     <div class="panel" id="panel" hidden>
       <div class="panel-toolbar">
@@ -844,22 +1227,45 @@
       <span id="lastSaved"></span>
       <span id="jsonSyncStatus"></span>
     </footer>
+
+    <input type="file" id="fileRestoreBackup" accept=".json,application/json" hidden />
   </div>
 
-  <script id="embedded-doc-data" type="application/json">{"dataVersion":5,"title":"POC Evaluation Tracker","subtitle":"Import a Google Doc or markdown evaluation framework to get started.","sections":{"virtualization":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[]},"kubernetes":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[]}}}</script>
+  <script id="embedded-doc-data" type="application/json">{"dataVersion":6,"title":"POC Evaluation Tracker","subtitle":"Import a Google Doc or markdown evaluation framework to get started.","workstreamOrder":["virtualization","kubernetes"],"workstreamLabels":{"virtualization":"Virtualization","kubernetes":"Kubernetes"},"sections":{"virtualization":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[],"defaultSectionTitle":"General"},"kubernetes":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[],"defaultSectionTitle":"General"}}}</script>
   <script>
     const EMBEDDED_DOC = JSON.parse(document.getElementById('embedded-doc-data').textContent);
     const STORAGE_KEY = "poc-tracker-v1";
     const STATE_JSON_URL = "state.json";
     const STATE_API_URL = "api/state";
+    const IMPORT_GOOGLE_DOC_API_URL = "api/import-google-doc";
+
+    function appApiUrl(relativePath) {
+      return new URL(String(relativePath).replace(/^\//, ""), window.location.href).href;
+    }
+
+    async function readApiJsonResponse(res) {
+      const raw = await res.text();
+      if (!raw) return { data: {}, parseFailed: false };
+      try {
+        return { data: JSON.parse(raw), parseFailed: false };
+      } catch {
+        return { data: null, parseFailed: true, raw };
+      }
+    }
     const JSON_SYNC_DEBOUNCE_MS = 600;
-    const SECTION_KEYS = ["virtualization", "kubernetes"];
-    const SECTION_LABELS = { virtualization: "Virtualization", kubernetes: "Kubernetes" };
+    const DEFAULT_HEADERS = ["Criteria", "Description", "Success Criteria", "Notes"];
+    const DEFAULT_SECTION_TITLE = "General";
+    const TRACKER_DATA_VERSION = 6;
 
     let state;
     let jsonSyncTimer = null;
     let jsonSyncCapable = false;
-    let activeTab = "virtualization";
+    let activeTab = null;
+    let pendingImportResult = null;
+    let pendingImportStatusEl = null;
+    let structureEditorDraft = null;
+    let structureEditorActiveWs = null;
+    let structureSaveAfterWarn = null;
     let globalHideCompleted = false;
     let panelHideCompleted = false;
 
@@ -867,15 +1273,217 @@
       return {
         title: "POC Evaluation Tracker",
         subtitle: "Import a Google Doc or markdown evaluation framework to get started.",
-        dataVersion: 0,
+        dataVersion: TRACKER_DATA_VERSION,
         sourceImportedAt: null,
-        sections: {
-          virtualization: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
-          kubernetes: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
-        },
+        workstreamOrder: [],
+        workstreamLabels: {},
+        sections: {},
         progress: {},
         datePolicyVersion: 0,
       };
+    }
+
+    function generateRowUid() {
+      return "r_" + Math.random().toString(36).slice(2, 11) + Date.now().toString(36).slice(-4);
+    }
+
+    function slugifyWorkstreamId(label) {
+      const base =
+        String(label)
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_|_$/g, "") || "workstream";
+      return base;
+    }
+
+    function uniqueWorkstreamId(label, existingIds) {
+      const set = existingIds instanceof Set ? existingIds : new Set(existingIds);
+      let id = slugifyWorkstreamId(label);
+      if (!set.has(id)) return id;
+      let n = 2;
+      while (set.has(`${id}_${n}`)) n++;
+      return `${id}_${n}`;
+    }
+
+    function formatWorkstreamIdLabel(id) {
+      return String(id)
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    function workstreamLabel(id) {
+      if (!id) return "";
+      return (
+        state.workstreamLabels?.[id] ||
+        state.sections?.[id]?.label ||
+        formatWorkstreamIdLabel(id)
+      );
+    }
+
+    function allWorkstreamIds() {
+      return Object.keys(state.sections || {});
+    }
+
+    function orderedWorkstreamIds() {
+      const order = state.workstreamOrder?.length
+        ? state.workstreamOrder.filter((id) => state.sections?.[id])
+        : allWorkstreamIds();
+      const seen = new Set(order);
+      allWorkstreamIds().forEach((id) => {
+        if (!seen.has(id)) order.push(id);
+      });
+      return order;
+    }
+
+    function workstreamsWithData() {
+      return orderedWorkstreamIds().filter((id) => (state.sections[id]?.rows?.length || 0) > 0);
+    }
+
+    function ensureWorkstreamSection(id, label) {
+      if (!state.sections[id]) {
+        state.sections[id] = {
+          headers: [...DEFAULT_HEADERS],
+          rows: [],
+          defaultSectionTitle: DEFAULT_SECTION_TITLE,
+        };
+      }
+      if (label) {
+        if (!state.workstreamLabels) state.workstreamLabels = {};
+        state.workstreamLabels[id] = label;
+      }
+      if (!state.workstreamOrder) state.workstreamOrder = [];
+      if (!state.workstreamOrder.includes(id)) state.workstreamOrder.push(id);
+    }
+
+    function ensureRowUids() {
+      let changed = false;
+      allWorkstreamIds().forEach((sec) => {
+        state.sections[sec].rows.forEach((row) => {
+          if (!row.uid) {
+            row.uid = generateRowUid();
+            changed = true;
+          }
+        });
+      });
+      return changed;
+    }
+
+    function migrateProgressKeysToRowUids() {
+      if (state.progressMigratedToUids) return false;
+      let changed = false;
+      const next = { ...(state.progress || {}) };
+      allWorkstreamIds().forEach((sec) => {
+        state.sections[sec].rows.forEach((row, i) => {
+          if (!row.uid) {
+            row.uid = generateRowUid();
+            changed = true;
+          }
+          const legacy = sec + "::" + i;
+          if (next[legacy] && !next[row.uid]) {
+            next[row.uid] = next[legacy];
+            delete next[legacy];
+            changed = true;
+          }
+        });
+      });
+      if (changed || !state.progressMigratedToUids) {
+        state.progress = next;
+        state.progressMigratedToUids = true;
+        changed = true;
+      }
+      return changed;
+    }
+
+    function migrateToDynamicWorkstreams() {
+      let changed = false;
+      if (!state.workstreamLabels) {
+        state.workstreamLabels = {
+          virtualization: "Virtualization",
+          kubernetes: "Kubernetes",
+        };
+        changed = true;
+      }
+      if (!state.workstreamOrder?.length && state.sections && Object.keys(state.sections).length) {
+        const keys = Object.keys(state.sections);
+        state.workstreamOrder =
+          keys.includes("virtualization") && keys.includes("kubernetes")
+            ? ["virtualization", "kubernetes"]
+            : keys;
+        changed = true;
+      }
+      allWorkstreamIds().forEach((id) => {
+        const sec = state.sections[id];
+        if (!sec.headers?.length) {
+          sec.headers = [...DEFAULT_HEADERS];
+          changed = true;
+        }
+        if (!sec.defaultSectionTitle) {
+          sec.defaultSectionTitle = DEFAULT_SECTION_TITLE;
+          changed = true;
+        }
+      });
+      if ((state.dataVersion || 0) < TRACKER_DATA_VERSION) {
+        state.dataVersion = TRACKER_DATA_VERSION;
+        changed = true;
+      }
+      return changed;
+    }
+
+    function defaultSectionTitleFor(sec) {
+      return state.sections[sec]?.defaultSectionTitle || DEFAULT_SECTION_TITLE;
+    }
+
+    function createParseContext() {
+      const buckets = {};
+      const order = [];
+      function ensureWorkstream(label) {
+        const norm = String(label || "").trim();
+        if (!norm) return null;
+        const existing = order.find((id) => buckets[id].label.toLowerCase() === norm.toLowerCase());
+        if (existing) return existing;
+        const id = uniqueWorkstreamId(norm, new Set(order));
+        buckets[id] = { id, label: norm, headers: [...DEFAULT_HEADERS], rows: [] };
+        order.push(id);
+        return id;
+      }
+      return {
+        buckets,
+        order,
+        ensureWorkstream,
+        toResult(title) {
+          return {
+            title,
+            workstreams: order.map((id) => ({
+              id,
+              label: buckets[id].label,
+              headers: buckets[id].headers,
+              rows: buckets[id].rows,
+            })),
+          };
+        },
+      };
+    }
+
+    function workstreamsFromLegacySections(sections) {
+      if (!sections) return [];
+      return Object.keys(sections).map((id) => ({
+        id,
+        label: formatWorkstreamIdLabel(id),
+        headers: sections[id].headers || [...DEFAULT_HEADERS],
+        rows: sections[id].rows || [],
+      }));
+    }
+
+    function normalizeImportResult(result) {
+      if (result?.workstreams?.length) return result;
+      if (result?.sections) {
+        return {
+          title: result.title,
+          workstreams: workstreamsFromLegacySections(result.sections),
+        };
+      }
+      return { title: result?.title, workstreams: [] };
     }
 
     function embeddedBranding() {
@@ -896,6 +1504,8 @@
       const base = defaultState();
       applyEmbeddedBranding(base);
       base.dataVersion = EMBEDDED_DOC.dataVersion;
+      base.workstreamOrder = EMBEDDED_DOC.workstreamOrder || [];
+      base.workstreamLabels = { ...(EMBEDDED_DOC.workstreamLabels || {}) };
       base.sections = { ...base.sections, ...EMBEDDED_DOC.sections };
       return base;
     }
@@ -911,10 +1521,21 @@
           merged.updatedAt = parsed.updatedAt;
           merged.datePolicyVersion = parsed.datePolicyVersion ?? 0;
           merged.sections = mergeSectionRows(stateFromEmbedded().sections, parsed.sections);
+          merged.workstreamOrder = parsed.workstreamOrder || merged.workstreamOrder;
+          merged.workstreamLabels = { ...merged.workstreamLabels, ...(parsed.workstreamLabels || {}) };
+          merged.progressMigratedToUids = parsed.progressMigratedToUids;
           return merged;
         }
-        const merged = { ...defaultState(), ...parsed, sections: { ...defaultState().sections, ...parsed.sections } };
-        merged.sections = mergeSectionRows(stateFromEmbedded().sections, merged.sections);
+        const merged = {
+          ...defaultState(),
+          ...parsed,
+          sections: { ...(parsed.sections || {}) },
+          workstreamLabels: { ...(parsed.workstreamLabels || {}) },
+          workstreamOrder: parsed.workstreamOrder || [],
+        };
+        if (!merged.workstreamOrder.length && merged.sections) {
+          merged.workstreamOrder = Object.keys(merged.sections);
+        }
         return merged;
       } catch {
         return stateFromEmbedded();
@@ -924,15 +1545,25 @@
     function mergeSectionRows(baseSections, overlaySections) {
       if (!overlaySections) return baseSections;
       const out = { ...baseSections };
-      SECTION_KEYS.forEach((key) => {
-        const base = baseSections[key];
+      const keys = new Set([...Object.keys(baseSections || {}), ...Object.keys(overlaySections || {})]);
+      keys.forEach((key) => {
+        const base = baseSections[key] || {
+          headers: [...DEFAULT_HEADERS],
+          rows: [],
+          defaultSectionTitle: DEFAULT_SECTION_TITLE,
+        };
         const overlay = overlaySections[key];
         if (!overlay?.rows?.length) {
           out[key] = base;
           return;
         }
+        if (!base.rows?.length) {
+          out[key] = { ...overlay };
+          return;
+        }
         out[key] = {
-          headers: base.headers,
+          ...base,
+          headers: overlay.headers?.length ? overlay.headers : base.headers,
           rows: base.rows.map((row, i) => ({ ...row, ...(overlay.rows[i] || {}) })),
         };
       });
@@ -950,9 +1581,24 @@
         updatedAt: remote.updatedAt,
         sourceImportedAt: remote.sourceImportedAt ?? base.sourceImportedAt,
       };
+      merged.title = remote.title || base.title;
+      merged.subtitle = remote.subtitle || base.subtitle;
       merged.sections = mergeSectionRows(base.sections, remote.sections);
-      merged.dataVersion = EMBEDDED_DOC.dataVersion;
+      merged.workstreamOrder = remote.workstreamOrder?.length
+        ? remote.workstreamOrder
+        : base.workstreamOrder;
+      merged.workstreamLabels = { ...base.workstreamLabels, ...(remote.workstreamLabels || {}) };
+      merged.dataVersion = remote.dataVersion ?? EMBEDDED_DOC.dataVersion;
+      merged.progressMigratedToUids = remote.progressMigratedToUids ?? merged.progressMigratedToUids;
       return merged;
+    }
+
+    function stateHasTrackerData(s) {
+      if (!s) return false;
+      const sections = s.sections || {};
+      const hasRows = Object.keys(sections).some((k) => (sections[k]?.rows?.length || 0) > 0);
+      const hasProgress = Object.keys(s.progress || {}).length > 0;
+      return hasRows || hasProgress;
     }
 
     function isTimestampNewer(a, b) {
@@ -973,9 +1619,16 @@
 
       if (!remote) return local;
 
+      if (stateHasTrackerData(remote) && !stateHasTrackerData(local)) {
+        return mergeRemotePayload(remote);
+      }
+
       const remoteTime = remote.updatedAt;
       const localTime = local.updatedAt;
       if (isTimestampNewer(remoteTime, localTime)) {
+        return mergeRemotePayload(remote);
+      }
+      if (!isTimestampNewer(localTime, remoteTime) && stateHasTrackerData(remote)) {
         return mergeRemotePayload(remote);
       }
       return local;
@@ -991,7 +1644,10 @@
         subtitle: state.subtitle,
         progress: state.progress,
         sections: state.sections,
+        workstreamOrder: state.workstreamOrder,
+        workstreamLabels: state.workstreamLabels,
         sourceImportedAt: state.sourceImportedAt,
+        progressMigratedToUids: state.progressMigratedToUids,
       };
     }
 
@@ -1055,9 +1711,16 @@
       applyEmbeddedBranding(state);
       setUiVisibility();
       jsonSyncCapable = await probeJsonSyncApi();
+      if (migrateToDynamicWorkstreams()) saveState();
+      if (migrateProgressKeysToRowUids()) saveState();
+      if (ensureRowUids()) saveState();
       if (migrateNotesYesToCompleted()) saveState();
       if (normalizeTrackerSchema()) saveState();
       if (syncCompletionDates()) saveState();
+      if (!activeTab || !state.sections[activeTab]) {
+        const withData = workstreamsWithData();
+        activeTab = withData[0] || orderedWorkstreamIds()[0] || null;
+      }
       renderAll();
       if (jsonSyncCapable) {
         if (!state.updatedAt || state.updatedAt === "1970-01-01T00:00:00.000Z") {
@@ -1071,11 +1734,115 @@
     }
 
     function rowId(section, index) {
-      return section + "::" + index;
+      const row = state.sections[section]?.rows[index];
+      if (!row) return section + "::" + index;
+      if (!row.uid) row.uid = generateRowUid();
+      return row.uid;
     }
 
     function getProgress(id) {
-      return state.progress[id] || { completed: false, completedAt: null };
+      const p = state.progress[id];
+      if (!p) return { completed: false, completedAt: null, completionLog: [] };
+      if (!Array.isArray(p.completionLog)) p.completionLog = [];
+      return p;
+    }
+
+    function ensureProgressRecord(id) {
+      if (!state.progress[id]) {
+        state.progress[id] = { completed: false, completedAt: null, completionLog: [] };
+      }
+      if (!Array.isArray(state.progress[id].completionLog)) {
+        state.progress[id].completionLog = [];
+      }
+      return state.progress[id];
+    }
+
+    function completionTimestampNow() {
+      return new Date().toISOString();
+    }
+
+    function formatTrackedCompletion(iso) {
+      if (!iso) return "";
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return String(iso);
+      return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+    }
+
+    function markRowCompleted(id) {
+      const at = completionTimestampNow();
+      const p = ensureProgressRecord(id);
+      p.completed = true;
+      p.completedAt = at;
+      p.completionLog.push({ at, type: "completed" });
+      return at;
+    }
+
+    function markRowReopened(id) {
+      const at = completionTimestampNow();
+      const p = ensureProgressRecord(id);
+      p.completed = false;
+      p.completedAt = null;
+      p.completionLog.push({ at, type: "reopened" });
+      return at;
+    }
+
+    function rowCompletionContext(sec, index) {
+      const row = state.sections[sec].rows[index];
+      return {
+        id: rowId(sec, index),
+        workstream: workstreamLabel(sec),
+        workstreamId: sec,
+        criteria: criteriaLabel(row),
+        section: row.section || defaultSectionTitleFor(sec),
+      };
+    }
+
+    function collectAllCompletionLogEntries() {
+      const entries = [];
+      allWorkstreamIds().forEach((sec) => {
+        state.sections[sec].rows.forEach((row, index) => {
+          const ctx = rowCompletionContext(sec, index);
+          const p = getProgress(ctx.id);
+          (p.completionLog || []).forEach((ev) => {
+            entries.push({
+              at: ev.at,
+              type: ev.type,
+              rowUid: ctx.id,
+              workstream: ctx.workstream,
+              workstreamId: ctx.workstreamId,
+              section: ctx.section,
+              criteria: ctx.criteria,
+            });
+          });
+        });
+      });
+      entries.sort((a, b) => new Date(a.at) - new Date(b.at));
+      return entries;
+    }
+
+    function collectCheckoffEvents() {
+      const fromLog = collectAllCompletionLogEntries().filter((e) => e.type === "completed");
+      if (fromLog.length) return fromLog;
+      const legacy = [];
+      allWorkstreamIds().forEach((sec) => {
+        state.sections[sec].rows.forEach((row, index) => {
+          const ctx = rowCompletionContext(sec, index);
+          const p = getProgress(ctx.id);
+          if (p.completed && p.completedAt) {
+            legacy.push({
+              at: p.completedAt,
+              type: "completed",
+              rowUid: ctx.id,
+              workstream: ctx.workstream,
+              workstreamId: ctx.workstreamId,
+              section: ctx.section,
+              criteria: ctx.criteria,
+            });
+          }
+        });
+      });
+      legacy.sort((a, b) => new Date(a.at) - new Date(b.at));
+      return legacy;
     }
 
     function hashString(str) {
@@ -1116,30 +1883,32 @@
     }
 
     function syncCompletionDates() {
-      const reassignAll = (state.datePolicyVersion || 0) < 1;
       let changed = false;
+      const version = state.datePolicyVersion || 0;
 
-      SECTION_KEYS.forEach((sec) => {
+      allWorkstreamIds().forEach((sec) => {
         state.sections[sec].rows.forEach((row, i) => {
           const id = rowId(sec, i);
           if (!isRowMarkedComplete(sec, i, row)) return;
 
-          const p = getProgress(id);
-          let completedAt = p.completedAt;
-
-          if (reassignAll || !completedAt) {
-            completedAt = reassignAll ? tuesdayThursdayIsoForId(id) : randomTuesdayThursdayIso();
-            state.progress[id] = { completed: true, completedAt };
+          const p = ensureProgressRecord(id);
+          if (!p.completed) {
+            p.completed = true;
             changed = true;
-          } else if (!p.completed) {
-            state.progress[id] = { completed: true, completedAt };
+          }
+          if (!p.completedAt) {
+            p.completedAt = completionTimestampNow();
+            p.completionLog.push({ at: p.completedAt, type: "completed" });
+            changed = true;
+          } else if (!p.completionLog.some((e) => e.type === "completed")) {
+            p.completionLog.push({ at: p.completedAt, type: "completed" });
             changed = true;
           }
         });
       });
 
-      if (reassignAll) {
-        state.datePolicyVersion = 1;
+      if (version < 2) {
+        state.datePolicyVersion = 2;
         changed = true;
       }
       return changed;
@@ -1148,6 +1917,8 @@
     function refreshCompletionViews() {
       updateStats();
       drawChart();
+      const tg = document.getElementById("timegraphModal");
+      if (tg && !tg.hidden) drawTimegraph();
     }
 
     function effectiveCompletedDate(section, index, row) {
@@ -1182,35 +1953,74 @@
       return normalizeNotesText(docCompletedValue(row));
     }
 
+    function normalizeSectionLabel(label) {
+      if (label == null || label === "") return "";
+      let s = String(label).trim();
+      s = s.replace(/^@section\s+/i, "");
+      s = s.replace(/\*\*(.+?)\*\*/g, "$1").replace(/\*\*/g, "");
+      s = s.replace(/\\([._*[\]()#+\-!])/g, "$1");
+      s = s.replace(/^\d+(?:\\?\.)?\s*/, "");
+      s = s.replace(/^\\?\.\s*/, "");
+      s = s.replace(/^[\s.\/\\:;|\-–—]+/, "");
+      while (/^[\s.\/\\:;|\-–—]+/.test(s)) {
+        s = s.replace(/^[\s.\/\\:;|\-–—]+/, "");
+      }
+      s = s.replace(/[.\/\\]+$/, "").trim();
+      return s;
+    }
+
     function sectionDisplayTitle(sectionLabel) {
-      return String(sectionLabel || "Other").replace(/^\d+\.\s*/, "").trim();
+      const cleaned = normalizeSectionLabel(sectionLabel);
+      return cleaned || "Other";
+    }
+
+    function normalizeImportedDocTitle(raw) {
+      const fallback = defaultState().title;
+      if (!raw) return fallback;
+      let t = String(raw)
+        .replace(/\s*-\s*Google Docs\s*$/i, "")
+        .replace(/\*\*(.+?)\*\*/g, "$1")
+        .replace(/\*\*/g, "")
+        .trim();
+      if (!t) return fallback;
+      if (/^poc doc\s*-/i.test(t)) return fallback;
+      if (/^openshift\s+(virtualization\s+)?poc\s+evaluation\s+framework/i.test(t)) return fallback;
+      if (/proof of concept.*evaluation framework/i.test(t) && t.length > 50) return fallback;
+      return t;
+    }
+
+    function resolvedPocTitleFromImport(result) {
+      const custom = document.getElementById("pocTitleInput")?.value.trim();
+      if (custom) return custom;
+      if (result?.title) return normalizeImportedDocTitle(result.title);
+      return defaultState().title;
     }
 
     function normalizeTrackerSchema() {
       let changed = false;
-      const virt = state.sections.virtualization;
-      const k8s = state.sections.kubernetes;
-      const virtHeaders = ["Criteria", "Description", "Success Criteria", "Notes"];
-      const k8sHeaders = ["Criteria", "Description", "Success Criteria", "Notes"];
-      if (JSON.stringify(virt.headers) !== JSON.stringify(virtHeaders)) {
-        virt.headers = virtHeaders;
-        changed = true;
-      }
-      if (JSON.stringify(k8s.headers) !== JSON.stringify(k8sHeaders)) {
-        k8s.headers = k8sHeaders;
-        changed = true;
-      }
-      virt.rows.forEach((row) => {
-        if (row.objective && !row.criteria) {
-          row.criteria = row.objective;
+      allWorkstreamIds().forEach((key) => {
+        const sec = state.sections[key];
+        if (!sec.headers?.length) {
+          sec.headers = [...DEFAULT_HEADERS];
           changed = true;
         }
-      });
-      k8s.rows.forEach((row) => {
-        if (row.objective && !row.criteria) {
-          row.criteria = row.objective;
-          changed = true;
-        }
+        sec.rows.forEach((row) => {
+          if (row.objective && !row.criteria) {
+            row.criteria = row.objective;
+            changed = true;
+          }
+          if (row.section) {
+            const cleaned = normalizeSectionLabel(row.section);
+            if (cleaned && cleaned !== row.section) {
+              row.section = cleaned;
+              changed = true;
+            }
+          }
+          if (!row.uid) {
+            row.uid = generateRowUid();
+            changed = true;
+          }
+        });
       });
       return changed;
     }
@@ -1234,8 +2044,9 @@
       const rows = state.sections[sec].rows;
       const groups = [];
       const indexByKey = new Map();
+      const fallback = defaultSectionTitleFor(sec);
       rows.forEach((row, index) => {
-        const key = row.section || "Other";
+        const key = row.section || fallback;
         if (!indexByKey.has(key)) {
           const group = {
             key,
@@ -1252,7 +2063,7 @@
 
     function migrateNotesYesToCompleted() {
       let changed = false;
-      SECTION_KEYS.forEach((sec) => {
+      allWorkstreamIds().forEach((sec) => {
         state.sections[sec].rows.forEach((row) => {
           ["notes", "completed", "status"].forEach((key) => {
             if (row[key] !== undefined && isExactYesNotes(row[key])) {
@@ -1301,7 +2112,7 @@
           hint.className = "completed-date-hint";
           td.appendChild(hint);
         }
-        hint.textContent = "Tracked: " + tracked.slice(0, 10);
+        hint.textContent = "Completed: " + formatTrackedCompletion(tracked);
       } else if (hint) {
         hint.remove();
       }
@@ -1316,13 +2127,15 @@
       if (row.status !== undefined) row.status = normalized;
 
       const p = getProgress(id);
-      if (isCompleteStatus(normalized)) {
-        state.progress[id] = {
-          completed: true,
-          completedAt: p.completedAt || randomTuesdayThursdayIso(),
-        };
-      } else {
-        state.progress[id] = { completed: false, completedAt: null };
+      const nowComplete = isCompleteStatus(normalized);
+      if (nowComplete && !p.completed) {
+        markRowCompleted(id);
+      } else if (!nowComplete && p.completed) {
+        markRowReopened(id);
+      } else if (!nowComplete) {
+        ensureProgressRecord(id);
+        state.progress[id].completed = false;
+        state.progress[id].completedAt = null;
       }
       saveState();
       refreshCompletionViews();
@@ -1354,11 +2167,7 @@
     }
 
     function hasData() {
-      return SECTION_KEYS.some((k) => state.sections[k].rows.length > 0);
-    }
-
-    function workstreamsWithData() {
-      return SECTION_KEYS.filter((k) => state.sections[k].rows.length > 0);
+      return workstreamsWithData().length > 0;
     }
 
     function syncTabBar() {
@@ -1368,20 +2177,18 @@
       tabBar.hidden = !showTabs;
       tabBar.classList.toggle("has-workstreams", showTabs);
 
-      document.querySelectorAll("#tabBar .tab").forEach((btn) => {
-        const key = btn.dataset.tab;
-        const visible = withData.includes(key);
-        btn.hidden = !visible;
-        btn.style.display = visible ? "" : "none";
-      });
-
+      tabBar.innerHTML = "";
       if (!showTabs) return;
 
-      if (!withData.includes(activeTab)) {
-        activeTab = withData[0];
-      }
-      document.querySelectorAll("#tabBar .tab").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.tab === activeTab);
+      if (!withData.includes(activeTab)) activeTab = withData[0];
+
+      withData.forEach((id) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "tab" + (id === activeTab ? " active" : "");
+        btn.dataset.tab = id;
+        btn.textContent = workstreamLabel(id);
+        tabBar.appendChild(btn);
       });
     }
 
@@ -1410,7 +2217,7 @@
     function countStats() {
       let total = 0;
       let done = 0;
-      SECTION_KEYS.forEach((sec) => {
+      allWorkstreamIds().forEach((sec) => {
         state.sections[sec].rows.forEach((row, i) => {
           total++;
           const id = rowId(sec, i);
@@ -1448,13 +2255,6 @@
         emptyBar: root.getPropertyValue("--surface2").trim() || "#f2f2f2",
       };
     }
-
-    const CHART_WORKSTREAM_LABELS = {
-      virtualization: "Virtualization",
-      kubernetes: "Kubernetes",
-    };
-
-    const CHART_WORKSTREAM_ORDER = ["virtualization", "kubernetes"];
 
     const CHART_STATUS_LABELS = {
       completed: "Completed",
@@ -1564,22 +2364,19 @@
       const barW = W - pad.l - pad.r;
       const rowH = 36;
       const gap = 20;
-      const rows = CHART_WORKSTREAM_ORDER.length;
-      const blockH = rows * rowH + (rows - 1) * gap;
-      let y0 = (H - blockH) / 2;
+      const chartOrder = workstreamsWithData();
+      const rows = chartOrder.length;
+      const blockH = rows * rowH + Math.max(0, rows - 1) * gap;
+      let y0 = rows ? (H - blockH) / 2 : H / 2;
 
-      let hasRows = false;
-      CHART_WORKSTREAM_ORDER.forEach((sec) => {
-        if (state.sections[sec].rows.length) hasRows = true;
-      });
       chartBarHitRegions = [];
 
-      if (!hasRows) {
+      if (!rows) {
         drawEmptyChartMessage(ctx, W, H, "No criteria loaded yet.");
         return;
       }
 
-      CHART_WORKSTREAM_ORDER.forEach((sec) => {
+      chartOrder.forEach((sec) => {
         const counts = workstreamStatusCounts(sec);
         drawStackedBarRow(
           ctx,
@@ -1588,7 +2385,7 @@
           barW,
           rowH,
           counts,
-          CHART_WORKSTREAM_LABELS[sec],
+          workstreamLabel(sec),
           chartBarHitRegions
         );
         y0 += rowH + gap;
@@ -1670,12 +2467,9 @@
             row.completed = "Completed";
             if (row.status !== undefined) row.status = "Completed";
           }
-          state.progress[id] = {
-            completed: true,
-            completedAt: p.completedAt || randomTuesdayThursdayIso(),
-          };
+          markRowCompleted(id);
         } else {
-          state.progress[id] = { completed: false, completedAt: null };
+          markRowReopened(id);
         }
         saveState();
         refreshRowDoneState(tr, sec, rowIndex, cb);
@@ -1721,7 +2515,7 @@
           if (tracked) {
             const hint = document.createElement("span");
             hint.className = "completed-date-hint";
-            hint.textContent = "Tracked: " + tracked.slice(0, 10);
+            hint.textContent = "Completed: " + formatTrackedCompletion(tracked);
             td.appendChild(hint);
           }
         } else if (hLow === "criteria" || hLow === "objective") {
@@ -1757,31 +2551,20 @@
         return;
       }
 
-      if (sec === "virtualization") {
-        const groups = groupRowsBySection(sec);
-        groups.forEach((group) => {
-          const block = document.createElement("section");
-          block.className = "section-block";
-          const heading = document.createElement("h3");
-          heading.textContent = group.title;
-          block.appendChild(heading);
-          const { table, tbody } = createDataTableElement(columnHeaders);
-          group.items.forEach(({ row, index }) => {
-            appendDataRow(sec, index, row, columnHeaders, tbody);
-          });
-          block.appendChild(table);
-          mount.appendChild(block);
-        });
-      } else {
+      const groups = groupRowsBySection(sec);
+      groups.forEach((group) => {
         const block = document.createElement("section");
         block.className = "section-block";
+        const heading = document.createElement("h3");
+        heading.textContent = group.title;
+        block.appendChild(heading);
         const { table, tbody } = createDataTableElement(columnHeaders);
-        section.rows.forEach((row, i) => {
-          appendDataRow(sec, i, row, columnHeaders, tbody);
+        group.items.forEach(({ row, index }) => {
+          appendDataRow(sec, index, row, columnHeaders, tbody);
         });
         block.appendChild(table);
         mount.appendChild(block);
-      }
+      });
 
       document.getElementById("tabSummary").textContent = tabSummaryText(sec);
     }
@@ -1809,7 +2592,7 @@
         const hide = (globalHideCompleted || panelHideCompleted) && completed;
         if (!hide) visible++;
       });
-      return `${visible} shown · ${doneCount}/${section.rows.length} complete in ${SECTION_LABELS[sec]}`;
+      return `${visible} shown · ${doneCount}/${section.rows.length} complete in ${workstreamLabel(sec)}`;
     }
 
     function headerToKey(h) {
@@ -1818,14 +2601,9 @@
 
     let lastReportHtml = "";
 
-    function otherWorkstreamKey(tab) {
-      return tab === "virtualization" ? "kubernetes" : "virtualization";
-    }
-
     function workstreamsForReportScope(scope) {
-      if (scope === "both") return [...SECTION_KEYS];
-      if (scope === "other") return [otherWorkstreamKey(activeTab)];
-      return [activeTab];
+      if (scope === "all" || scope === "both") return workstreamsWithData();
+      return activeTab ? [activeTab] : workstreamsWithData();
     }
 
     function reportRowStatusLabel(sec, index, row) {
@@ -1842,23 +2620,14 @@
       const headers = getDisplayHeaders(sec);
       const groups = [];
 
-      if (sec === "virtualization") {
-        const bySection = groupRowsBySection(sec);
-        bySection.forEach((group) => {
-          const rows = [];
-          group.items.forEach(({ index, row }) => {
-            if (reportIncludeRow(sec, index, row)) rows.push({ index, row });
-          });
-          if (rows.length) groups.push({ title: group.title, headers, rows });
+      const bySection = groupRowsBySection(sec);
+      bySection.forEach((group) => {
+        const rows = [];
+        group.items.forEach(({ index, row }) => {
+          if (reportIncludeRow(sec, index, row)) rows.push({ index, row });
         });
-        return groups;
-      }
-
-      const rows = [];
-      section.rows.forEach((row, i) => {
-        if (reportIncludeRow(sec, i, row)) rows.push({ index: i, row });
+        if (rows.length) groups.push({ title: group.title, headers, rows });
       });
-      if (rows.length) groups.push({ title: null, headers, rows });
       return groups;
     }
 
@@ -1877,7 +2646,7 @@
       tabs.forEach((sec) => {
         const groups = buildReportRowGroups(sec);
         if (!groups.length) return;
-        parts.push(`<h2 style="color:#0072ce;font-size:18px;margin:28px 0 12px;border-bottom:1px solid #d9dadc;padding-bottom:6px;">${escapeHtml(SECTION_LABELS[sec] || sec)}</h2>`);
+        parts.push(`<h2 style="color:#0072ce;font-size:18px;margin:28px 0 12px;border-bottom:1px solid #d9dadc;padding-bottom:6px;">${escapeHtml(workstreamLabel(sec))}</h2>`);
         groups.forEach((group) => {
           if (group.title) {
             parts.push(`<h3 style="font-size:15px;margin:18px 0 8px;">${escapeHtml(group.title)}</h3>`);
@@ -1915,12 +2684,201 @@
         .replace(/"/g, "&quot;");
     }
 
+    function buildCompletionExportPayload() {
+      const log = collectAllCompletionLogEntries();
+      const checkoffs = collectCheckoffEvents();
+      return {
+        version: 1,
+        exportedAt: completionTimestampNow(),
+        title: state.title || defaultState().title,
+        checkoffCount: checkoffs.length,
+        log,
+        checkoffs,
+      };
+    }
+
+    function downloadTrackerBackupJson() {
+      const payload = stateToJsonPayload();
+      const blob = new Blob([JSON.stringify(payload, null, 2) + "\n"], {
+        type: "application/json;charset=utf-8",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "poc-tracker-backup.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function applyRestoreFromBackup(parsed) {
+      if (!parsed || typeof parsed !== "object") {
+        throw new Error("Invalid backup file.");
+      }
+      if (!parsed.sections || typeof parsed.sections !== "object") {
+        throw new Error("Backup is missing sections (not a full tracker backup). Use poc-tracker-backup.json, not the timegraph export.");
+      }
+      state = {
+        ...defaultState(),
+        ...parsed,
+        sections: parsed.sections,
+        progress: parsed.progress || {},
+        workstreamOrder: parsed.workstreamOrder || Object.keys(parsed.sections),
+        workstreamLabels: parsed.workstreamLabels || {},
+        progressMigratedToUids: parsed.progressMigratedToUids ?? true,
+      };
+      if (parsed.title) state.title = parsed.title;
+      if (parsed.subtitle) state.subtitle = parsed.subtitle;
+      migrateToDynamicWorkstreams();
+      migrateProgressKeysToRowUids();
+      ensureRowUids();
+      normalizeTrackerSchema();
+      const withData = workstreamsWithData();
+      activeTab = withData[0] || state.workstreamOrder[0] || null;
+      saveState();
+      renderAll();
+    }
+
+    function downloadCompletionTimestampsJson() {
+      const payload = buildCompletionExportPayload();
+      const blob = new Blob([JSON.stringify(payload, null, 2) + "\n"], {
+        type: "application/json;charset=utf-8",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "poc-completion-timestamps.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function csvEscape(value) {
+      const s = String(value ?? "");
+      if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+      return s;
+    }
+
+    function downloadCompletionTimestampsCsv() {
+      const log = collectAllCompletionLogEntries();
+      const lines = [
+        "timestamp,type,workstream,section,criteria,row_uid",
+        ...log.map((e) =>
+          [
+            csvEscape(e.at),
+            csvEscape(e.type),
+            csvEscape(e.workstream),
+            csvEscape(e.section),
+            csvEscape(e.criteria),
+            csvEscape(e.rowUid),
+          ].join(",")
+        ),
+      ];
+      const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "poc-completion-timestamps.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function drawTimegraph() {
+      const canvas = document.getElementById("timegraphCanvas");
+      const summary = document.getElementById("timegraphSummary");
+      if (!canvas || !summary) return;
+
+      const events = collectCheckoffEvents();
+      const { ctx, W, H } = setupCanvas(canvas);
+      const theme = chartTheme();
+      const colors = chartStatusColors();
+
+      if (!events.length) {
+        summary.textContent = "No check-off timestamps yet. Mark items complete with the checkbox to build the timeline.";
+        drawEmptyChartMessage(ctx, W, H, "No completions recorded yet.");
+        return;
+      }
+
+      const times = events.map((e) => new Date(e.at).getTime()).filter((t) => !Number.isNaN(t));
+      const tMin = Math.min(...times);
+      const tMax = Math.max(...times);
+      const span = Math.max(tMax - tMin, 60 * 60 * 1000);
+      const pad = { l: 48, r: 24, t: 28, b: 44 };
+      const plotW = W - pad.l - pad.r;
+      const plotH = H - pad.t - pad.b;
+
+      summary.textContent = `${events.length} check-off${events.length === 1 ? "" : "s"} recorded · ${formatTrackedCompletion(new Date(tMin).toISOString())} — ${formatTrackedCompletion(new Date(tMax).toISOString())}`;
+
+      const xFor = (t) => pad.l + ((t - tMin) / span) * plotW;
+      const yForCount = (n) => pad.t + plotH - (n / events.length) * plotH;
+
+      ctx.strokeStyle = theme.border;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(pad.l, pad.t, plotW, plotH);
+
+      ctx.fillStyle = theme.muted;
+      ctx.font = "11px Red Hat Text, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      const xLabelCount = 4;
+      for (let i = 0; i <= xLabelCount; i++) {
+        const t = tMin + (span * i) / xLabelCount;
+        const x = xFor(t);
+        ctx.fillText(
+          new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+          x,
+          pad.t + plotH + 8
+        );
+        ctx.beginPath();
+        ctx.moveTo(x, pad.t + plotH);
+        ctx.lineTo(x, pad.t + plotH + 4);
+        ctx.stroke();
+      }
+
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      for (let n = 0; n <= Math.min(events.length, 5); n++) {
+        const y = yForCount(n);
+        ctx.fillText(String(n), pad.l - 8, y);
+        ctx.beginPath();
+        ctx.moveTo(pad.l - 4, y);
+        ctx.lineTo(pad.l, y);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = colors.inProgress;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      events.forEach((ev, i) => {
+        const x = xFor(new Date(ev.at).getTime());
+        const y = yForCount(i + 1);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      events.forEach((ev, i) => {
+        const x = xFor(new Date(ev.at).getTime());
+        const y = yForCount(i + 1);
+        ctx.fillStyle = colors.completed;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function openTimegraphModal() {
+      document.getElementById("timegraphModal").hidden = false;
+      drawTimegraph();
+    }
+
+    function closeTimegraphModal() {
+      document.getElementById("timegraphModal").hidden = true;
+    }
+
     function openReportModal() {
       const modal = document.getElementById("reportModal");
-      document.getElementById("reportScopeActiveLabel").textContent =
-        `This tab (${SECTION_LABELS[activeTab]})`;
-      document.getElementById("reportScopeOtherLabel").textContent =
-        `Other tab (${SECTION_LABELS[otherWorkstreamKey(activeTab)]})`;
+      document.getElementById("reportScopeActiveLabel").textContent = activeTab
+        ? `This tab (${workstreamLabel(activeTab)})`
+        : "This tab";
       document.getElementById("reportPreview").hidden = true;
       document.getElementById("reportModalActions").hidden = true;
       lastReportHtml = "";
@@ -1977,25 +2935,34 @@
       saveState();
     }
 
-    function detectSection(line) {
-      const t = line.trim().toLowerCase();
-      if (/virtualization/.test(t) && /poc|doc/.test(t)) return "virtualization";
-      if (/^virtualization\b/.test(t) || t === "virtualization") return "virtualization";
-      if (/kubernetes/.test(t) && /poc|doc/.test(t)) return "kubernetes";
-      if (/^kubernetes\b/.test(t) || t === "kubernetes" || /^k8s\b/.test(t)) return "kubernetes";
-      return null;
-    }
-
     function parseWorkstreamDirective(line) {
       const m = line.match(/^@(?:workstream|tab)\s+(.+)$/i);
-      if (!m) return null;
-      const label = m[1].trim();
-      const direct = detectSection(label);
-      if (direct) return direct;
-      const t = label.toLowerCase();
-      if (/virt|kubevirt|ove/.test(t)) return "virtualization";
-      if (/k8s|kubernetes|oke/.test(t)) return "kubernetes";
-      return null;
+      return m ? m[1].trim() : null;
+    }
+
+    function workstreamLabelFromLine(line) {
+      const trimmed = line.trim();
+      const directive = parseWorkstreamDirective(trimmed);
+      if (directive) return directive;
+
+      const pocDoc = trimmed.match(/^poc\s+doc\s*[-–—:]\s*(.+)$/i);
+      if (pocDoc) return pocDoc[1].trim();
+
+      const t = trimmed.toLowerCase();
+      if (/virtualization/.test(t) && /poc|doc/.test(t)) return "Virtualization";
+      if (/^virtualization\b/.test(t) || t === "virtualization") return "Virtualization";
+      if (/kubernetes/.test(t) && /poc|doc/.test(t)) return "Kubernetes";
+      if (/^kubernetes\b/.test(t) || t === "kubernetes" || /^k8s\b/.test(t)) return "Kubernetes";
+      if (/^tab\s*[-–—:]\s*(.+)$/i.test(trimmed)) {
+        return trimmed.replace(/^tab\s*[-–—:]\s*/i, "").trim();
+      }
+
+      const cols = splitRow(line);
+      if (cols && cols.length >= 2) return null;
+      if (trimmed.length < 3 || trimmed.length > 100) return null;
+      if (/^\d+[\s.\)\/:]/.test(trimmed)) return null;
+      if (/proof of concept|evaluation framework|guides the validation/i.test(trimmed)) return null;
+      return trimmed;
     }
 
     function parseSectionDirective(line) {
@@ -2040,13 +3007,201 @@
       return row;
     }
 
-    function parsePlainText(text) {
+    function normalizeGoogleDocHeaders(cells) {
+      return normalizeHeaders(cells).map((h) => {
+        const t = h.trim();
+        if (/^objective$/i.test(t)) return "Criteria";
+        if (/^completed$/i.test(t)) return "Notes";
+        if (/^success\s*criteria$/i.test(t)) return "Success Criteria";
+        return h;
+      });
+    }
+
+    function isTableHeaderCells(cells) {
+      if (!cells || cells.length < 3) return false;
+      if (!cells.every((c) => String(c).trim().length < 80)) return false;
+      const joined = cells.join(" ").toLowerCase();
+      return (
+        /(objective|criteria|item|task)/.test(joined) &&
+        /(description|success|notes|complete|status)/.test(joined)
+      );
+    }
+
+    function looksLikeGoogleDocPlainTextExport(text) {
+      const lines = String(text).split(/\r?\n/);
+      let singleFieldLines = 0;
+      let multiColumnLines = 0;
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t) continue;
+        const parts = line.split("\t").map((c) => c.trim()).filter(Boolean);
+        if (parts.length >= 3) multiColumnLines++;
+        else singleFieldLines++;
+      }
+      return singleFieldLines >= 12 && singleFieldLines > multiColumnLines;
+    }
+
+    function parseGoogleDocPlainTextExport(text) {
+      const ctx = createParseContext();
       const lines = text.split(/\r?\n/);
       let title = null;
-      const sections = {
-        virtualization: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
-        kubernetes: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
-      };
+      let current = null;
+      let headers = null;
+      let currentRowSection = null;
+      let pendingCells = [];
+
+      function wsBucket() {
+        return current ? ctx.buckets[current] : null;
+      }
+
+      function defaultHeaders() {
+        return headers || (wsBucket()?.headers || DEFAULT_HEADERS);
+      }
+
+      function flushPendingRow() {
+        if (!pendingCells.length || !current) {
+          pendingCells = [];
+          return;
+        }
+        const useHeaders = defaultHeaders();
+        const colCount = useHeaders.length;
+        const cells = pendingCells.slice(0, colCount);
+        while (cells.length < colCount) cells.push("");
+
+        if (isTableHeaderCells(cells)) {
+          headers = normalizeGoogleDocHeaders(cells);
+          ctx.buckets[current].headers = headers;
+          pendingCells = [];
+          return;
+        }
+
+        const row = cellsToRow(useHeaders, cells);
+        const notesKey = headerToKey("Notes");
+        const completedKey = headerToKey("Completed");
+        if (row[completedKey] !== undefined && !row[notesKey]) {
+          row[notesKey] = row[completedKey];
+          row.notes = row[completedKey];
+        }
+        if (currentRowSection) row.section = currentRowSection;
+        row.uid = generateRowUid();
+        ctx.buckets[current].rows.push(row);
+        pendingCells = [];
+      }
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          if (pendingCells.length) flushPendingRow();
+          continue;
+        }
+
+        const wsDirective = parseWorkstreamDirective(trimmed);
+        if (wsDirective) {
+          flushPendingRow();
+          current = ctx.ensureWorkstream(wsDirective);
+          headers = null;
+          currentRowSection = null;
+          continue;
+        }
+
+        const sectionTag = parseSectionDirective(trimmed);
+        if (sectionTag) {
+          flushPendingRow();
+          currentRowSection = normalizeSectionLabel(sectionTag);
+          if (!current) current = ctx.ensureWorkstream("Imported");
+          continue;
+        }
+
+        const wsLabel = workstreamLabelFromLine(trimmed);
+        const strongWs =
+          wsLabel &&
+          (/^virtualization$/i.test(wsLabel) ||
+            /^kubernetes$/i.test(wsLabel) ||
+            /poc\s+doc/i.test(trimmed) ||
+            /^tab\s*[-–—:]/i.test(trimmed));
+        if (strongWs) {
+          flushPendingRow();
+          current = ctx.ensureWorkstream(wsLabel);
+          headers = null;
+          currentRowSection = null;
+          continue;
+        }
+
+        if (/^\d+[\s.\)\/:]/.test(trimmed) && current) {
+          flushPendingRow();
+          currentRowSection = normalizeSectionLabel(trimmed);
+          continue;
+        }
+
+        if (
+          !title &&
+          trimmed.length < 120 &&
+          !/^\d+\./.test(trimmed) &&
+          !strongWs &&
+          !/proof of concept|evaluation framework|guides the validation/i.test(trimmed)
+        ) {
+          title = trimmed;
+          continue;
+        }
+
+        if (!current) continue;
+
+        const cols = splitRow(line);
+        if (cols && cols.length >= 2) {
+          flushPendingRow();
+          if (isTableHeaderCells(cols) && !headers) {
+            headers = normalizeGoogleDocHeaders(cols);
+            ctx.buckets[current].headers = headers;
+            continue;
+          }
+          const useHeaders = defaultHeaders();
+          const row = cellsToRow(useHeaders, cols);
+          if (currentRowSection) row.section = currentRowSection;
+          row.uid = generateRowUid();
+          ctx.buckets[current].rows.push(row);
+          continue;
+        }
+
+        pendingCells.push(trimmed);
+        if (pendingCells.length >= defaultHeaders().length) flushPendingRow();
+      }
+
+      flushPendingRow();
+      return ctx.toResult(title);
+    }
+
+    function parseGoogleDocTabbedExport(text) {
+      const chunks = text.split(/\f/);
+      const ctx = createParseContext();
+      let docTitle = null;
+      chunks.forEach((chunk, idx) => {
+        const trimmed = chunk.trim();
+        if (!trimmed) return;
+        const lines = trimmed.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+        const tabLabel = (lines[0] && lines[0].length < 120 ? lines[0] : null) || `Tab ${idx + 1}`;
+        const id = ctx.ensureWorkstream(tabLabel);
+        const inner = parseGoogleDocPlainTextExport(trimmed);
+        if (inner.title && !docTitle) docTitle = inner.title;
+        const bucket = ctx.buckets[id];
+        inner.workstreams.forEach((ws) => {
+          if (ws.headers?.length) bucket.headers = ws.headers;
+          bucket.rows.push(...(ws.rows || []));
+        });
+      });
+      return ctx.toResult(docTitle);
+    }
+
+    function parsePlainText(text) {
+      if (String(text).includes("\f")) {
+        const tabbed = parseGoogleDocTabbedExport(text);
+        if (importResultRowCount(tabbed)) return tabbed;
+      }
+      if (looksLikeGoogleDocPlainTextExport(text)) {
+        return parseGoogleDocPlainTextExport(text);
+      }
+      const ctx = createParseContext();
+      const lines = text.split(/\r?\n/);
+      let title = null;
       let current = null;
       let headers = null;
       let currentRowSection = null;
@@ -2055,9 +3210,9 @@
         const trimmed = line.trim();
         if (!trimmed) continue;
 
-        const workstream = parseWorkstreamDirective(trimmed);
-        if (workstream) {
-          current = workstream;
+        const wsDirective = parseWorkstreamDirective(trimmed);
+        if (wsDirective) {
+          current = ctx.ensureWorkstream(wsDirective);
           headers = null;
           currentRowSection = null;
           continue;
@@ -2065,23 +3220,35 @@
 
         const sectionTag = parseSectionDirective(trimmed);
         if (sectionTag) {
-          currentRowSection = sectionTag;
-          if (!current) current = "virtualization";
+          currentRowSection = normalizeSectionLabel(sectionTag);
+          if (!current) current = ctx.ensureWorkstream("Imported");
+          continue;
+        }
+
+        if (/^\d+[\s.\)\/:]/.test(trimmed) && current) {
+          currentRowSection = normalizeSectionLabel(trimmed);
           continue;
         }
 
         if (!title && trimmed.length < 120 && !trimmed.includes("\t") && !/^\d+\./.test(trimmed)) {
-          const sec = detectSection(trimmed);
-          if (!sec) {
+          const ws = workstreamLabelFromLine(trimmed);
+          if (!ws) {
             title = trimmed;
             continue;
           }
         }
 
-        const secSwitch = detectSection(trimmed);
-        if (secSwitch) {
-          current = secSwitch;
+        const wsLabel = workstreamLabelFromLine(trimmed);
+        if (wsLabel && (trimmed.startsWith("##") || /^@(?:workstream|tab)\b/i.test(trimmed) || /poc\s+doc/i.test(trimmed))) {
+          current = ctx.ensureWorkstream(wsLabel.replace(/^##\s+/, "").trim());
           headers = null;
+          currentRowSection = null;
+          continue;
+        }
+        if (wsLabel && !splitRow(line) && (/^virtualization$/i.test(wsLabel) || /^kubernetes$/i.test(wsLabel))) {
+          current = ctx.ensureWorkstream(wsLabel);
+          headers = null;
+          currentRowSection = null;
           continue;
         }
 
@@ -2089,43 +3256,47 @@
 
         const cols = splitRow(line);
         if (cols && cols.length >= 2) {
-          const maybeHeader = cols.every((c) => c.length < 40) &&
-            cols.some((c) => /owner|status|item|task|notes|complete|due|date/i.test(c));
-          if (maybeHeader && !headers) {
-            headers = normalizeHeaders(cols);
-            sections[current].headers = headers;
+          const maybeHeader =
+            isTableHeaderCells(cols) ||
+            (cols.every((c) => c.length < 40) &&
+              cols.some((c) => /owner|status|item|task|notes|complete|due|date|objective|description|success/i.test(c)));
+          if (maybeHeader && isTableHeaderCells(cols)) {
+            headers = normalizeGoogleDocHeaders(cols);
+            ctx.buckets[current].headers = headers;
             continue;
           }
-          const useHeaders = headers || sections[current].headers;
+          if (maybeHeader && !headers) {
+            headers = normalizeHeaders(cols);
+            ctx.buckets[current].headers = headers;
+            continue;
+          }
+          const useHeaders = headers || ctx.buckets[current].headers;
           const row = cellsToRow(useHeaders, cols);
           if (currentRowSection) row.section = currentRowSection;
-          sections[current].rows.push(row);
+          row.uid = generateRowUid();
+          ctx.buckets[current].rows.push(row);
           continue;
         }
 
         const chk = parseCheckboxLine(line);
         if (chk) {
-          const useHeaders = sections[current].headers;
+          const useHeaders = ctx.buckets[current].headers;
           const cells = [chk.item, "", chk.status, "", chk.status === "Complete" ? new Date().toISOString().slice(0, 10) : ""];
           const row = cellsToRow(useHeaders, cells);
           if (currentRowSection) row.section = currentRowSection;
-          sections[current].rows.push(row);
+          row.uid = generateRowUid();
+          ctx.buckets[current].rows.push(row);
         }
       }
 
-      return { title, sections };
+      return ctx.toResult(title);
     }
 
     function parseHtmlExport(html) {
       const doc = new DOMParser().parseFromString(html, "text/html");
       const titleEl = doc.querySelector("title");
       let title = titleEl ? titleEl.textContent.trim() : null;
-
-      const sections = {
-        virtualization: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
-        kubernetes: { headers: ["Criteria", "Description", "Success Criteria", "Notes"], rows: [] },
-      };
-
+      const ctx = createParseContext();
       let current = null;
       const elements = [...doc.body.querySelectorAll("h1,h2,h3,h4,p,table")];
 
@@ -2133,13 +3304,16 @@
         const text = (el.textContent || "").trim();
         if (!text) continue;
         const tag = el.tagName.toLowerCase();
-        if (tag.startsWith("h") || (tag === "p" && text.length < 80)) {
-          const sec = detectSection(text);
-          if (sec) {
-            current = sec;
+        if (tag === "h2" || (tag.startsWith("h") && tag !== "h3" && tag !== "h4")) {
+          const ws = workstreamLabelFromLine(text) || text;
+          if (ws && text.length < 120) {
+            current = ctx.ensureWorkstream(ws);
             if (!title && tag === "h1") title = text;
             continue;
           }
+        }
+        if (tag === "h3" && current) {
+          continue;
         }
         if (!current || el.tagName !== "TABLE") continue;
 
@@ -2152,72 +3326,125 @@
           const isHeaderRow = ri === 0 && [...tr.querySelectorAll("th")].length > 0;
           if (isHeaderRow || (ri === 0 && cells.some((c) => /owner|status|item|complete/i.test(c)))) {
             headers = normalizeHeaders(cells);
-            sections[current].headers = headers;
+            ctx.buckets[current].headers = headers;
             return;
           }
-          const useHeaders = headers || sections[current].headers;
-          sections[current].rows.push(cellsToRow(useHeaders, cells));
+          const useHeaders = headers || ctx.buckets[current].headers;
+          const row = cellsToRow(useHeaders, cells);
+          row.uid = generateRowUid();
+          ctx.buckets[current].rows.push(row);
         });
       }
 
-      if (!sections.virtualization.rows.length && !sections.kubernetes.rows.length) {
+      if (!ctx.order.length) {
         const tables = [...doc.querySelectorAll("table")];
-        if (tables.length >= 2) {
-          current = "virtualization";
-          tables.forEach((table, ti) => {
-            current = ti === 0 ? "virtualization" : "kubernetes";
-            if (ti > 1) return;
-            let headers = null;
-            [...table.querySelectorAll("tr")].forEach((tr, ri) => {
-              const cells = [...tr.querySelectorAll("td,th")].map((c) => c.textContent.trim());
-              if (!cells.length) return;
-              if (ri === 0) {
-                headers = normalizeHeaders(cells);
-                sections[current].headers = headers;
-                return;
-              }
-              sections[current].rows.push(cellsToRow(headers || sections[current].headers, cells));
-            });
+        tables.forEach((table, ti) => {
+          const label = `Workstream ${ti + 1}`;
+          current = ctx.ensureWorkstream(label);
+          let headers = null;
+          [...table.querySelectorAll("tr")].forEach((tr, ri) => {
+            const cells = [...tr.querySelectorAll("td,th")].map((c) => c.textContent.trim());
+            if (!cells.length) return;
+            if (ri === 0 && cells.some((c) => /criteria|objective|description|notes/i.test(c))) {
+              headers = normalizeHeaders(cells);
+              ctx.buckets[current].headers = headers;
+              return;
+            }
+            const useHeaders = headers || ctx.buckets[current].headers;
+            const row = cellsToRow(useHeaders, cells);
+            row.uid = generateRowUid();
+            ctx.buckets[current].rows.push(row);
           });
-          if (tables.length > 1) {
-            current = "kubernetes";
-            let headers = null;
-            [...tables[1].querySelectorAll("tr")].forEach((tr, ri) => {
-              const cells = [...tr.querySelectorAll("td,th")].map((c) => c.textContent.trim());
-              if (!cells.length) return;
-              if (ri === 0) {
-                headers = normalizeHeaders(cells);
-                sections.kubernetes.headers = headers;
-                return;
-              }
-              sections.kubernetes.rows.push(cellsToRow(headers || sections.kubernetes.headers, cells));
-            });
-          }
-        }
+        });
       }
 
-      return { title, sections };
+      return ctx.toResult(title);
     }
 
-    function applyImport(result) {
-      if (result.title) {
-        state.title = result.title.replace(/\s*-\s*Google Docs\s*$/i, "").trim();
-        if (!/virtualization|kubernetes|workstream|tracker|migration|platform/i.test(state.title)) {
-          state.title = result.title + " — Workstream Tracker";
-        }
-      }
-      SECTION_KEYS.forEach((k) => {
-        if (result.sections[k].rows.length) {
-          state.sections[k] = result.sections[k];
-        }
+    function importResultRowCount(result) {
+      const normalized = normalizeImportResult(result);
+      return normalized.workstreams.reduce((n, ws) => n + (ws.rows?.length || 0), 0);
+    }
+
+    function applyImport(result, approvedWorkstreams) {
+      const normalized = normalizeImportResult(result);
+      const list = (approvedWorkstreams || normalized.workstreams).filter((ws) => ws.rows?.length);
+      state.title = resolvedPocTitleFromImport(result);
+      state.sections = {};
+      state.workstreamOrder = [];
+      state.workstreamLabels = {};
+      state.progress = {};
+      list.forEach((ws) => {
+        ensureWorkstreamSection(ws.id, ws.label);
+        state.sections[ws.id] = {
+          headers: ws.headers?.length ? [...ws.headers] : [...DEFAULT_HEADERS],
+          rows: (ws.rows || []).map((r) => ({ ...r, uid: r.uid || generateRowUid() })),
+          defaultSectionTitle: DEFAULT_SECTION_TITLE,
+        };
+        state.workstreamLabels[ws.id] = ws.label;
       });
+      if (list.length) activeTab = list[0].id;
       state.sourceImportedAt = new Date().toISOString();
       saveState();
       renderAll();
     }
 
-    function importResultRowCount(result) {
-      return SECTION_KEYS.reduce((n, k) => n + result.sections[k].rows.length, 0);
+    function openWorkstreamApproveModal(result, statusEl) {
+      const normalized = normalizeImportResult(result);
+      pendingImportResult = normalized;
+      pendingImportStatusEl = statusEl;
+      const list = document.getElementById("workstreamApproveList");
+      list.innerHTML = "";
+      normalized.workstreams
+        .filter((ws) => ws.rows?.length)
+        .forEach((ws) => {
+          const item = document.createElement("div");
+          item.className = "workstream-approve-item";
+          item.dataset.workstreamId = ws.id;
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = true;
+          cb.id = "ws-approve-" + ws.id;
+          const label = document.createElement("input");
+          label.type = "text";
+          label.value = ws.label;
+          label.setAttribute("aria-label", "Workstream name");
+          const meta = document.createElement("span");
+          meta.className = "workstream-approve-meta";
+          meta.textContent = `${ws.rows.length} row${ws.rows.length === 1 ? "" : "s"}`;
+          item.appendChild(cb);
+          item.appendChild(label);
+          item.appendChild(meta);
+          list.appendChild(item);
+        });
+      document.getElementById("workstreamApproveModal").hidden = false;
+    }
+
+    function closeWorkstreamApproveModal() {
+      document.getElementById("workstreamApproveModal").hidden = true;
+      pendingImportResult = null;
+      pendingImportStatusEl = null;
+    }
+
+    function confirmWorkstreamApprove() {
+      if (!pendingImportResult) return;
+      const approved = [];
+      document.querySelectorAll(".workstream-approve-item").forEach((item) => {
+        const cb = item.querySelector('input[type="checkbox"]');
+        if (!cb?.checked) return;
+        const id = item.dataset.workstreamId;
+        const labelInput = item.querySelector('input[type="text"]');
+        const ws = pendingImportResult.workstreams.find((w) => w.id === id);
+        if (!ws) return;
+        approved.push({ ...ws, label: labelInput?.value.trim() || ws.label });
+      });
+      if (!approved.length) {
+        setImportStatus(pendingImportStatusEl, "Select at least one workstream to import.", true);
+        return;
+      }
+      setImportStatus(pendingImportStatusEl, "", false);
+      applyImport(pendingImportResult, approved);
+      closeWorkstreamApproveModal();
     }
 
     function setImportStatus(el, message, isError) {
@@ -2237,14 +3464,22 @@
       if (!importResultRowCount(result)) {
         setImportStatus(
           statusEl,
-          "No Virtualization or Kubernetes criteria found. Check workstream headings and tables.",
+          "No workstream criteria found. Check tab headings (## workstream) and tables.",
           true
         );
         return false;
       }
-      setImportStatus(statusEl, "", false);
-      applyImport(result);
+      openWorkstreamApproveModal(result, statusEl);
       return true;
+    }
+
+    function stripMarkdownInline(value) {
+      if (value == null) return "";
+      return String(value)
+        .replace(/\*\*(.+?)\*\*/g, "$1")
+        .replace(/\*\*/g, "")
+        .replace(/\\([._*[\]()#+\-!])/g, "$1")
+        .trim();
     }
 
     function parseMarkdown(text) {
@@ -2254,24 +3489,28 @@
       let tableActive = false;
 
       for (const line of lines) {
-        const t = line.trim();
+        const t = stripMarkdownInline(line.trim());
         if (!t) {
           tableActive = false;
           continue;
         }
         if (/^#\s+/.test(t) && !/^##/.test(t)) {
-          docTitle = t.replace(/^#\s+/, "").trim();
+          docTitle = stripMarkdownInline(t.replace(/^#\s+/, "").trim());
           tableActive = false;
           continue;
         }
         if (/^##\s+/.test(t)) {
           tableActive = false;
-          out.push(t.replace(/^##\s+/, "").trim());
+          out.push(
+            "@workstream " + stripMarkdownInline(t.replace(/^##\s+/, "").trim())
+          );
           continue;
         }
         if (/^###\s+/.test(t)) {
           tableActive = false;
-          out.push("@section " + t.replace(/^###\s+/, "").trim());
+          out.push(
+            "@section " + normalizeSectionLabel(stripMarkdownInline(t.replace(/^###\s+/, "").trim()))
+          );
           continue;
         }
         if (/^@(?:workstream|tab|section)\b/i.test(t)) {
@@ -2283,7 +3522,7 @@
           if (/^[\s|:\-]+$/.test(t.replace(/\|/g, ""))) continue;
           const cells = t
             .split("|")
-            .map((c) => c.trim())
+            .map((c) => stripMarkdownInline(c.trim()))
             .filter((c, i, arr) => !(i === 0 && c === "") && !(i === arr.length - 1 && c === ""));
           if (cells.length >= 2) {
             out.push(cells.join("\t"));
@@ -2302,6 +3541,14 @@
       return result;
     }
 
+    function importGoogleDocMarkdownFile(text, fileName) {
+      const status = document.getElementById("importGoogleDocStatus");
+      if (fileName) {
+        setImportStatus(status, `Loaded ${fileName} — importing…`, false);
+      }
+      tryApplyImport(parseMarkdown(text), status);
+    }
+
     async function importGoogleDocFromUrl() {
       const status = document.getElementById("importGoogleDocStatus");
       const url = document.getElementById("googleDocUrl").value.trim();
@@ -2317,14 +3564,21 @@
       const btn = document.getElementById("btnImportGoogleDoc");
       if (btn) btn.disabled = true;
       try {
-        const res = await fetch("/api/import-google-doc", {
+        const res = await fetch(appApiUrl(IMPORT_GOOGLE_DOC_API_URL), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url }),
         });
-        const data = await res.json();
+        const { data, parseFailed, raw } = await readApiJsonResponse(res);
+        if (parseFailed) {
+          const hint =
+            res.status === 404 || /not found/i.test(String(raw))
+              ? "Import API not available. Run npm start or docker compose up (static hosting cannot fetch Google Docs)."
+              : String(raw || `Import failed (${res.status})`).slice(0, 240);
+          throw new Error(hint);
+        }
         if (!res.ok) throw new Error(data.error || "Import failed");
-        tryApplyImport(parsePlainText(data.text), status);
+        tryApplyImport(parseMarkdown(data.text), status);
       } catch (err) {
         setImportStatus(status, err.message || "Import failed.", true);
       } finally {
@@ -2346,10 +3600,352 @@
       importMarkdownContent(document.getElementById("markdownSource").value);
     }
 
+    function groupRowsBySectionInDraft(wsId) {
+      const sec = structureEditorDraft.sections[wsId];
+      const fallback = sec.defaultSectionTitle || DEFAULT_SECTION_TITLE;
+      const groups = [];
+      const indexByKey = new Map();
+      sec.rows.forEach((row, index) => {
+        const key = row.section || fallback;
+        if (!indexByKey.has(key)) {
+          const group = { key, title: sectionDisplayTitle(key), items: [] };
+          indexByKey.set(key, group);
+          groups.push(group);
+        }
+        indexByKey.get(key).items.push({ row, index });
+      });
+      if (!groups.length) {
+        groups.push({ key: fallback, title: fallback, items: [] });
+      }
+      return groups;
+    }
+
+    function draftRowCellValue(row, header) {
+      const key = headerToKey(header);
+      if (key === "criteria") return row.criteria ?? row.objective ?? row.item ?? "";
+      return row[key] ?? "";
+    }
+
+    function setDraftRowCell(row, header, value, headers) {
+      const key = headerToKey(header);
+      row[key] = value;
+      if (key === "criteria") {
+        row.criteria = value;
+        row.item = value;
+      }
+      if (!row.cells) row.cells = headers.map((h) => draftRowCellValue(row, h));
+      const i = headers.indexOf(header);
+      if (i >= 0) row.cells[i] = value;
+    }
+
+    function newEmptyDraftRow(headers, sectionTitle) {
+      const row = { uid: generateRowUid(), section: sectionTitle };
+      headers.forEach((h) => setDraftRowCell(row, h, "", headers));
+      return row;
+    }
+
+    function cloneStructureFromState() {
+      return {
+        workstreamOrder: [...(state.workstreamOrder || orderedWorkstreamIds())],
+        workstreamLabels: { ...(state.workstreamLabels || {}) },
+        sections: JSON.parse(JSON.stringify(state.sections || {})),
+      };
+    }
+
+    function hasCompletionProgress() {
+      return Object.values(state.progress || {}).some((p) => p?.completed);
+    }
+
+    function openStructureEditor({ emptyStart = false } = {}) {
+      if (emptyStart) {
+        const id = uniqueWorkstreamId("Workstream 1", []);
+        structureEditorDraft = {
+          workstreamOrder: [id],
+          workstreamLabels: { [id]: "Workstream 1" },
+          sections: {
+            [id]: {
+              headers: [...DEFAULT_HEADERS],
+              rows: [newEmptyDraftRow(DEFAULT_HEADERS, DEFAULT_SECTION_TITLE)],
+              defaultSectionTitle: DEFAULT_SECTION_TITLE,
+            },
+          },
+        };
+      } else {
+        structureEditorDraft = cloneStructureFromState();
+        if (!structureEditorDraft.workstreamOrder.length) {
+          const id = uniqueWorkstreamId("Workstream 1", []);
+          structureEditorDraft.workstreamOrder = [id];
+          structureEditorDraft.workstreamLabels[id] = "Workstream 1";
+          structureEditorDraft.sections[id] = {
+            headers: [...DEFAULT_HEADERS],
+            rows: [],
+            defaultSectionTitle: DEFAULT_SECTION_TITLE,
+          };
+        }
+      }
+      structureEditorActiveWs = structureEditorDraft.workstreamOrder[0];
+      document.getElementById("structureEditorModal").hidden = false;
+      renderStructureEditor();
+    }
+
+    function closeStructureEditor() {
+      document.getElementById("structureEditorModal").hidden = true;
+      structureEditorDraft = null;
+      structureEditorActiveWs = null;
+    }
+
+    function renderStructureEditor() {
+      const body = document.getElementById("structureEditorBody");
+      body.innerHTML = "";
+      if (!structureEditorDraft || !structureEditorActiveWs) return;
+      const wsId = structureEditorActiveWs;
+      const sec = structureEditorDraft.sections[wsId];
+      if (!sec) return;
+
+      const toolbar = document.createElement("div");
+      toolbar.className = "structure-toolbar";
+      const btnAddSection = document.createElement("button");
+      btnAddSection.type = "button";
+      btnAddSection.textContent = "Add section";
+      btnAddSection.addEventListener("click", () => {
+        const name = prompt("Section title", "New section");
+        if (!name?.trim()) return;
+        const title = normalizeSectionLabel(name.trim());
+        sec.rows.push(newEmptyDraftRow(sec.headers, title));
+        renderStructureEditor();
+      });
+      const btnAddColumn = document.createElement("button");
+      btnAddColumn.type = "button";
+      btnAddColumn.textContent = "Add column";
+      btnAddColumn.addEventListener("click", () => {
+        const name = prompt("Column header", "Column");
+        if (!name?.trim()) return;
+        sec.headers.push(name.trim());
+        sec.rows.forEach((row) => setDraftRowCell(row, name.trim(), "", sec.headers));
+        renderStructureEditor();
+      });
+      const btnRenameWs = document.createElement("button");
+      btnRenameWs.type = "button";
+      btnRenameWs.textContent = "Rename workstream";
+      btnRenameWs.addEventListener("click", () => {
+        const name = prompt("Workstream name", structureEditorDraft.workstreamLabels[wsId] || wsId);
+        if (!name?.trim()) return;
+        structureEditorDraft.workstreamLabels[wsId] = name.trim();
+        renderStructureEditor();
+      });
+      toolbar.appendChild(btnAddSection);
+      toolbar.appendChild(btnAddColumn);
+      toolbar.appendChild(btnRenameWs);
+      body.appendChild(toolbar);
+
+      const wsTabs = document.createElement("div");
+      wsTabs.className = "structure-ws-tabs";
+      structureEditorDraft.workstreamOrder.forEach((id) => {
+        const tab = document.createElement("button");
+        tab.type = "button";
+        tab.className = "structure-ws-tab" + (id === wsId ? " active" : "");
+        tab.textContent = structureEditorDraft.workstreamLabels[id] || id;
+        tab.addEventListener("click", () => {
+          structureEditorActiveWs = id;
+          renderStructureEditor();
+        });
+        wsTabs.appendChild(tab);
+      });
+      const addWs = document.createElement("button");
+      addWs.type = "button";
+      addWs.className = "structure-ws-tab";
+      addWs.textContent = "+ Workstream";
+      addWs.addEventListener("click", () => {
+        const name = prompt("Workstream name", `Workstream ${structureEditorDraft.workstreamOrder.length + 1}`);
+        if (!name?.trim()) return;
+        const id = uniqueWorkstreamId(name.trim(), new Set(structureEditorDraft.workstreamOrder));
+        structureEditorDraft.workstreamOrder.push(id);
+        structureEditorDraft.workstreamLabels[id] = name.trim();
+        structureEditorDraft.sections[id] = {
+          headers: [...DEFAULT_HEADERS],
+          rows: [newEmptyDraftRow(DEFAULT_HEADERS, DEFAULT_SECTION_TITLE)],
+          defaultSectionTitle: DEFAULT_SECTION_TITLE,
+        };
+        structureEditorActiveWs = id;
+        renderStructureEditor();
+      });
+      wsTabs.appendChild(addWs);
+      body.appendChild(wsTabs);
+
+      const defWrap = document.createElement("div");
+      defWrap.className = "structure-toolbar";
+      const defLabel = document.createElement("label");
+      defLabel.textContent = "Default section title ";
+      const defInput = document.createElement("input");
+      defInput.type = "text";
+      defInput.value = sec.defaultSectionTitle || DEFAULT_SECTION_TITLE;
+      defInput.addEventListener("change", () => {
+        sec.defaultSectionTitle = defInput.value.trim() || DEFAULT_SECTION_TITLE;
+      });
+      defLabel.appendChild(defInput);
+      defWrap.appendChild(defLabel);
+      body.appendChild(defWrap);
+
+      const groups = groupRowsBySectionInDraft(wsId);
+      groups.forEach((group) => {
+        const block = document.createElement("div");
+        block.className = "structure-section-block";
+        block.dataset.sectionKey = group.key;
+
+        const head = document.createElement("div");
+        head.className = "structure-section-head";
+        const titleInput = document.createElement("input");
+        titleInput.type = "text";
+        titleInput.value = group.title;
+        titleInput.addEventListener("change", () => {
+          const newTitle = normalizeSectionLabel(titleInput.value.trim()) || group.key;
+          group.items.forEach(({ row }) => {
+            row.section = newTitle;
+          });
+          renderStructureEditor();
+        });
+        const btnAddRow = document.createElement("button");
+        btnAddRow.type = "button";
+        btnAddRow.textContent = "Add row";
+        btnAddRow.addEventListener("click", () => {
+          const sectionTitle = titleInput.value.trim() || group.key;
+          sec.rows.push(newEmptyDraftRow(sec.headers, sectionTitle));
+          renderStructureEditor();
+        });
+        const btnDelSection = document.createElement("button");
+        btnDelSection.type = "button";
+        btnDelSection.textContent = "Remove section";
+        btnDelSection.addEventListener("click", () => {
+          if (!confirm("Remove all rows in this section?")) return;
+          const toRemove = new Set(group.items.map((x) => x.index));
+          sec.rows = sec.rows.filter((_, i) => !toRemove.has(i));
+          renderStructureEditor();
+        });
+        head.appendChild(titleInput);
+        head.appendChild(btnAddRow);
+        head.appendChild(btnDelSection);
+        block.appendChild(head);
+
+        const table = document.createElement("table");
+        table.className = "structure-edit-table";
+        const thead = document.createElement("thead");
+        const hr = document.createElement("tr");
+        const dragTh = document.createElement("th");
+        dragTh.className = "drag-col";
+        dragTh.textContent = "↕";
+        hr.appendChild(dragTh);
+        sec.headers.forEach((h, hi) => {
+          const th = document.createElement("th");
+          const inp = document.createElement("input");
+          inp.value = h;
+          inp.addEventListener("change", () => {
+            const next = inp.value.trim() || h;
+            sec.headers[hi] = next;
+            renderStructureEditor();
+          });
+          th.appendChild(inp);
+          hr.appendChild(th);
+        });
+        const actTh = document.createElement("th");
+        actTh.className = "structure-row-actions";
+        actTh.textContent = "";
+        hr.appendChild(actTh);
+        thead.appendChild(hr);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        group.items.forEach(({ row, index }) => {
+          const tr = document.createElement("tr");
+          tr.draggable = true;
+          tr.dataset.rowIndex = String(index);
+          tr.addEventListener("dragstart", (e) => {
+            tr.classList.add("dragging");
+            e.dataTransfer.setData("text/plain", String(index));
+          });
+          tr.addEventListener("dragend", () => tr.classList.remove("dragging"));
+          tr.addEventListener("dragover", (e) => e.preventDefault());
+          tr.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const from = parseInt(e.dataTransfer.getData("text/plain"), 10);
+            const to = index;
+            if (Number.isNaN(from) || from === to) return;
+            const moved = sec.rows.splice(from, 1)[0];
+            sec.rows.splice(to, 0, moved);
+            renderStructureEditor();
+          });
+
+          const dragTd = document.createElement("td");
+          dragTd.className = "drag-col";
+          dragTd.textContent = "⋮";
+          tr.appendChild(dragTd);
+
+          sec.headers.forEach((h) => {
+            const td = document.createElement("td");
+            const ta = document.createElement("textarea");
+            ta.rows = 2;
+            ta.value = draftRowCellValue(row, h);
+            ta.addEventListener("input", () => setDraftRowCell(row, h, ta.value, sec.headers));
+            td.appendChild(ta);
+            tr.appendChild(td);
+          });
+
+          const delTd = document.createElement("td");
+          delTd.className = "structure-row-actions";
+          const delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.textContent = "Delete";
+          delBtn.addEventListener("click", () => {
+            sec.rows.splice(index, 1);
+            renderStructureEditor();
+          });
+          delTd.appendChild(delBtn);
+          tr.appendChild(delTd);
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        block.appendChild(table);
+        body.appendChild(block);
+      });
+    }
+
+    function commitStructureDraft() {
+      if (!structureEditorDraft) return;
+      const keep = new Set(structureEditorDraft.workstreamOrder);
+      structureEditorDraft.workstreamOrder.forEach((id) => {
+        const label = structureEditorDraft.workstreamLabels[id] || formatWorkstreamIdLabel(id);
+        ensureWorkstreamSection(id, label);
+        state.sections[id] = JSON.parse(JSON.stringify(structureEditorDraft.sections[id]));
+        state.workstreamLabels[id] = label;
+      });
+      allWorkstreamIds().forEach((id) => {
+        if (!keep.has(id)) {
+          delete state.sections[id];
+          delete state.workstreamLabels[id];
+        }
+      });
+      state.workstreamOrder = [...structureEditorDraft.workstreamOrder];
+      ensureRowUids();
+      const withData = workstreamsWithData();
+      activeTab = withData[0] || state.workstreamOrder[0] || null;
+      state.sourceImportedAt = state.sourceImportedAt || new Date().toISOString();
+      saveState();
+      renderAll();
+      closeStructureEditor();
+    }
+
+    function requestStructureSave() {
+      if (hasCompletionProgress()) {
+        structureSaveAfterWarn = true;
+        document.getElementById("structureWarnModal").hidden = false;
+        return;
+      }
+      commitStructureDraft();
+    }
+
     function setImportMode(mode) {
-      const gdoc = mode === "gdoc";
-      document.getElementById("importPanelGdoc").hidden = !gdoc;
-      document.getElementById("importPanelMarkdown").hidden = gdoc;
+      document.getElementById("importPanelGdoc").hidden = mode !== "gdoc";
+      document.getElementById("importPanelMarkdown").hidden = mode !== "markdown";
+      document.getElementById("importPanelBuild").hidden = mode !== "build";
       document.querySelectorAll(".import-mode").forEach((btn) => {
         const active = btn.dataset.importMode === mode;
         btn.classList.toggle("active", active);
@@ -2363,6 +3959,30 @@
 
     document.getElementById("btnImportGoogleDoc").addEventListener("click", () => {
       importGoogleDocFromUrl();
+    });
+
+    document.getElementById("btnChooseGoogleDocFile").addEventListener("click", () => {
+      document.getElementById("fileGoogleDocExport").click();
+    });
+
+    document.getElementById("fileGoogleDocExport").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      e.target.value = "";
+      if (!file) return;
+      const status = document.getElementById("importGoogleDocStatus");
+      const name = (file.name || "").toLowerCase();
+      if (!/\.(md|markdown)$/.test(name)) {
+        setImportStatus(status, "Choose a Markdown (.md) file from File → Download → Markdown.", true);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        importGoogleDocMarkdownFile(reader.result, file.name);
+      };
+      reader.onerror = () => {
+        setImportStatus(status, "Could not read that file.", true);
+      };
+      reader.readAsText(file);
     });
 
     document.getElementById("btnImportMarkdown").addEventListener("click", () => {
@@ -2398,13 +4018,32 @@
       }
     });
 
-    document.getElementById("btnReset").addEventListener("click", () => {
-      closeAppMenu();
-      if (!confirm("Clear all imported rows and completion progress in this browser?")) return;
+    function openResetModal() {
+      document.getElementById("resetModal").hidden = false;
+    }
+
+    function closeResetModal() {
+      document.getElementById("resetModal").hidden = true;
+    }
+
+    function performResetAllData() {
       state = stateFromEmbedded();
       saveState();
       renderAll();
+      closeResetModal();
+    }
+
+    document.getElementById("btnReset").addEventListener("click", () => {
+      closeAppMenu();
+      openResetModal();
     });
+
+    document.getElementById("btnResetConfirm").addEventListener("click", () => {
+      performResetAllData();
+    });
+
+    document.getElementById("btnResetCancel").addEventListener("click", closeResetModal);
+    document.getElementById("resetModalBackdrop").addEventListener("click", closeResetModal);
 
     function closeAppMenu() {
       const toggle = document.getElementById("menuToggle");
@@ -2465,6 +4104,81 @@
       openReportModal();
     });
 
+    document.getElementById("btnEditStructure").addEventListener("click", () => {
+      closeAppMenu();
+      openStructureEditor({ emptyStart: false });
+    });
+
+    document.getElementById("btnViewTimegraph").addEventListener("click", () => {
+      closeAppMenu();
+      openTimegraphModal();
+    });
+
+    document.getElementById("btnDownloadBackup").addEventListener("click", () => {
+      closeAppMenu();
+      downloadTrackerBackupJson();
+    });
+
+    document.getElementById("btnRestoreBackup").addEventListener("click", () => {
+      closeAppMenu();
+      document.getElementById("fileRestoreBackup").click();
+    });
+
+    document.getElementById("fileRestoreBackup").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      e.target.value = "";
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(String(reader.result || ""));
+          if (
+            !confirm(
+              "Restore this backup? It will replace all criteria, checkboxes, and notes in this browser (and sync to state.json if the server is running)."
+            )
+          ) {
+            return;
+          }
+          applyRestoreFromBackup(parsed);
+        } catch (err) {
+          alert(err.message || "Could not restore that file.");
+        }
+      };
+      reader.onerror = () => alert("Could not read that file.");
+      reader.readAsText(file);
+    });
+
+    document.getElementById("btnTimegraphClose").addEventListener("click", closeTimegraphModal);
+    document.getElementById("timegraphModalBackdrop").addEventListener("click", closeTimegraphModal);
+    document.getElementById("btnTimegraphDownloadJson").addEventListener("click", downloadCompletionTimestampsJson);
+    document.getElementById("btnTimegraphDownloadCsv").addEventListener("click", downloadCompletionTimestampsCsv);
+
+    document.getElementById("btnStartBuild").addEventListener("click", () => {
+      openStructureEditor({ emptyStart: true });
+    });
+
+    document.getElementById("btnStructureSave").addEventListener("click", requestStructureSave);
+    document.getElementById("btnStructureCancel").addEventListener("click", closeStructureEditor);
+    document.getElementById("structureEditorBackdrop").addEventListener("click", closeStructureEditor);
+
+    document.getElementById("btnStructureWarnConfirm").addEventListener("click", () => {
+      document.getElementById("structureWarnModal").hidden = true;
+      if (structureSaveAfterWarn) commitStructureDraft();
+      structureSaveAfterWarn = false;
+    });
+    document.getElementById("btnStructureWarnCancel").addEventListener("click", () => {
+      document.getElementById("structureWarnModal").hidden = true;
+      structureSaveAfterWarn = false;
+    });
+    document.getElementById("structureWarnBackdrop").addEventListener("click", () => {
+      document.getElementById("structureWarnModal").hidden = true;
+      structureSaveAfterWarn = false;
+    });
+
+    document.getElementById("btnWorkstreamApproveConfirm").addEventListener("click", confirmWorkstreamApprove);
+    document.getElementById("btnWorkstreamApproveCancel").addEventListener("click", closeWorkstreamApproveModal);
+    document.getElementById("workstreamApproveBackdrop").addEventListener("click", closeWorkstreamApproveModal);
+
     document.getElementById("btnReportPreview").addEventListener("click", () => {
       lastReportHtml = buildReportHtml(selectedReportScope());
       const preview = document.getElementById("reportPreview");
@@ -2496,19 +4210,31 @@
     document.getElementById("reportModalBackdrop").addEventListener("click", closeReportModal);
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !document.getElementById("reportModal").hidden) closeReportModal();
+      if (e.key !== "Escape") return;
+      if (!document.getElementById("resetModal").hidden) closeResetModal();
+      else if (!document.getElementById("structureEditorModal").hidden) closeStructureEditor();
+      else if (!document.getElementById("structureWarnModal").hidden) {
+        document.getElementById("structureWarnModal").hidden = true;
+        structureSaveAfterWarn = false;
+      }       else if (!document.getElementById("workstreamApproveModal").hidden) closeWorkstreamApproveModal();
+      else if (!document.getElementById("timegraphModal").hidden) closeTimegraphModal();
+      else if (!document.getElementById("reportModal").hidden) closeReportModal();
     });
 
-    document.querySelectorAll(".tab").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
-        btn.classList.add("active");
-        activeTab = btn.dataset.tab;
-        renderTable();
-      });
+    document.getElementById("tabBar").addEventListener("click", (e) => {
+      const btn = e.target.closest(".tab");
+      if (!btn?.dataset.tab) return;
+      activeTab = btn.dataset.tab;
+      syncTabBar();
+      renderTable();
     });
 
-    window.addEventListener("resize", () => drawChart());
+    window.addEventListener("resize", () => {
+      drawChart();
+      if (document.getElementById("timegraphModal") && !document.getElementById("timegraphModal").hidden) {
+        drawTimegraph();
+      }
+    });
 
     bindStatusBarChartHover();
     boot();

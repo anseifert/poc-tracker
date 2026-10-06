@@ -25,7 +25,7 @@ Progress is stored in the named volume `poc_tracker_state` (mounted at `/data` i
 
 ## Getting criteria into the app
 
-On the empty home screen, set an optional **POC title**, then choose one of three tabs.
+On the empty home screen, set an optional **POC title** and optional **status colors** (defaults: completed `#22c55e`, in progress `#f59e0b`), then choose one of three tabs.
 
 ### Google Doc (default)
 
@@ -74,8 +74,10 @@ After data exists, use the hamburger menu → **Edit POC structure…** to chang
 - **Workstream tabs** appear for each workstream that has rows.
 - **Sections** group rows under headings (default section title **General** when none is set).
 - Check **Done** on a row to record a **timestamp**; unchecking and checking again sets a new completion time. Notes can also mark items complete.
-- **POC progress by workstream** chart on the main page.
+- **POC progress by workstream** chart on the main page (default colors: **green** = completed, **amber** = in progress, neutral gray = open).
+- **Status colors** — set **Completed** and **In progress** colors in the POC title panel (before import), on the **Build here** tab, or via hamburger **Chart colors…** after data exists. Saved in `state.json` with the POC; used on the chart, legend, timegraph, and notes highlighting.
 - Hamburger menu:
+  - **Chart colors…** — change completed / in-progress colors after import
   - **View timegraph…** — timeline of check-offs; download completion log as JSON or CSV
   - **Email report…** — HTML preview, copy, or download (open / in-progress items)
   - **Download backup (JSON)** / **Restore from backup…** — full app state (criteria + progress), for moving machines or recovering after clearing browser data
@@ -86,7 +88,7 @@ After data exists, use the hamburger menu → **Edit POC structure…** to chang
 | Mechanism | What it does |
 |-----------|----------------|
 | **Browser `localStorage`** | Always used while you work |
-| **`state.json`** | Written when using `npm start` or Docker (`PUT /api/state`); reloaded on next visit if the browser cache was cleared |
+| **`state.json`** | Written when using `npm start` or Docker (`PUT /api/state`); includes criteria, progress, workstreams, and `statusColors`; reloaded on next visit if the browser cache was cleared |
 | **`state.json.backup`** | Server copies `state.json` over this file every **5 minutes** (same folder as `state.json`) |
 | **`poc-tracker-backup.json`** | Manual export from the menu (same payload shape as `state.json`) |
 

@@ -40,9 +40,11 @@
       --eprod-blue-bright: #0072ce;
       --eprod-white: #ffffff;
       --eprod-gray: #75787b;
-      --chart-completed: var(--eprod-enterprise-blue);
-      --chart-in-progress: var(--eprod-blue-bright);
-      --chart-open: var(--eprod-white);
+      --chart-completed: #22c55e;
+      --chart-in-progress: #f59e0b;
+      --status-completed: #22c55e;
+      --status-in-progress: #f59e0b;
+      --chart-open: var(--rh-gray-10);
       --chart-muted: var(--eprod-gray);
       --chart-border: #d9dadc;
 
@@ -498,7 +500,7 @@
       font-weight: 600;
     }
 
-    .status-yes { color: var(--done); }
+    .status-yes { color: var(--status-completed, var(--done)); }
     .status-partial { color: var(--warn); }
 
     td.completed-cell {
@@ -533,8 +535,51 @@
       border-color: var(--rh-gray-30);
     }
 
-    .completed-input.status-yes { color: var(--done); border-color: var(--rh-teal-50); }
-    .completed-input.status-partial { color: var(--warn); border-color: var(--rh-yellow-50); }
+    .completed-input.status-yes {
+      color: var(--status-completed, var(--done));
+      border-color: var(--status-completed, var(--rh-teal-50));
+    }
+    .completed-input.status-partial {
+      color: var(--status-in-progress, var(--warn));
+      border-color: var(--status-in-progress, var(--rh-orange-50));
+    }
+
+    .status-color-fields {
+      border: none;
+      margin: 0 0 0.85rem;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      width: 100%;
+    }
+
+    .status-color-fields legend {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.15rem;
+      width: 100%;
+    }
+
+    .status-color-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.88rem;
+    }
+
+    .status-color-label input[type="color"] {
+      width: 2.6rem;
+      height: 2rem;
+      padding: 0.15rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: var(--surface);
+    }
 
     .completed-date-hint {
       display: block;
@@ -590,14 +635,14 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: var(--eprod-enterprise-blue, #003087);
+      background: var(--chart-completed);
     }
 
     .timegraph-legend .dot.line {
       border-radius: 1px;
       width: 18px;
       height: 3px;
-      background: var(--eprod-blue-bright, #0072ce);
+      background: var(--chart-in-progress);
     }
 
     @media (max-width: 600px) {
@@ -1013,6 +1058,7 @@
             <button type="button" id="btnHideCompleted" data-requires-data hidden>Hide all completed</button>
             <button type="button" id="btnEmailReport" data-requires-data hidden>Email report…</button>
             <button type="button" id="btnEditStructure" data-requires-data hidden>Edit POC structure…</button>
+            <button type="button" id="btnChartColors" data-requires-data hidden>Chart colors…</button>
             <button type="button" id="btnViewTimegraph" data-requires-data hidden>View timegraph…</button>
             <div class="app-menu-divider" role="separator"></div>
             <button type="button" id="btnDownloadBackup">Download backup (JSON)</button>
@@ -1042,6 +1088,17 @@
             autocomplete="off"
           />
           <p class="import-hint">Shown at the top of the tracker and in email reports. Leave blank to use the default template title.</p>
+          <fieldset class="status-color-fields">
+            <legend>Status colors</legend>
+            <label class="status-color-label">
+              <span>Completed</span>
+              <input type="color" class="status-color-completed" value="#22c55e" aria-label="Completed color" />
+            </label>
+            <label class="status-color-label">
+              <span>In progress</span>
+              <input type="color" class="status-color-in-progress" value="#f59e0b" aria-label="In progress color" />
+            </label>
+          </fieldset>
         </div>
         <div class="import-mode-tabs" role="tablist" aria-label="Import source">
           <button type="button" class="import-mode active" data-import-mode="gdoc" role="tab" aria-selected="true">Google Doc</button>
@@ -1096,6 +1153,17 @@
           <p class="import-hint" style="margin-top:0">
             Create workstreams, sections, and criteria tables in the app. Same layout as imported docs — use sections to group rows under each workstream tab.
           </p>
+          <fieldset class="status-color-fields">
+            <legend>Status colors</legend>
+            <label class="status-color-label">
+              <span>Completed</span>
+              <input type="color" class="status-color-completed" value="#22c55e" aria-label="Completed color" />
+            </label>
+            <label class="status-color-label">
+              <span>In progress</span>
+              <input type="color" class="status-color-in-progress" value="#f59e0b" aria-label="In progress color" />
+            </label>
+          </fieldset>
           <div class="import-panel-actions">
             <button type="button" class="primary" id="btnStartBuild">Start building POC…</button>
           </div>
@@ -1111,6 +1179,30 @@
           <span><span class="legend-dot" style="background:var(--chart-completed)"></span>Completed</span>
           <span><span class="legend-dot" style="background:var(--chart-in-progress)"></span>In progress</span>
           <span><span class="legend-dot legend-dot-open" style="background:var(--chart-open)"></span>Open</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="chartColorsModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="chartColorsModalBackdrop"></div>
+      <div class="report-modal-panel" role="dialog" aria-labelledby="chartColorsModalTitle" aria-modal="true">
+        <h2 id="chartColorsModalTitle">Chart colors</h2>
+        <p class="import-hint" style="margin-top:0">
+          Applies to the progress chart, legend, timegraph, and notes styling for completed vs in-progress text. Open items stay neutral gray on the chart.
+        </p>
+        <fieldset class="status-color-fields">
+          <legend>Status colors</legend>
+          <label class="status-color-label">
+            <span>Completed</span>
+            <input type="color" class="status-color-completed" value="#22c55e" aria-label="Completed color" />
+          </label>
+          <label class="status-color-label">
+            <span>In progress</span>
+            <input type="color" class="status-color-in-progress" value="#f59e0b" aria-label="In progress color" />
+          </label>
+        </fieldset>
+        <div class="report-modal-actions">
+          <button type="button" class="primary" id="btnChartColorsClose">Done</button>
         </div>
       </div>
     </div>
@@ -1256,6 +1348,7 @@
     const DEFAULT_HEADERS = ["Criteria", "Description", "Success Criteria", "Notes"];
     const DEFAULT_SECTION_TITLE = "General";
     const TRACKER_DATA_VERSION = 6;
+    const DEFAULT_STATUS_COLORS = { completed: "#22c55e", inProgress: "#f59e0b" };
 
     let state;
     let jsonSyncTimer = null;
@@ -1280,7 +1373,110 @@
         sections: {},
         progress: {},
         datePolicyVersion: 0,
+        statusColors: { ...DEFAULT_STATUS_COLORS },
       };
+    }
+
+    function defaultStatusColors() {
+      return { ...DEFAULT_STATUS_COLORS };
+    }
+
+    function normalizeHexColor(value, fallback) {
+      const f = String(fallback || "#000000");
+      if (!value) return f;
+      let s = String(value).trim();
+      if (!s.startsWith("#")) s = "#" + s;
+      if (/^#[0-9a-fA-F]{3}$/.test(s)) {
+        const r = s[1];
+        const g = s[2];
+        const b = s[3];
+        s = `#${r}${r}${g}${g}${b}${b}`;
+      }
+      return /^#[0-9a-fA-F]{6}$/.test(s) ? s.toLowerCase() : f;
+    }
+
+    function ensureStatusColors() {
+      let changed = false;
+      if (!state.statusColors) {
+        state.statusColors = defaultStatusColors();
+        changed = true;
+      } else {
+        const next = {
+          completed: normalizeHexColor(state.statusColors.completed, DEFAULT_STATUS_COLORS.completed),
+          inProgress: normalizeHexColor(state.statusColors.inProgress, DEFAULT_STATUS_COLORS.inProgress),
+        };
+        if (
+          next.completed !== state.statusColors.completed ||
+          next.inProgress !== state.statusColors.inProgress
+        ) {
+          state.statusColors = next;
+          changed = true;
+        }
+      }
+      return changed;
+    }
+
+    function getStatusColors() {
+      const base = defaultStatusColors();
+      const sc = state?.statusColors || base;
+      return {
+        completed: normalizeHexColor(sc.completed, base.completed),
+        inProgress: normalizeHexColor(sc.inProgress, base.inProgress),
+      };
+    }
+
+    function applyStatusColorsFromState() {
+      const c = getStatusColors();
+      const root = document.documentElement;
+      root.style.setProperty("--chart-completed", c.completed);
+      root.style.setProperty("--chart-in-progress", c.inProgress);
+      root.style.setProperty("--status-completed", c.completed);
+      root.style.setProperty("--status-in-progress", c.inProgress);
+      const statDone = document.getElementById("statDone");
+      if (statDone) statDone.style.color = c.completed;
+    }
+
+    function syncStatusColorInputs() {
+      const c = getStatusColors();
+      document.querySelectorAll("input.status-color-completed").forEach((el) => {
+        el.value = c.completed;
+      });
+      document.querySelectorAll("input.status-color-in-progress").forEach((el) => {
+        el.value = c.inProgress;
+      });
+    }
+
+    function onStatusColorInput(e) {
+      const c = getStatusColors();
+      if (e.target.classList.contains("status-color-completed")) {
+        c.completed = normalizeHexColor(e.target.value, c.completed);
+      }
+      if (e.target.classList.contains("status-color-in-progress")) {
+        c.inProgress = normalizeHexColor(e.target.value, c.inProgress);
+      }
+      state.statusColors = { ...c };
+      applyStatusColorsFromState();
+      syncStatusColorInputs();
+      saveState();
+      refreshCompletionViews();
+      if (hasData()) renderTable();
+    }
+
+    function bindStatusColorInputs() {
+      document.querySelectorAll("input.status-color-completed, input.status-color-in-progress").forEach((el) => {
+        if (el.dataset.colorBound) return;
+        el.dataset.colorBound = "1";
+        el.addEventListener("input", onStatusColorInput);
+      });
+    }
+
+    function openChartColorsModal() {
+      syncStatusColorInputs();
+      document.getElementById("chartColorsModal").hidden = false;
+    }
+
+    function closeChartColorsModal() {
+      document.getElementById("chartColorsModal").hidden = true;
     }
 
     function generateRowUid() {
@@ -1590,6 +1786,12 @@
       merged.workstreamLabels = { ...base.workstreamLabels, ...(remote.workstreamLabels || {}) };
       merged.dataVersion = remote.dataVersion ?? EMBEDDED_DOC.dataVersion;
       merged.progressMigratedToUids = remote.progressMigratedToUids ?? merged.progressMigratedToUids;
+      if (remote.statusColors) {
+        merged.statusColors = {
+          completed: normalizeHexColor(remote.statusColors.completed, DEFAULT_STATUS_COLORS.completed),
+          inProgress: normalizeHexColor(remote.statusColors.inProgress, DEFAULT_STATUS_COLORS.inProgress),
+        };
+      }
       return merged;
     }
 
@@ -1648,6 +1850,7 @@
         workstreamLabels: state.workstreamLabels,
         sourceImportedAt: state.sourceImportedAt,
         progressMigratedToUids: state.progressMigratedToUids,
+        statusColors: getStatusColors(),
       };
     }
 
@@ -1711,6 +1914,10 @@
       applyEmbeddedBranding(state);
       setUiVisibility();
       jsonSyncCapable = await probeJsonSyncApi();
+      if (ensureStatusColors()) saveState();
+      applyStatusColorsFromState();
+      syncStatusColorInputs();
+      bindStatusColorInputs();
       if (migrateToDynamicWorkstreams()) saveState();
       if (migrateProgressKeysToRowUids()) saveState();
       if (ensureRowUids()) saveState();
@@ -2240,9 +2447,9 @@
     function chartStatusColors() {
       const root = getComputedStyle(document.documentElement);
       return {
-        completed: root.getPropertyValue("--chart-completed").trim() || "#003087",
-        inProgress: root.getPropertyValue("--chart-in-progress").trim() || "#0072ce",
-        open: root.getPropertyValue("--chart-open").trim() || "#ffffff",
+        completed: root.getPropertyValue("--chart-completed").trim() || DEFAULT_STATUS_COLORS.completed,
+        inProgress: root.getPropertyValue("--chart-in-progress").trim() || DEFAULT_STATUS_COLORS.inProgress,
+        open: root.getPropertyValue("--chart-open").trim() || "#f2f2f2",
       };
     }
 
@@ -2732,6 +2939,9 @@
       migrateProgressKeysToRowUids();
       ensureRowUids();
       normalizeTrackerSchema();
+      ensureStatusColors();
+      applyStatusColorsFromState();
+      syncStatusColorInputs();
       const withData = workstreamsWithData();
       activeTab = withData[0] || state.workstreamOrder[0] || null;
       saveState();
@@ -4170,10 +4380,18 @@
       openStructureEditor({ emptyStart: false });
     });
 
+    document.getElementById("btnChartColors").addEventListener("click", () => {
+      closeAppMenu();
+      openChartColorsModal();
+    });
+
     document.getElementById("btnViewTimegraph").addEventListener("click", () => {
       closeAppMenu();
       openTimegraphModal();
     });
+
+    document.getElementById("btnChartColorsClose").addEventListener("click", closeChartColorsModal);
+    document.getElementById("chartColorsModalBackdrop").addEventListener("click", closeChartColorsModal);
 
     document.getElementById("btnDownloadBackup").addEventListener("click", () => {
       closeAppMenu();
@@ -4278,6 +4496,7 @@
         document.getElementById("structureWarnModal").hidden = true;
         structureSaveAfterWarn = false;
       }       else if (!document.getElementById("workstreamApproveModal").hidden) closeWorkstreamApproveModal();
+      else if (!document.getElementById("chartColorsModal").hidden) closeChartColorsModal();
       else if (!document.getElementById("timegraphModal").hidden) closeTimegraphModal();
       else if (!document.getElementById("reportModal").hidden) closeReportModal();
     });

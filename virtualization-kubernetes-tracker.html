@@ -441,8 +441,9 @@
       padding: 0.55rem 0.85rem;
       border-bottom: 1px solid var(--rh-gray-20);
       vertical-align: top;
-      word-wrap: break-word;
-      overflow-wrap: anywhere;
+      overflow-wrap: normal;
+      word-break: normal;
+      hyphens: none;
     }
 
     tr:hover td { background: var(--rh-gray-10); }
@@ -523,8 +524,9 @@
       border-radius: 6px;
       padding: 0.35rem 0.5rem;
       white-space: pre-wrap;
-      word-wrap: break-word;
-      overflow-wrap: anywhere;
+      overflow-wrap: break-word;
+      word-break: normal;
+      hyphens: none;
       resize: vertical;
       field-sizing: content;
     }
@@ -1017,6 +1019,114 @@
       margin-top: 1rem;
     }
 
+    .signoff-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      .signoff-form-grid { grid-template-columns: 1fr; }
+    }
+
+    .signoff-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.88rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .signoff-field input,
+    .signoff-field textarea {
+      font: inherit;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.45rem 0.55rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .signoff-field textarea {
+      min-height: 7rem;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .signoff-field-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: -0.35rem 0 0.75rem;
+    }
+
+    .signoff-roster-heading {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 1rem 0 0.35rem;
+      color: var(--rh-gray-60);
+    }
+
+    .signoff-roster-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .signoff-roster-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-bottom: 0.75rem;
+      max-height: 14rem;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.5rem;
+      background: var(--surface2);
+    }
+
+    .signoff-roster-row {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr 1fr auto;
+      gap: 0.4rem;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .signoff-roster-row input[type="text"] {
+      font: inherit;
+      font-size: 0.82rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.3rem 0.4rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .signoff-roster-row .signoff-remove {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.45rem;
+    }
+
+    .signoff-empty {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      padding: 0.35rem;
+    }
+
+    .signoff-check-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+      font-size: 0.88rem;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+    }
+
     .report-preview-frame {
       margin-top: 1rem;
       border: 1px solid var(--border);
@@ -1057,6 +1167,7 @@
             <button type="button" id="btnShowAll" data-requires-data hidden>Show all rows</button>
             <button type="button" id="btnHideCompleted" data-requires-data hidden>Hide all completed</button>
             <button type="button" id="btnEmailReport" data-requires-data hidden>Email report…</button>
+            <button type="button" id="btnSignOffSheet" data-requires-data hidden>POC sign-off sheet…</button>
             <button type="button" id="btnEditStructure" data-requires-data hidden>Edit POC structure…</button>
             <button type="button" id="btnChartColors" data-requires-data hidden>Chart colors…</button>
             <button type="button" id="btnViewTimegraph" data-requires-data hidden>View timegraph…</button>
@@ -1304,6 +1415,51 @@
       </div>
     </div>
 
+    <div id="signOffModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="signOffModalBackdrop"></div>
+      <div class="report-modal-panel signoff-panel" role="dialog" aria-labelledby="signOffModalTitle" aria-modal="true">
+        <h2 id="signOffModalTitle">POC sign-off sheet</h2>
+        <p style="margin:0 0 1rem;font-size:0.9rem;color:var(--muted);">
+          Formal completion sign-off with summary stats and signature lines. Download HTML or use Print → Save as PDF.
+        </p>
+        <div class="signoff-form-grid">
+          <label class="signoff-field">
+            <span>Customer / organization (optional)</span>
+            <input type="text" id="signOffCustomerName" autocomplete="organization" />
+          </label>
+          <label class="signoff-field">
+            <span>Project name (optional)</span>
+            <input type="text" id="signOffProjectName" autocomplete="off" />
+          </label>
+        </div>
+        <label class="signoff-field">
+          <span>Attestation text</span>
+          <textarea id="signOffAttestation" spellcheck="true"></textarea>
+        </label>
+        <p class="signoff-field-hint">Edit the wording above; it is saved with this POC in <code>state.json</code>.</p>
+        <label class="signoff-check-option">
+          <input type="checkbox" id="signOffBlockIncomplete" />
+          <span>Only allow sign-off when all criteria are completed</span>
+        </label>
+        <div class="signoff-roster-heading">Signatories</div>
+        <p class="signoff-field-hint" style="margin-top:0;">
+          Names are collected from <strong>Owner</strong> (and similar) columns when you import or refresh. Check who should appear on this sheet.
+        </p>
+        <div class="signoff-roster-actions">
+          <button type="button" id="btnSignOffRefreshOwners">Refresh from Owner columns</button>
+          <button type="button" id="btnSignOffAddPerson">Add person</button>
+        </div>
+        <div id="signOffRosterList" class="signoff-roster-list" aria-live="polite"></div>
+        <button type="button" class="primary" id="btnSignOffPreview">Preview sign-off sheet</button>
+        <div id="signOffPreview" class="report-preview-frame" hidden></div>
+        <div class="report-modal-actions" id="signOffModalActions" hidden>
+          <button type="button" id="btnSignOffDownload">Download HTML</button>
+          <button type="button" id="btnSignOffPrint">Print / Save as PDF</button>
+          <button type="button" id="btnSignOffClose">Close</button>
+        </div>
+      </div>
+    </div>
+
     <div class="tabs" id="tabBar" hidden></div>
 
     <div class="panel" id="panel" hidden>
@@ -1362,6 +1518,20 @@
     let globalHideCompleted = false;
     let panelHideCompleted = false;
 
+    const DEFAULT_SIGNOFF_ATTESTATION =
+      "The undersigned confirm that the proof of concept identified above was executed according to the evaluation criteria documented in this engagement. Completion status shown in the summary reflects recorded results in the POC tracker as of the date below.\n\n" +
+      "Signatures indicate organizational acceptance of the POC outcome described in this document. They do not replace separate contractual acceptance, security review, or production readiness gates unless explicitly agreed in writing.";
+
+    function defaultSignOffSettings() {
+      return {
+        attestationText: DEFAULT_SIGNOFF_ATTESTATION,
+        customerName: "",
+        projectName: "",
+        selectedSignatoryIds: [],
+        blockUnlessComplete: false,
+      };
+    }
+
     function defaultState() {
       return {
         title: "POC Evaluation Tracker",
@@ -1374,6 +1544,8 @@
         progress: {},
         datePolicyVersion: 0,
         statusColors: { ...DEFAULT_STATUS_COLORS },
+        signatoryRoster: [],
+        signOff: defaultSignOffSettings(),
       };
     }
 
@@ -1481,6 +1653,105 @@
 
     function generateRowUid() {
       return "r_" + Math.random().toString(36).slice(2, 11) + Date.now().toString(36).slice(-4);
+    }
+
+    function generateSignatoryId() {
+      return "s_" + Math.random().toString(36).slice(2, 11) + Date.now().toString(36).slice(-4);
+    }
+
+    function ensureSignOffState() {
+      let changed = false;
+      if (!Array.isArray(state.signatoryRoster)) {
+        state.signatoryRoster = [];
+        changed = true;
+      }
+      const defaults = defaultSignOffSettings();
+      if (!state.signOff || typeof state.signOff !== "object") {
+        state.signOff = defaults;
+        changed = true;
+      } else {
+        if (state.signOff.attestationText == null || state.signOff.attestationText === "") {
+          state.signOff.attestationText = defaults.attestationText;
+          changed = true;
+        }
+        if (state.signOff.customerName == null) {
+          state.signOff.customerName = "";
+          changed = true;
+        }
+        if (state.signOff.projectName == null) {
+          state.signOff.projectName = "";
+          changed = true;
+        }
+        if (!Array.isArray(state.signOff.selectedSignatoryIds)) {
+          state.signOff.selectedSignatoryIds = [];
+          changed = true;
+        }
+        if (state.signOff.blockUnlessComplete == null) {
+          state.signOff.blockUnlessComplete = false;
+          changed = true;
+        }
+      }
+      return changed;
+    }
+
+    function isOwnerLikeHeader(header) {
+      return /owner|assignee|responsible|accountable|poc\s*lead|stakeholder/i.test(String(header || ""));
+    }
+
+    function splitPersonNames(cell) {
+      if (cell == null || !String(cell).trim()) return [];
+      return String(cell)
+        .split(/\s*(?:,|;|\/|\band\b)\s*/i)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+
+    function collectOwnerNamesFromCriteria() {
+      const names = [];
+      const seen = new Set();
+      allWorkstreamIds().forEach((sec) => {
+        const headers = getDisplayHeaders(sec);
+        headers.forEach((h) => {
+          if (!isOwnerLikeHeader(h)) return;
+          state.sections[sec].rows.forEach((row) => {
+            splitPersonNames(cellValueForHeader(row, h)).forEach((name) => {
+              const key = name.toLowerCase();
+              if (seen.has(key)) return;
+              seen.add(key);
+              names.push(name);
+            });
+          });
+        });
+      });
+      return names;
+    }
+
+    function mergeNamesIntoRoster(names) {
+      ensureSignOffState();
+      const norm = (n) => n.toLowerCase().trim();
+      const existing = new Set(state.signatoryRoster.map((s) => norm(s.name)));
+      let added = 0;
+      names.forEach((name) => {
+        if (!name || existing.has(norm(name))) return;
+        const id = generateSignatoryId();
+        state.signatoryRoster.push({
+          id,
+          name,
+          role: "",
+          organization: "",
+          source: "import",
+        });
+        if (!state.signOff.selectedSignatoryIds.includes(id)) {
+          state.signOff.selectedSignatoryIds.push(id);
+        }
+        existing.add(norm(name));
+        added += 1;
+      });
+      return added;
+    }
+
+    function refreshSignatoryRosterFromOwners() {
+      return mergeNamesIntoRoster(collectOwnerNamesFromCriteria());
     }
 
     function slugifyWorkstreamId(label) {
@@ -1766,26 +2037,37 @@
       return out;
     }
 
-    function mergeRemotePayload(remote) {
-      const base = stateFromEmbedded();
+    function trackerDataScore(s) {
+      if (!s) return 0;
+      let rows = 0;
+      Object.values(s.sections || {}).forEach((sec) => {
+        rows += sec?.rows?.length || 0;
+      });
+      const progressKeys = Object.keys(s.progress || {}).length;
+      return rows * 1000 + progressKeys;
+    }
+
+    function hydrateFromRemote(remote) {
+      const base = defaultState();
+      const sections = remote.sections
+        ? JSON.parse(JSON.stringify(remote.sections))
+        : { ...base.sections };
       const merged = {
         ...base,
-        progress: remote.progress || {},
-        datePolicyVersion: remote.datePolicyVersion ?? 0,
-        title: base.title,
-        subtitle: base.subtitle,
-        updatedAt: remote.updatedAt,
+        ...remote,
+        sections,
+        progress: { ...(remote.progress || {}) },
+        workstreamOrder: remote.workstreamOrder?.length
+          ? [...remote.workstreamOrder]
+          : Object.keys(sections),
+        workstreamLabels: { ...(remote.workstreamLabels || {}) },
+        updatedAt: remote.updatedAt || base.updatedAt,
         sourceImportedAt: remote.sourceImportedAt ?? base.sourceImportedAt,
+        dataVersion: remote.dataVersion ?? EMBEDDED_DOC.dataVersion,
+        progressMigratedToUids: remote.progressMigratedToUids ?? base.progressMigratedToUids,
       };
-      merged.title = remote.title || base.title;
-      merged.subtitle = remote.subtitle || base.subtitle;
-      merged.sections = mergeSectionRows(base.sections, remote.sections);
-      merged.workstreamOrder = remote.workstreamOrder?.length
-        ? remote.workstreamOrder
-        : base.workstreamOrder;
-      merged.workstreamLabels = { ...base.workstreamLabels, ...(remote.workstreamLabels || {}) };
-      merged.dataVersion = remote.dataVersion ?? EMBEDDED_DOC.dataVersion;
-      merged.progressMigratedToUids = remote.progressMigratedToUids ?? merged.progressMigratedToUids;
+      if (remote.title) merged.title = remote.title;
+      if (remote.subtitle) merged.subtitle = remote.subtitle;
       if (remote.statusColors) {
         merged.statusColors = {
           completed: normalizeHexColor(remote.statusColors.completed, DEFAULT_STATUS_COLORS.completed),
@@ -1796,11 +2078,7 @@
     }
 
     function stateHasTrackerData(s) {
-      if (!s) return false;
-      const sections = s.sections || {};
-      const hasRows = Object.keys(sections).some((k) => (sections[k]?.rows?.length || 0) > 0);
-      const hasProgress = Object.keys(s.progress || {}).length > 0;
-      return hasRows || hasProgress;
+      return trackerDataScore(s) > 0;
     }
 
     function isTimestampNewer(a, b) {
@@ -1821,19 +2099,18 @@
 
       if (!remote) return local;
 
-      if (stateHasTrackerData(remote) && !stateHasTrackerData(local)) {
-        return mergeRemotePayload(remote);
-      }
+      const localScore = trackerDataScore(local);
+      const remoteScore = trackerDataScore(remote);
+
+      // Prefer whichever copy actually has criteria / progress (stale local cache often wins on timestamp alone).
+      if (remoteScore > localScore) return hydrateFromRemote(remote);
+      if (localScore > remoteScore) return local;
 
       const remoteTime = remote.updatedAt;
       const localTime = local.updatedAt;
-      if (isTimestampNewer(remoteTime, localTime)) {
-        return mergeRemotePayload(remote);
-      }
-      if (!isTimestampNewer(localTime, remoteTime) && stateHasTrackerData(remote)) {
-        return mergeRemotePayload(remote);
-      }
-      return local;
+      if (isTimestampNewer(remoteTime, localTime)) return hydrateFromRemote(remote);
+      if (isTimestampNewer(localTime, remoteTime)) return local;
+      return hydrateFromRemote(remote);
     }
 
     function stateToJsonPayload() {
@@ -1851,6 +2128,8 @@
         sourceImportedAt: state.sourceImportedAt,
         progressMigratedToUids: state.progressMigratedToUids,
         statusColors: getStatusColors(),
+        signatoryRoster: state.signatoryRoster || [],
+        signOff: state.signOff || defaultSignOffSettings(),
       };
     }
 
@@ -1915,6 +2194,7 @@
       setUiVisibility();
       jsonSyncCapable = await probeJsonSyncApi();
       if (ensureStatusColors()) saveState();
+      if (ensureSignOffState()) saveState();
       applyStatusColorsFromState();
       syncStatusColorInputs();
       bindStatusColorInputs();
@@ -2807,6 +3087,7 @@
     }
 
     let lastReportHtml = "";
+    let lastSignOffHtml = "";
 
     function workstreamsForReportScope(scope) {
       if (scope === "all" || scope === "both") return workstreamsWithData();
@@ -2883,6 +3164,175 @@
       return parts.join("");
     }
 
+    function formatAttestationHtml(text) {
+      const blocks = String(text || "")
+        .split(/\n\n+/)
+        .map((p) => p.trim())
+        .filter(Boolean);
+      if (!blocks.length) return "";
+      return blocks
+        .map(
+          (p) =>
+            `<p style="margin:0 0 12px;line-height:1.5;">${escapeHtml(p).replace(/\n/g, "<br>")}</p>`
+        )
+        .join("");
+    }
+
+    function workstreamCompletionStats(sec) {
+      const rows = state.sections[sec]?.rows || [];
+      let total = 0;
+      let done = 0;
+      rows.forEach((row, index) => {
+        total += 1;
+        if (isRowMarkedComplete(sec, index, row)) done += 1;
+      });
+      return { total, done, open: total - done, pct: total ? Math.round((done / total) * 100) : 0 };
+    }
+
+    function signatoriesForSheet() {
+      ensureSignOffState();
+      const ids = state.signOff.selectedSignatoryIds || [];
+      const byId = new Map(state.signatoryRoster.map((e) => [e.id, e]));
+      return ids.map((id) => byId.get(id)).filter(Boolean);
+    }
+
+    function buildSignOffHtml() {
+      ensureSignOffState();
+      const { total, done, open, pct } = countStats();
+      const complete = open === 0 && total > 0;
+      if (state.signOff.blockUnlessComplete && !complete) {
+        return null;
+      }
+
+      const title = escapeHtml(state.title || embeddedBranding().title);
+      const generated = new Date().toLocaleString();
+      const importedAt = state.sourceImportedAt
+        ? new Date(state.sourceImportedAt).toLocaleString()
+        : "";
+      const customer = escapeHtml(state.signOff.customerName || "");
+      const project = escapeHtml(state.signOff.projectName || "");
+      const parts = [];
+
+      parts.push(
+        `<!DOCTYPE html><html><head><meta charset="utf-8"><title>POC Sign-Off — ${title}</title></head><body style="font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#151515;line-height:1.45;margin:0;padding:24px;max-width:880px;">`
+      );
+      parts.push(`<h1 style="color:#003087;font-size:22px;margin:0 0 6px;">Proof of Concept — Completion Sign-Off</h1>`);
+      parts.push(`<h2 style="color:#0072ce;font-size:17px;font-weight:600;margin:0 0 16px;">${title}</h2>`);
+
+      if (customer || project) {
+        parts.push(`<table style="font-size:13px;margin:0 0 16px;border-collapse:collapse;">`);
+        if (customer) {
+          parts.push(
+            `<tr><td style="padding:2px 12px 2px 0;color:#75787b;">Customer / organization</td><td><strong>${customer}</strong></td></tr>`
+          );
+        }
+        if (project) {
+          parts.push(
+            `<tr><td style="padding:2px 12px 2px 0;color:#75787b;">Project</td><td><strong>${project}</strong></td></tr>`
+          );
+        }
+        parts.push(`</table>`);
+      }
+
+      parts.push(
+        `<p style="color:#75787b;font-size:13px;margin:0 0 20px;">Generated ${escapeHtml(generated)}${importedAt ? ` · Criteria imported ${escapeHtml(importedAt)}` : ""}</p>`
+      );
+
+      if (!complete && total > 0) {
+        parts.push(
+          `<div style="background:#fff8e6;border:1px solid #f0d78c;border-radius:6px;padding:12px 14px;margin:0 0 20px;font-size:13px;"><strong>Note:</strong> Not all evaluation criteria are marked complete (${done} of ${total}, ${pct}%). This sign-off documents progress to date and does not represent full POC closure unless all workstreams show 100% completion.</div>`
+        );
+      }
+
+      parts.push(`<h3 style="font-size:15px;margin:24px 0 10px;color:#003087;">POC summary</h3>`);
+      parts.push(
+        `<p style="margin:0 0 12px;font-size:14px;"><strong>Overall:</strong> ${done} of ${total} criteria completed (${pct}%)</p>`
+      );
+      parts.push(
+        `<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;"><thead><tr>`
+      );
+      parts.push(
+        `<th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">Workstream</th>`
+      );
+      parts.push(
+        `<th style="text-align:right;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">Completed</th>`
+      );
+      parts.push(
+        `<th style="text-align:right;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">Total</th>`
+      );
+      parts.push(
+        `<th style="text-align:right;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">%</th></tr></thead><tbody>`
+      );
+      workstreamsWithData().forEach((sec) => {
+        const ws = workstreamCompletionStats(sec);
+        parts.push(`<tr>`);
+        parts.push(
+          `<td style="border:1px solid #d9dadc;padding:8px;">${escapeHtml(workstreamLabel(sec))}</td>`
+        );
+        parts.push(`<td style="border:1px solid #d9dadc;padding:8px;text-align:right;">${ws.done}</td>`);
+        parts.push(`<td style="border:1px solid #d9dadc;padding:8px;text-align:right;">${ws.total}</td>`);
+        parts.push(`<td style="border:1px solid #d9dadc;padding:8px;text-align:right;">${ws.pct}%</td>`);
+        parts.push(`</tr>`);
+      });
+      parts.push(`</tbody></table>`);
+
+      parts.push(`<h3 style="font-size:15px;margin:24px 0 10px;color:#003087;">Attestation</h3>`);
+      parts.push(`<div style="font-size:14px;margin:0 0 24px;">${formatAttestationHtml(state.signOff.attestationText)}</div>`);
+
+      parts.push(`<h3 style="font-size:15px;margin:24px 0 10px;color:#003087;">Signatures</h3>`);
+      const signers = signatoriesForSheet();
+      if (!signers.length) {
+        parts.push(
+          `<p style="color:#75787b;font-size:13px;">No signatories selected. Add names in the tracker sign-off dialog and check &quot;Include on sheet&quot;.</p>`
+        );
+      } else {
+        parts.push(
+          `<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:24px;"><thead><tr>`
+        );
+        parts.push(
+          `<th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">Name</th>`
+        );
+        parts.push(
+          `<th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">Role / title</th>`
+        );
+        parts.push(
+          `<th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">Organization</th>`
+        );
+        parts.push(
+          `<th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;min-width:10rem;">Signature</th>`
+        );
+        parts.push(
+          `<th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;min-width:6rem;">Date</th></tr></thead><tbody>`
+        );
+        signers.forEach((person) => {
+          parts.push(`<tr>`);
+          parts.push(
+            `<td style="border:1px solid #d9dadc;padding:10px 8px;vertical-align:bottom;">${escapeHtml(person.name)}</td>`
+          );
+          parts.push(
+            `<td style="border:1px solid #d9dadc;padding:10px 8px;vertical-align:bottom;">${escapeHtml(person.role || "")}</td>`
+          );
+          parts.push(
+            `<td style="border:1px solid #d9dadc;padding:10px 8px;vertical-align:bottom;">${escapeHtml(person.organization || "")}</td>`
+          );
+          parts.push(
+            `<td style="border:1px solid #d9dadc;padding:10px 8px;vertical-align:bottom;"><div style="border-bottom:1px solid #151515;min-height:1.6rem;"></div></td>`
+          );
+          parts.push(
+            `<td style="border:1px solid #d9dadc;padding:10px 8px;vertical-align:bottom;"><div style="border-bottom:1px solid #151515;min-height:1.6rem;"></div></td>`
+          );
+          parts.push(`</tr>`);
+        });
+        parts.push(`</tbody></table>`);
+      }
+
+      parts.push(
+        `<p style="color:#75787b;font-size:12px;margin-top:32px;border-top:1px solid #d9dadc;padding-top:12px;">This document was generated from the POC Evaluation Tracker. Signature and date lines are for manual completion when printed.</p>`
+      );
+      parts.push(`</body></html>`);
+      return parts.join("");
+    }
+
     function escapeHtml(s) {
       return String(s)
         .replace(/&/g, "&amp;")
@@ -2924,22 +3374,20 @@
       if (!parsed.sections || typeof parsed.sections !== "object") {
         throw new Error("Backup is missing sections (not a full tracker backup). Use poc-tracker-backup.json, not the timegraph export.");
       }
-      state = {
-        ...defaultState(),
-        ...parsed,
-        sections: parsed.sections,
-        progress: parsed.progress || {},
-        workstreamOrder: parsed.workstreamOrder || Object.keys(parsed.sections),
-        workstreamLabels: parsed.workstreamLabels || {},
-        progressMigratedToUids: parsed.progressMigratedToUids ?? true,
-      };
-      if (parsed.title) state.title = parsed.title;
-      if (parsed.subtitle) state.subtitle = parsed.subtitle;
+      const rowCount = trackerDataScore(parsed);
+      if (rowCount === 0) {
+        throw new Error(
+          "That backup has no criteria rows (empty sections). Use poc-tracker-backup.json or state.json.backup from when you had data, not an empty state.json."
+        );
+      }
+      state = hydrateFromRemote(parsed);
+      state.updatedAt = new Date().toISOString();
       migrateToDynamicWorkstreams();
       migrateProgressKeysToRowUids();
       ensureRowUids();
       normalizeTrackerSchema();
       ensureStatusColors();
+      ensureSignOffState();
       applyStatusColorsFromState();
       syncStatusColorInputs();
       const withData = workstreamsWithData();
@@ -3121,22 +3569,180 @@
       await navigator.clipboard.writeText(html);
     }
 
-    function downloadReportHtml(html) {
+    function downloadHtmlFile(html, filename) {
       const blob = new Blob([html], { type: "text/html;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
+      a.download = filename || "export.html";
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    function downloadReportHtml(html) {
+      downloadHtmlFile(html, "poc-status-report.html");
+    }
+
+    function printHtmlDocument(html) {
+      const w = window.open("", "_blank", "noopener,noreferrer");
+      if (!w) {
+        alert("Allow pop-ups to print the sign-off sheet.");
+        return;
+      }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+      setTimeout(() => {
+        try {
+          w.print();
+        } catch (_) {
+          /* user may cancel */
+        }
+      }, 300);
+    }
+
+    function syncSignOffFormFromState() {
+      ensureSignOffState();
+      document.getElementById("signOffCustomerName").value = state.signOff.customerName || "";
+      document.getElementById("signOffProjectName").value = state.signOff.projectName || "";
+      document.getElementById("signOffAttestation").value =
+        state.signOff.attestationText || DEFAULT_SIGNOFF_ATTESTATION;
+      document.getElementById("signOffBlockIncomplete").checked = Boolean(
+        state.signOff.blockUnlessComplete
+      );
+      renderSignOffRosterList();
+    }
+
+    function readSignOffFormIntoState() {
+      ensureSignOffState();
+      state.signOff.customerName = document.getElementById("signOffCustomerName").value.trim();
+      state.signOff.projectName = document.getElementById("signOffProjectName").value.trim();
+      state.signOff.attestationText = document.getElementById("signOffAttestation").value;
+      state.signOff.blockUnlessComplete = document.getElementById("signOffBlockIncomplete").checked;
+
+      const selectedIds = [];
+      document.querySelectorAll(".signoff-roster-row").forEach((row) => {
+        const id = row.dataset.id;
+        const entry = state.signatoryRoster.find((e) => e.id === id);
+        if (!entry) return;
+        const nameInput = row.querySelector('[data-field="name"]');
+        const roleInput = row.querySelector('[data-field="role"]');
+        const orgInput = row.querySelector('[data-field="organization"]');
+        if (nameInput) entry.name = nameInput.value.trim();
+        if (roleInput) entry.role = roleInput.value.trim();
+        if (orgInput) entry.organization = orgInput.value.trim();
+        const cb = row.querySelector('input[type="checkbox"]');
+        if (cb?.checked) selectedIds.push(id);
+      });
+      state.signOff.selectedSignatoryIds = selectedIds;
+    }
+
+    function renderSignOffRosterList() {
+      const host = document.getElementById("signOffRosterList");
+      if (!host) return;
+      ensureSignOffState();
+      host.innerHTML = "";
+      const selected = new Set(state.signOff.selectedSignatoryIds || []);
+
+      if (!state.signatoryRoster.length) {
+        const empty = document.createElement("p");
+        empty.className = "signoff-empty";
+        empty.textContent =
+          "No signatories yet. Use Refresh from Owner columns or Add person.";
+        host.appendChild(empty);
+        return;
+      }
+
+      state.signatoryRoster.forEach((entry) => {
+        const row = document.createElement("div");
+        row.className = "signoff-roster-row";
+        row.dataset.id = entry.id;
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = selected.has(entry.id);
+        cb.title = "Include on sign-off sheet";
+        cb.setAttribute("aria-label", `Include ${entry.name || "person"} on sheet`);
+
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.dataset.field = "name";
+        nameInput.placeholder = "Name";
+        nameInput.value = entry.name || "";
+
+        const roleInput = document.createElement("input");
+        roleInput.type = "text";
+        roleInput.dataset.field = "role";
+        roleInput.placeholder = "Role / title";
+        roleInput.value = entry.role || "";
+
+        const orgInput = document.createElement("input");
+        orgInput.type = "text";
+        orgInput.dataset.field = "organization";
+        orgInput.placeholder = "Organization";
+        orgInput.value = entry.organization || "";
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "signoff-remove";
+        removeBtn.textContent = "Remove";
+        removeBtn.addEventListener("click", () => {
+          state.signatoryRoster = state.signatoryRoster.filter((e) => e.id !== entry.id);
+          state.signOff.selectedSignatoryIds = (state.signOff.selectedSignatoryIds || []).filter(
+            (id) => id !== entry.id
+          );
+          renderSignOffRosterList();
+          saveState();
+        });
+
+        row.append(cb, nameInput, roleInput, orgInput, removeBtn);
+        host.appendChild(row);
+      });
+    }
+
+    function openSignOffModal() {
+      ensureSignOffState();
+      syncSignOffFormFromState();
+      document.getElementById("signOffPreview").hidden = true;
+      document.getElementById("signOffModalActions").hidden = true;
+      lastSignOffHtml = "";
+      document.getElementById("signOffModal").hidden = false;
+    }
+
+    function closeSignOffModal() {
+      readSignOffFormIntoState();
+      saveState();
+      document.getElementById("signOffModal").hidden = true;
+    }
+
+    function previewSignOffSheet() {
+      readSignOffFormIntoState();
+      saveState();
+      const preview = document.getElementById("signOffPreview");
+      lastSignOffHtml = buildSignOffHtml();
+      if (lastSignOffHtml == null) {
+        preview.textContent =
+          "All criteria must be completed before generating a sign-off sheet (see the checkbox above).";
+        lastSignOffHtml = "";
+      } else {
+        preview.innerHTML = lastSignOffHtml;
+      }
+      preview.hidden = false;
+      document.getElementById("signOffModalActions").hidden = false;
     }
 
     function renderAll() {
       document.getElementById("pageTitle").textContent = state.title || defaultState().title;
       const sub = document.getElementById("pageSubtitle");
-      if (sub && state.subtitle) {
-        const link = sub.querySelector("a");
-        sub.textContent = state.subtitle + " ";
-        if (link) sub.appendChild(link);
+      if (sub) {
+        const showSub = !hasData() && Boolean(String(state.subtitle || "").trim());
+        sub.hidden = !showSub;
+        if (showSub) {
+          const link = sub.querySelector("a");
+          sub.textContent = state.subtitle + " ";
+          if (link) sub.appendChild(link);
+        }
       }
       setUiVisibility();
       updateStats();
@@ -3580,6 +4186,7 @@
       const normalized = normalizeImportResult(result);
       const list = (approvedWorkstreams || normalized.workstreams).filter((ws) => ws.rows?.length);
       state.title = resolvedPocTitleFromImport(result);
+      state.subtitle = "";
       state.sections = {};
       state.workstreamOrder = [];
       state.workstreamLabels = {};
@@ -3595,6 +4202,7 @@
       });
       if (list.length) activeTab = list[0].id;
       state.sourceImportedAt = new Date().toISOString();
+      refreshSignatoryRosterFromOwners();
       saveState();
       renderAll();
     }
@@ -4375,6 +4983,47 @@
       openReportModal();
     });
 
+    document.getElementById("btnSignOffSheet").addEventListener("click", () => {
+      closeAppMenu();
+      openSignOffModal();
+    });
+
+    document.getElementById("btnSignOffPreview").addEventListener("click", previewSignOffSheet);
+    document.getElementById("btnSignOffDownload").addEventListener("click", () => {
+      if (!lastSignOffHtml) return;
+      downloadHtmlFile(lastSignOffHtml, "poc-sign-off.html");
+    });
+    document.getElementById("btnSignOffPrint").addEventListener("click", () => {
+      if (!lastSignOffHtml) return;
+      printHtmlDocument(lastSignOffHtml);
+    });
+    document.getElementById("btnSignOffClose").addEventListener("click", closeSignOffModal);
+    document.getElementById("signOffModalBackdrop").addEventListener("click", closeSignOffModal);
+    document.getElementById("btnSignOffRefreshOwners").addEventListener("click", () => {
+      const added = refreshSignatoryRosterFromOwners();
+      renderSignOffRosterList();
+      saveState();
+      if (added) {
+        alert(`Added ${added} name(s) from Owner columns.`);
+      } else {
+        alert("No new names found in Owner (or similar) columns.");
+      }
+    });
+    document.getElementById("btnSignOffAddPerson").addEventListener("click", () => {
+      ensureSignOffState();
+      state.signatoryRoster.push({
+        id: generateSignatoryId(),
+        name: "",
+        role: "",
+        organization: "",
+        source: "manual",
+      });
+      renderSignOffRosterList();
+      const host = document.getElementById("signOffRosterList");
+      const lastInput = host.querySelector(".signoff-roster-row:last-child [data-field='name']");
+      if (lastInput) lastInput.focus();
+    });
+
     document.getElementById("btnEditStructure").addEventListener("click", () => {
       closeAppMenu();
       openStructureEditor({ emptyStart: false });
@@ -4499,6 +5148,7 @@
       else if (!document.getElementById("chartColorsModal").hidden) closeChartColorsModal();
       else if (!document.getElementById("timegraphModal").hidden) closeTimegraphModal();
       else if (!document.getElementById("reportModal").hidden) closeReportModal();
+      else if (!document.getElementById("signOffModal").hidden) closeSignOffModal();
     });
 
     document.getElementById("tabBar").addEventListener("click", (e) => {

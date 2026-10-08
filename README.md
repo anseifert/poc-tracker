@@ -69,6 +69,16 @@ Switch to **Build here** → **Start building POC…** to create workstreams, se
 
 After data exists, use the hamburger menu → **Edit POC structure…** to change the framework (with a warning if completion progress already exists).
 
+### POC sign-off sheet
+
+Hamburger → **POC sign-off sheet…** builds a printable HTML page:
+
+- **Summary** — overall and per-workstream completion counts (from tracker checkboxes / notes).
+- **Attestation** — default English text you can edit; stored in `state.json` under `signOff.attestationText`.
+- **Signatories** — roster in `signatoryRoster`; names are added on **import** from table columns whose headers match **Owner**, **Assignee**, **Responsible**, and similar. Use **Refresh from Owner columns** after editing criteria. Each person has free-form **role** and **organization** fields. Check who appears on the sheet; order follows the list.
+- **Incomplete POCs** — a yellow notice appears on the sheet unless everything is done. Optional checkbox blocks preview until 100% complete.
+- **Output** — **Download HTML** (`poc-sign-off.html`) or **Print / Save as PDF** from the browser.
+
 ## Using the tracker
 
 - **Workstream tabs** appear for each workstream that has rows.
@@ -80,6 +90,7 @@ After data exists, use the hamburger menu → **Edit POC structure…** to chang
   - **Chart colors…** — change completed / in-progress colors after import
   - **View timegraph…** — timeline of check-offs; download completion log as JSON or CSV
   - **Email report…** — HTML preview, copy, or download (open / in-progress items)
+  - **POC sign-off sheet…** — formal completion document with POC summary, editable attestation text, and signature lines; pick signatories from a roster (names from **Owner** / similar columns on import, or add manually); download HTML or print to PDF
   - **Download backup (JSON)** / **Restore from backup…** — full app state (criteria + progress), for moving machines or recovering after clearing browser data
   - **Reset all data** — clears criteria and progress
 
@@ -88,7 +99,7 @@ After data exists, use the hamburger menu → **Edit POC structure…** to chang
 | Mechanism | What it does |
 |-----------|----------------|
 | **Browser `localStorage`** | Always used while you work |
-| **`state.json`** | Written when using `npm start` or Docker (`PUT /api/state`); includes criteria, progress, workstreams, and `statusColors`; reloaded on next visit if the browser cache was cleared |
+| **`state.json`** | Written when using `npm start` or Docker (`PUT /api/state`); includes criteria, progress, workstreams, `statusColors`, `signatoryRoster`, and `signOff` (attestation text and options); reloaded on next visit if the browser cache was cleared |
 | **`state.json.backup`** | Server copies `state.json` over this file every **5 minutes** (same folder as `state.json`) |
 | **`poc-tracker-backup.json`** | Manual export from the menu (same payload shape as `state.json`) |
 
@@ -97,6 +108,12 @@ After data exists, use the hamburger menu → **Edit POC structure…** to chang
 To restore from `state.json.backup` on the server: stop writes if needed, then `cp state.json.backup state.json` in `DATA_DIR` (or `/data` in Docker) and refresh the app.
 
 The timegraph **Download JSON/CSV** files are completion **logs only**; use **Download backup (JSON)** or `state.json` for a full restore.
+
+**Restore troubleshooting**
+
+- Dropping a file named `state.json` in the project folder only loads on **`npm start`** (or Docker), not when opening the HTML as `file://`. The app merges server `state.json` with browser `localStorage`; if the file has more criteria rows than the cache, the file wins.
+- A valid full backup must have **non-empty `sections.*.rows`** (and usually `progress`). A fresh `state.json` from `state.json.example` looks correct but has **zero rows** — restoring it shows an empty POC.
+- Prefer **`poc-tracker-backup.json`** (menu export) or **`state.json.backup`** over a hand-edited empty `state.json`.
 
 ## Project layout
 

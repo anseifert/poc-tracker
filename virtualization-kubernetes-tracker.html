@@ -2412,17 +2412,36 @@
       const id = rowId(section, index);
       const p = getProgress(id);
       if (p.completedAt) return p.completedAt.slice(0, 10);
-      const fromDoc = parseDocDate(row.notes ?? row.completed);
-      if (fromDoc && isRowDocComplete(row)) return fromDoc;
+      const fromDoc = parseDocDate(row.notes ?? row.completed ?? row.status);
+      if (fromDoc && isRowDocComplete(row, section)) return fromDoc;
       return null;
     }
 
     function isNotesColumn(header) {
-      const h = String(header).toLowerCase();
-      return h === "notes" || h.includes("complete");
+      const h = String(header).toLowerCase().trim();
+      return h === "notes" || h === "status" || h.includes("complete");
     }
 
-    function docCompletedValue(row) {
+    function notesFieldKeysForSection(sec) {
+      const keys = new Set();
+      getDisplayHeaders(sec).forEach((h) => {
+        if (isNotesColumn(h)) keys.add(headerToKey(h));
+      });
+      if (!keys.size) {
+        keys.add("notes");
+        keys.add("completed");
+        keys.add("status");
+      }
+      return keys;
+    }
+
+    function docCompletedValue(row, sec) {
+      if (sec) {
+        for (const key of notesFieldKeysForSection(sec)) {
+          const val = row[key];
+          if (val != null && String(val).trim()) return String(val).trim();
+        }
+      }
       return (row.notes ?? row.completed ?? row.status ?? "").trim();
     }
 
@@ -2436,8 +2455,8 @@
       return value;
     }
 
-    function displayNotesValue(row) {
-      return normalizeNotesText(docCompletedValue(row));
+    function displayNotesValue(row, sec) {
+      return normalizeNotesText(docCompletedValue(row, sec));
     }
 
     function normalizeSectionLabel(label) {
@@ -2579,14 +2598,14 @@
       return false;
     }
 
-    function isRowDocComplete(row) {
-      return isCompleteStatus(docCompletedValue(row));
+    function isRowDocComplete(row, sec) {
+      return isCompleteStatus(docCompletedValue(row, sec));
     }
 
     function isRowMarkedComplete(sec, index, row) {
       const id = rowId(sec, index);
       const p = getProgress(id);
-      return p.completed || isRowDocComplete(row);
+      return p.completed || isRowDocComplete(row, sec);
     }
 
     function updateNotesDateHint(td, id) {
@@ -2609,9 +2628,9 @@
       const row = state.sections[sec].rows[index];
       const id = rowId(sec, index);
       const normalized = normalizeNotesText(value);
-      row.notes = normalized;
-      row.completed = normalized;
-      if (row.status !== undefined) row.status = normalized;
+      notesFieldKeysForSection(sec).forEach((key) => {
+        row[key] = normalized;
+      });
 
       const p = getProgress(id);
       const nowComplete = isCompleteStatus(normalized);
@@ -2628,10 +2647,10 @@
       refreshCompletionViews();
     }
 
-    function applyCompletedInputStyle(input, row) {
-      const docVal = docCompletedValue(row);
+    function applyCompletedInputStyle(input, row, sec) {
+      const docVal = docCompletedValue(row, sec);
       input.classList.remove("status-yes", "status-partial");
-      if (isRowDocComplete(row)) input.classList.add("status-yes");
+      if (isRowDocComplete(row, sec)) input.classList.add("status-yes");
       else if (docVal) input.classList.add("status-partial");
     }
 
@@ -2709,7 +2728,7 @@
           total++;
           const id = rowId(sec, i);
           const p = getProgress(id);
-          const completed = p.completed || isRowDocComplete(row);
+          const completed = p.completed || isRowDocComplete(row, sec);
           if (completed) done++;
         });
       });
@@ -2754,8 +2773,8 @@
     function rowStatusCategory(sec, row, index) {
       const id = rowId(sec, index);
       const p = getProgress(id);
-      if (p.completed || isRowDocComplete(row)) return "completed";
-      if (docCompletedValue(row)) return "inProgress";
+      if (p.completed || isRowDocComplete(row, sec)) return "completed";
+      if (docCompletedValue(row, sec)) return "inProgress";
       return "open";
     }
 
@@ -2934,7 +2953,7 @@
     function appendDataRow(sec, rowIndex, row, displayHeaders, tbody) {
       const id = rowId(sec, rowIndex);
       const p = getProgress(id);
-      const docDone = isRowDocComplete(row);
+      const docDone = isRowDocComplete(row, sec);
       const completed = p.completed || docDone;
       const hide = (globalHideCompleted || panelHideCompleted) && completed;
 
@@ -2949,10 +2968,10 @@
       cb.checked = completed;
       cb.addEventListener("change", () => {
         if (cb.checked) {
-          if (!docCompletedValue(row)) {
-            row.notes = "Completed";
-            row.completed = "Completed";
-            if (row.status !== undefined) row.status = "Completed";
+          if (!docCompletedValue(row, sec)) {
+            notesFieldKeysForSection(sec).forEach((key) => {
+              row[key] = "Completed";
+            });
           }
           markRowCompleted(id);
         } else {
@@ -2964,9 +2983,9 @@
         refreshCompletionViews();
         const notesEl = tr.querySelector(".completed-input");
         if (notesEl) {
-          notesEl.value = displayNotesValue(row);
+          notesEl.value = displayNotesValue(row, sec);
           autoResizeNotesField(notesEl);
-          applyCompletedInputStyle(notesEl, row);
+          applyCompletedInputStyle(notesEl, row, sec);
         }
         updateNotesDateHint(tr.querySelector("td.completed-cell"), id);
       });
@@ -2981,17 +3000,20 @@
           td.classList.add("completed-cell");
           const input = document.createElement("textarea");
           input.className = "completed-input";
-          input.value = displayNotesValue(row);
+          input.value = displayNotesValue(row, sec);
           input.placeholder = "e.g. Completed, In progress…";
-          input.setAttribute("aria-label", "Notes for " + criteriaLabel(row));
-          applyCompletedInputStyle(input, row);
+          input.setAttribute(
+            "aria-label",
+            (h.toLowerCase().trim() === "status" ? "Status for " : "Notes for ") + criteriaLabel(row)
+          );
+          applyCompletedInputStyle(input, row, sec);
           autoResizeNotesField(input);
           input.addEventListener("input", () => autoResizeNotesField(input));
           input.addEventListener("change", () => {
             const normalized = normalizeNotesText(input.value);
             if (normalized !== input.value) input.value = normalized;
             setRowCompletedText(sec, rowIndex, input.value);
-            applyCompletedInputStyle(input, state.sections[sec].rows[rowIndex]);
+            applyCompletedInputStyle(input, state.sections[sec].rows[rowIndex], sec);
             refreshRowDoneState(tr, sec, rowIndex, cb);
             document.getElementById("tabSummary").textContent = tabSummaryText(sec);
             updateNotesDateHint(td, rowId(sec, rowIndex));
@@ -3060,7 +3082,7 @@
       const row = state.sections[sec].rows[index];
       const id = rowId(sec, index);
       const p = getProgress(id);
-      const completed = p.completed || isRowDocComplete(row);
+      const completed = p.completed || isRowDocComplete(row, sec);
       checkbox.checked = completed;
       tr.classList.toggle("row-done", completed);
       const hide = (globalHideCompleted || panelHideCompleted) && completed;
@@ -3074,7 +3096,7 @@
       section.rows.forEach((row, i) => {
         const id = rowId(sec, i);
         const p = getProgress(id);
-        const completed = p.completed || isRowDocComplete(row);
+        const completed = p.completed || isRowDocComplete(row, sec);
         if (completed) doneCount++;
         const hide = (globalHideCompleted || panelHideCompleted) && completed;
         if (!hide) visible++;
@@ -3151,7 +3173,7 @@
             parts.push(`<td style="border:1px solid #d9dadc;padding:8px;vertical-align:top;">${escapeHtml(reportRowStatusLabel(sec, index, row))}</td>`);
             group.headers.forEach((h) => {
               const val = cellValueForHeader(row, h);
-              const notes = isNotesColumn(h) ? displayNotesValue(row) : val;
+              const notes = isNotesColumn(h) ? displayNotesValue(row, sec) : val;
               parts.push(`<td style="border:1px solid #d9dadc;padding:8px;vertical-align:top;">${escapeHtml(notes ?? "")}</td>`);
             });
             parts.push(`</tr>`);

@@ -42,7 +42,7 @@ After import, the **Approve workstreams** dialog lists each detected workstream.
 | `# OpenShift … Evaluation Framework - …` immediately under a POC Doc line | Document subtitle only (not a separate workstream) |
 | Other `# …` headings (e.g. appendix tabs) | Workstreams named from the heading text |
 | `##` / `###` under a tab | **Sections** inside the current workstream |
-| Tables | Criteria rows (headers taken from the table; **Objective** maps to **Criteria**, **Completed** to **Notes**) |
+| Tables | Criteria rows (headers taken from the table; **Objective** → **Criteria**, **Completed** → **Notes**; a **Status** column is treated like **Notes** — editable text and completion styling) |
 
 URL import uses the same Markdown parser as upload.
 

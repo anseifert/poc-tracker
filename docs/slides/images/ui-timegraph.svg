@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect width="600" height="360" fill="rgba(0,0,0,.35)"/>
+  <rect x="40" y="24" width="520" height="312" rx="8" fill="#fff"/>
+  <text x="64" y="56" font-size="18" font-weight="600">Completion timegraph</text>
+  <line x1="80" y1="260" x2="520" y2="260" stroke="#c7c7c7"/>
+  <line x1="80" y1="100" x2="80" y2="260" stroke="#c7c7c7"/>
+  <path d="M80 240 L160 220 L240 200 L320 160 L400 140 L480 120" fill="none" stroke="#0072ce" stroke-width="2"/>
+  <circle cx="160" cy="220" r="5" fill="#22c55e"/>
+  <circle cx="320" cy="160" r="5" fill="#22c55e"/>
+  <circle cx="480" cy="120" r="5" fill="#22c55e"/>
+  <text x="64" y="300" font-size="11" fill="#707070">Download JSON / CSV  completion log only (not full restore)</text>
+</svg>

@@ -3,6 +3,10 @@
   "private": true,
   "scripts": {
     "postinstall": "node scripts/ensure-state.mjs",
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "capture-slides": "node scripts/capture-slide-screenshots.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.64.1"
   }
 }

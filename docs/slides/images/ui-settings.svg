@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect width="480" height="360" fill="rgba(0,0,0,.35)"/>
+  <rect x="60" y="48" width="360" height="264" rx="8" fill="#fff"/>
+  <text x="84" y="84" font-size="18" font-weight="600">POC Settings</text>
+  <rect x="84" y="104" width="312" height="40" rx="6" fill="#f2f2f2" stroke="#e0e0e0"/>
+  <text x="100" y="130" font-size="13">POC title</text>
+  <rect x="84" y="152" width="312" height="40" rx="6" fill="#f2f2f2" stroke="#e0e0e0"/>
+  <text x="100" y="178" font-size="13">Summary</text>
+  <rect x="84" y="200" width="312" height="40" rx="6" fill="#0072ce" fill-opacity=".12" stroke="#0072ce"/>
+  <text x="100" y="226" font-size="13" font-weight="600" fill="#003087">POC structure</text>
+  <rect x="84" y="248" width="312" height="40" rx="6" fill="#f2f2f2" stroke="#e0e0e0"/>
+  <text x="100" y="274" font-size="13">Chart colors</text>
+</svg>

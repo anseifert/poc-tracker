@@ -15,6 +15,8 @@ npm start
 
 Open [http://localhost:8081](http://localhost:8081) (or the port shown in the console).
 
+**User guide slides:** open [`docs/slides/index.html`](docs/slides/index.html) in a browser (arrow keys to navigate; print to PDF). See [`docs/slides/README.md`](docs/slides/README.md) for optional live screenshots.
+
 ### Docker Compose
 
 ```bash

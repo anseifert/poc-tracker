@@ -1104,6 +1104,28 @@
       color: var(--rh-red-60);
     }
 
+    .print-blocked-lead {
+      margin: 0 0 0.75rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .print-blocked-steps {
+      margin: 0 0 0.75rem 1.1rem;
+      padding: 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .print-blocked-note {
+      margin: 0 0 1rem;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
     .signoff-form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1472,6 +1494,28 @@
       </div>
     </div>
 
+    <div id="printBlockedModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="printBlockedBackdrop"></div>
+      <div class="report-modal-panel" role="dialog" aria-labelledby="printBlockedTitle" aria-modal="true">
+        <h2 id="printBlockedTitle">Printing was blocked</h2>
+        <p id="printBlockedLead" class="print-blocked-lead">
+          Your browser blocked the print window. The tracker cannot turn pop-ups on for you — you allow them in browser settings for this site.
+        </p>
+        <ul class="print-blocked-steps">
+          <li>Click the <strong>pop-up blocked</strong> or <strong>site controls</strong> icon in the address bar (often on the right).</li>
+          <li>Choose <strong>Always allow pop-ups</strong> (or <strong>Pop-ups and redirects → Allow</strong>) for this page.</li>
+          <li>Click <strong>Try again</strong> below.</li>
+        </ul>
+        <p class="print-blocked-note">
+          If you already allowed pop-ups, we will try an in-page print fallback automatically before showing this message.
+        </p>
+        <div class="report-modal-actions">
+          <button type="button" class="primary" id="btnPrintBlockedRetry">Try again</button>
+          <button type="button" id="btnPrintBlockedClose">Close</button>
+        </div>
+      </div>
+    </div>
+
     <div id="workstreamApproveModal" class="report-modal" hidden>
       <div class="report-modal-backdrop" id="workstreamApproveBackdrop"></div>
       <div class="report-modal-panel" role="dialog" aria-labelledby="workstreamApproveTitle" aria-modal="true">
@@ -1531,6 +1575,7 @@
           <canvas id="timegraphCanvas" aria-label="Timeline of completed criteria"></canvas>
         </div>
         <div class="report-modal-actions">
+          <button type="button" id="btnTimegraphSavePdf">Print / Save as PDF</button>
           <button type="button" id="btnTimegraphDownloadJson">Download JSON</button>
           <button type="button" id="btnTimegraphDownloadCsv">Download CSV</button>
           <button type="button" id="btnTimegraphClose">Close</button>
@@ -1553,7 +1598,10 @@
           <label><input type="checkbox" name="reportItemFilter" value="incomplete" checked /> Only show incomplete</label>
           <label><input type="checkbox" name="reportItemFilter" value="all" /> Send everything</label>
         </fieldset>
-        <button type="button" class="primary" id="btnReportPreview">Preview report</button>
+        <div class="report-modal-actions" style="margin-top:0">
+          <button type="button" class="primary" id="btnReportPreview">Preview report</button>
+          <button type="button" id="btnReportSavePdf">Print / Save as PDF</button>
+        </div>
         <div id="reportPreview" class="report-preview-frame" hidden></div>
         <div class="report-modal-actions" id="reportModalActions" hidden>
           <button type="button" id="btnReportCopy">Copy HTML</button>
@@ -3459,6 +3507,8 @@
 
     let lastReportHtml = "";
     let lastSignOffHtml = "";
+    let pendingPrintHtml = null;
+    let pendingPrintContext = "";
 
     function workstreamsForReportScope(scope) {
       if (scope === "all" || scope === "both") return workstreamsWithData();
@@ -3922,6 +3972,60 @@
       });
     }
 
+    function buildTimegraphPrintHtml() {
+      drawTimegraph();
+      const canvas = document.getElementById("timegraphCanvas");
+      const summaryText = document.getElementById("timegraphSummary")?.textContent || "";
+      const events = collectCheckoffEvents();
+      const title = escapeHtml(state.title || defaultState().title);
+      const generated = escapeHtml(new Date().toLocaleString());
+      const parts = [];
+      parts.push(
+        `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title} — Completion timegraph</title></head>`
+      );
+      parts.push(
+        `<body style="font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#151515;line-height:1.45;margin:0;padding:20px;">`
+      );
+      parts.push(`<h1 style="color:#003087;font-size:22px;margin:0 0 8px;">${title}</h1>`);
+      parts.push(`<h2 style="color:#0072ce;font-size:18px;margin:0 0 12px;">Completion timegraph</h2>`);
+      parts.push(`<p style="color:#75787b;font-size:13px;margin:0 0 16px;">Generated ${generated}</p>`);
+      parts.push(`<p style="margin:0 0 20px;">${escapeHtml(summaryText)}</p>`);
+      if (!events.length) {
+        parts.push(`<p>No check-off timestamps recorded yet.</p>`);
+      } else if (canvas) {
+        parts.push(
+          `<img src="${canvas.toDataURL("image/png")}" alt="Completion timegraph chart" style="max-width:100%;height:auto;border:1px solid #d9dadc;" />`
+        );
+        parts.push(`<h3 style="font-size:15px;margin:28px 0 12px;">Check-offs</h3>`);
+        parts.push(
+          `<table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr><th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">When</th><th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">Workstream</th><th style="text-align:left;border:1px solid #d9dadc;padding:8px;background:#f2f2f2;">Criteria</th></tr></thead><tbody>`
+        );
+        events.forEach((ev) => {
+          parts.push(
+            `<tr><td style="border:1px solid #d9dadc;padding:8px;vertical-align:top;">${escapeHtml(formatTrackedCompletion(ev.at))}</td><td style="border:1px solid #d9dadc;padding:8px;vertical-align:top;">${escapeHtml(ev.workstream || "")}</td><td style="border:1px solid #d9dadc;padding:8px;vertical-align:top;">${escapeHtml(ev.criteria || "")}</td></tr>`
+          );
+        });
+        parts.push(`</tbody></table>`);
+      }
+      parts.push(`</body></html>`);
+      return parts.join("");
+    }
+
+    function printEmailReportPdf() {
+      const itemFilter = selectedReportItemFilter();
+      const html = buildReportHtmlForExport(selectedReportScope(), itemFilter) || lastReportHtml;
+      if (!html) {
+        alert(reportEmptyMessage(itemFilter));
+        return;
+      }
+      lastReportHtml = html;
+      printHtmlDocument(html, "the email report");
+    }
+
+    function printTimegraphPdf() {
+      printHtmlDocument(buildTimegraphPrintHtml(), "the completion timegraph");
+    }
+
     function openTimegraphModal() {
       document.getElementById("timegraphModal").hidden = false;
       drawTimegraph();
@@ -4127,12 +4231,43 @@
       downloadHtmlFile(html, "poc-status-report.html");
     }
 
-    function printHtmlDocument(html) {
-      const w = window.open("", "_blank", "noopener,noreferrer");
-      if (!w) {
-        alert("Allow pop-ups to print the sign-off sheet.");
-        return;
+    function printHtmlViaHiddenFrame(html) {
+      try {
+        const frame = document.createElement("iframe");
+        frame.setAttribute("aria-hidden", "true");
+        frame.title = "Print";
+        frame.style.cssText =
+          "position:fixed;width:0;height:0;border:0;opacity:0;pointer-events:none;left:-9999px;top:0;";
+        document.body.appendChild(frame);
+        const win = frame.contentWindow;
+        if (!win) {
+          frame.remove();
+          return false;
+        }
+        const doc = win.document;
+        doc.open();
+        doc.write(html);
+        doc.close();
+        const runPrint = () => {
+          try {
+            win.focus();
+            win.print();
+          } catch (_) {
+            /* user may cancel */
+          }
+          setTimeout(() => frame.remove(), 2500);
+        };
+        frame.addEventListener("load", () => setTimeout(runPrint, 50), { once: true });
+        setTimeout(runPrint, 400);
+        return true;
+      } catch (_) {
+        return false;
       }
+    }
+
+    function printHtmlViaPopupWindow(html) {
+      const w = window.open("", "_blank", "noopener,noreferrer");
+      if (!w) return false;
       w.document.open();
       w.document.write(html);
       w.document.close();
@@ -4144,6 +4279,47 @@
           /* user may cancel */
         }
       }, 300);
+      return true;
+    }
+
+    function openPrintBlockedModal(contextLabel) {
+      const lead = document.getElementById("printBlockedLead");
+      if (lead && contextLabel) {
+        lead.textContent =
+          `Your browser blocked the print window for ${contextLabel}. The tracker cannot enable pop-ups automatically — allow them in your browser settings for this site, then try again.`;
+      }
+      document.getElementById("printBlockedModal").hidden = false;
+    }
+
+    function closePrintBlockedModal() {
+      document.getElementById("printBlockedModal").hidden = true;
+    }
+
+    function printHtmlDocument(html, contextLabel) {
+      if (!html) return false;
+      pendingPrintHtml = html;
+      pendingPrintContext = contextLabel || "this document";
+      if (printHtmlViaPopupWindow(html)) {
+        pendingPrintHtml = null;
+        return true;
+      }
+      if (printHtmlViaHiddenFrame(html)) {
+        pendingPrintHtml = null;
+        return true;
+      }
+      openPrintBlockedModal(pendingPrintContext);
+      return false;
+    }
+
+    function retryPendingPrint() {
+      const html = pendingPrintHtml;
+      const contextLabel = pendingPrintContext;
+      if (!html) {
+        closePrintBlockedModal();
+        return;
+      }
+      closePrintBlockedModal();
+      printHtmlDocument(html, contextLabel);
     }
 
     function syncSignOffFormFromState() {
@@ -4232,6 +4408,7 @@
         removeBtn.className = "signoff-remove";
         removeBtn.textContent = "Remove";
         removeBtn.addEventListener("click", () => {
+          readSignOffFormIntoState();
           state.signatoryRoster = state.signatoryRoster.filter((e) => e.id !== entry.id);
           state.signOff.selectedSignatoryIds = (state.signOff.selectedSignatoryIds || []).filter(
             (id) => id !== entry.id
@@ -5542,11 +5719,16 @@
     });
     document.getElementById("btnSignOffPrint").addEventListener("click", () => {
       if (!lastSignOffHtml) return;
-      printHtmlDocument(lastSignOffHtml);
+      printHtmlDocument(lastSignOffHtml, "the sign-off sheet");
     });
+
+    document.getElementById("btnPrintBlockedRetry").addEventListener("click", retryPendingPrint);
+    document.getElementById("btnPrintBlockedClose").addEventListener("click", closePrintBlockedModal);
+    document.getElementById("printBlockedBackdrop").addEventListener("click", closePrintBlockedModal);
     document.getElementById("btnSignOffClose").addEventListener("click", closeSignOffModal);
     document.getElementById("signOffModalBackdrop").addEventListener("click", closeSignOffModal);
     document.getElementById("btnSignOffRefreshOwners").addEventListener("click", () => {
+      readSignOffFormIntoState();
       const added = refreshSignatoryRosterFromOwners();
       renderSignOffRosterList();
       saveState();
@@ -5557,15 +5739,21 @@
       }
     });
     document.getElementById("btnSignOffAddPerson").addEventListener("click", () => {
+      readSignOffFormIntoState();
       ensureSignOffState();
+      const id = generateSignatoryId();
       state.signatoryRoster.push({
-        id: generateSignatoryId(),
+        id,
         name: "",
         role: "",
         organization: "",
         source: "manual",
       });
+      if (!state.signOff.selectedSignatoryIds.includes(id)) {
+        state.signOff.selectedSignatoryIds.push(id);
+      }
       renderSignOffRosterList();
+      saveState();
       const host = document.getElementById("signOffRosterList");
       const lastInput = host.querySelector(".signoff-roster-row:last-child [data-field='name']");
       if (lastInput) lastInput.focus();
@@ -5657,6 +5845,7 @@
 
     document.getElementById("btnTimegraphClose").addEventListener("click", closeTimegraphModal);
     document.getElementById("timegraphModalBackdrop").addEventListener("click", closeTimegraphModal);
+    document.getElementById("btnTimegraphSavePdf").addEventListener("click", printTimegraphPdf);
     document.getElementById("btnTimegraphDownloadJson").addEventListener("click", downloadCompletionTimestampsJson);
     document.getElementById("btnTimegraphDownloadCsv").addEventListener("click", downloadCompletionTimestampsCsv);
 
@@ -5740,6 +5929,8 @@
       downloadReportHtml(html);
     });
 
+    document.getElementById("btnReportSavePdf").addEventListener("click", printEmailReportPdf);
+
     document.getElementById("btnReportClose").addEventListener("click", closeReportModal);
     document.getElementById("reportModalBackdrop").addEventListener("click", closeReportModal);
 
@@ -5758,6 +5949,7 @@
       else if (!document.getElementById("timegraphModal").hidden) closeTimegraphModal();
       else if (!document.getElementById("reportModal").hidden) closeReportModal();
       else if (!document.getElementById("signOffModal").hidden) closeSignOffModal();
+      else if (!document.getElementById("printBlockedModal").hidden) closePrintBlockedModal();
     });
 
     document.getElementById("tabBar").addEventListener("click", (e) => {

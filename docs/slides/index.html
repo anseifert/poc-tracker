@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>POC Evaluation Tracker — User Guide</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" />
+  <style>
+    :root {
+      --rh-red: #ee0000;
+      --eprod-blue: #003087;
+      --eprod-bright: #0072ce;
+    }
+    .reveal h1, .reveal h2, .reveal h3 { color: var(--eprod-blue); text-transform: none; }
+    .reveal h1 { font-size: 1.9em; }
+    .reveal .subtitle { color: #707070; font-size: 0.55em; margin-top: 0.5em; }
+    .reveal .tagline { color: #151515; font-size: 0.75em; }
+    .reveal ul { font-size: 0.72em; line-height: 1.45; }
+    .reveal li { margin-bottom: 0.35em; }
+    .reveal code { background: #f2f2f2; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.85em; }
+    .reveal .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+    .reveal .figure { margin: 0.5rem 0 0; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+    .reveal .figure img, .reveal .figure picture { display: block; width: 100%; height: auto; }
+    .reveal .small { font-size: 0.55em; color: #707070; }
+    .reveal table.compact { font-size: 0.58em; margin: 0 auto; }
+    .reveal table.compact th { background: #003087; color: #fff; }
+    .reveal .accent { color: var(--rh-red); }
+    .reveal section.title-slide { text-align: center; }
+    .reveal section.title-slide h1 { margin-bottom: 0; }
+    .reveal .logo-bar { height: 4px; width: 120px; background: var(--rh-red); margin: 1rem auto; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section class="title-slide">
+        <h1>POC Evaluation Tracker</h1>
+        <div class="logo-bar"></div>
+        <p class="tagline">Import criteria · track completion · report · sign off</p>
+        <p class="subtitle">User guide · github.com/anseifert/poc-tracker</p>
+      </section>
+
+      <section>
+        <h2>What it does</h2>
+        <ul>
+          <li>Single-page app for <strong>POC / evaluation criteria</strong> across workstreams</li>
+          <li><strong>Import</strong> from Google Doc, markdown, or build in the browser</li>
+          <li><strong>Done</strong> checkboxes with timestamps, charts, and a completion timegraph</li>
+          <li><strong>POC Settings</strong> — title, summary, structure, colors</li>
+          <li><strong>Email report</strong> (HTML copy/download) and <strong>sign-off sheet</strong> (print/PDF)</li>
+          <li><strong>Backup / restore</strong> full state for another machine or after clearing browser data</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Quick start</h2>
+        <div class="cols">
+          <div>
+            <pre><code data-trim style="font-size:0.5em">git clone https://github.com/anseifert/poc-tracker.git
+cd poc-tracker
+npm install
+npm start</code></pre>
+            <p class="small">Open <code>http://localhost:8081</code></p>
+            <p class="small">Or: <code>docker compose up --build</code></p>
+          </div>
+          <div>
+            <ul>
+              <li>Port default: <strong>8081</strong></li>
+              <li>Progress syncs to <code>state.json</code> on the server</li>
+              <li>Auto backup: <code>state.json.backup</code> every 5 minutes</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Home screen — get criteria in</h2>
+        <div class="cols">
+          <ul>
+            <li>Set optional <strong>POC title</strong> and <strong>status colors</strong></li>
+            <li><strong>Google Doc</strong> — URL import (needs server) or upload <code>.md</code></li>
+            <li><strong>Markdown</strong> — paste or file</li>
+            <li><strong>Build here</strong> — full-screen structure editor</li>
+            <li>Use the <a href="https://docs.google.com/document/d/1QD0Tboo8Wm6GxObBhxqrCPG0x4lBBR9DkapDppnSBRw/edit">Google Doc template</a> (File → Make a copy)</li>
+          </ul>
+          <figure class="figure">
+            <picture>
+              <source srcset="images/01-home-import.png" type="image/png" />
+              <img src="images/ui-home.svg" alt="Import home screen" />
+            </picture>
+          </figure>
+        </div>
+      </section>
+
+      <section>
+        <h2>Google Doc → workstreams</h2>
+        <table class="compact">
+          <thead><tr><th>In downloaded Markdown</th><th>Becomes</th></tr></thead>
+          <tbody>
+            <tr><td><code># POC Doc - Kubernetes</code></td><td>Workstream tab</td></tr>
+            <tr><td><code>##</code> / <code>###</code> headings</td><td>Sections inside the tab</td></tr>
+            <tr><td>Tables</td><td>Criteria rows</td></tr>
+            <tr><td><strong>Status</strong> column</td><td>Editable like Notes; drives styling</td></tr>
+          </tbody>
+        </table>
+        <p class="small">After import: <strong>Approve workstreams</strong> — select tabs, rename, then <strong>Import selected</strong>.</p>
+      </section>
+
+      <section>
+        <h2>Main tracker UI</h2>
+        <div class="cols">
+          <ul>
+            <li><strong>Stats</strong> — total, completed, open, % complete</li>
+            <li><strong>Chart</strong> — completed / in progress / open per workstream</li>
+            <li><strong>Summary</strong> — read-only paragraph (edit in POC Settings)</li>
+            <li><strong>Workstream tabs</strong> — one per imported stream with rows</li>
+            <li><strong>Table</strong> — Done · criteria columns · Status/Notes</li>
+            <li>Footer — last saved + <em>Saved and synced</em> when using <code>npm start</code></li>
+          </ul>
+          <figure class="figure">
+            <picture>
+              <source srcset="images/02-tracker-main.png" type="image/png" />
+              <img src="images/ui-tracker.svg" alt="Main tracker view" />
+            </picture>
+          </figure>
+        </div>
+      </section>
+
+      <section>
+        <h2>Marking criteria complete</h2>
+        <ul>
+          <li>Check <strong>Done</strong> → records <code>progress[uid].completed</code>, timestamp, and log entry</li>
+          <li>Status/notes can show <strong>Completed</strong> (or type it) — same outcome when aligned</li>
+          <li>Unchecking clears completion text and logs <strong>reopened</strong></li>
+          <li>Each row has a stable <code>uid</code> — required for backup/restore</li>
+        </ul>
+        <p class="small">Per-tab: <strong>Hide completed rows in this tab</strong>. Menu: show/hide all completed.</p>
+      </section>
+
+      <section>
+        <h2>Hamburger menu</h2>
+        <div class="cols">
+          <figure class="figure">
+            <picture>
+              <source srcset="images/03-hamburger-menu.png" type="image/png" />
+              <img src="images/ui-menu.svg" alt="Application menu" />
+            </picture>
+          </figure>
+          <ul>
+            <li><span class="accent">Reset all data</span></li>
+            <li>Show / hide completed rows</li>
+            <li>Email report…</li>
+            <li>POC Settings</li>
+            <li>View timegraph…</li>
+            <li>POC sign-off sheet…</li>
+            <li>Download backup (JSON)</li>
+            <li>Restore from backup…</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>POC Settings hub</h2>
+        <div class="cols">
+          <figure class="figure">
+            <picture>
+              <source srcset="images/04-poc-settings.png" type="image/png" />
+              <img src="images/ui-settings.svg" alt="POC Settings modal" />
+            </picture>
+          </figure>
+          <ul>
+            <li><strong>POC title</strong> — header, reports, sign-off</li>
+            <li><strong>Summary</strong> — narrative below the chart</li>
+            <li><strong>POC structure</strong> — workstreams, sections, columns, rows (warning if progress exists)</li>
+            <li><strong>Chart colors</strong> — completed / in-progress styling</li>
+            <li>Sub-screens use <strong>← POC Settings</strong> to return</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Build here (structure editor)</h2>
+        <ul>
+          <li>Add/rename <strong>workstreams</strong>, <strong>sections</strong>, table <strong>columns</strong></li>
+          <li>Add/delete rows; <strong>drag</strong> to reorder</li>
+          <li><strong>Save</strong> loads the normal tracker with tabs and chart</li>
+          <li>Same editor opens from POC Settings → POC structure</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Email report</h2>
+        <div class="cols">
+          <figure class="figure">
+            <picture>
+              <source srcset="images/05-email-report.png" type="image/png" />
+              <img src="images/ui-email.svg" alt="Email report modal" />
+            </picture>
+          </figure>
+          <ul>
+            <li>Scope: <strong>this tab</strong> or <strong>all workstreams</strong></li>
+            <li>Filter: only completed · only incomplete · send everything</li>
+            <li><strong>Preview report</strong> → Copy HTML or Download HTML</li>
+            <li>Paste into email body (status feedback on copy)</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Completion timegraph</h2>
+        <figure class="figure" style="max-width:70%;margin:0 auto">
+          <picture>
+            <source srcset="images/06-timegraph.png" type="image/png" />
+            <img src="images/ui-timegraph.svg" alt="Timegraph modal" />
+          </picture>
+        </figure>
+        <ul>
+          <li>Timeline of check-offs (cumulative line + individual events)</li>
+          <li>Export <strong>JSON</strong> or <strong>CSV</strong> — log only, <em>not</em> a full POC restore</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>POC sign-off sheet</h2>
+        <div class="cols">
+          <figure class="figure">
+            <picture>
+              <source srcset="images/07-sign-off.png" type="image/png" />
+              <img src="images/ui-signoff.svg" alt="Sign-off modal" />
+            </picture>
+          </figure>
+          <ul>
+            <li>Completion overview (overall + per workstream)</li>
+            <li>Editable <strong>attestation</strong> text</li>
+            <li><strong>Signatories</strong> from Owner columns + manual entries</li>
+            <li>Optional block until 100% complete</li>
+            <li><strong>Download HTML</strong> or <strong>Print / Save as PDF</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Backup &amp; restore</h2>
+        <table class="compact">
+          <thead><tr><th>Mechanism</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td>Menu → Download backup (JSON)</td><td>Portable full state</td></tr>
+            <tr><td><code>state.json</code> on server</td><td>Live sync with <code>npm start</code> / Docker</td></tr>
+            <tr><td><code>state.json.backup</code></td><td>Automatic server snapshot</td></tr>
+            <tr><td>Menu → Restore from backup…</td><td>Replace criteria + all checkoffs</td></tr>
+          </tbody>
+        </table>
+        <p class="small">Re-importing a Google Doc on a blank POC creates <strong>new</strong> row IDs — use a <strong>full</strong> backup to move progress.</p>
+      </section>
+
+      <section>
+        <h2>How state is stored</h2>
+        <figure class="figure" style="max-width:85%;margin:0 auto">
+          <img src="images/ui-architecture.svg" alt="Browser, server, state.json" />
+        </figure>
+        <p class="small"><code>sections.*.rows[].uid</code> must match keys in <code>progress</code> for checkboxes to restore correctly.</p>
+      </section>
+
+      <section>
+        <h2>Component map</h2>
+        <table class="compact" style="font-size:0.5em">
+          <thead><tr><th>UI area</th><th>Components</th></tr></thead>
+          <tbody>
+            <tr><td>Import</td><td>Title/colors · Google / Markdown / Build tabs · Approve workstreams</td></tr>
+            <tr><td>Tracker</td><td>Stats · chart · summary · tabs · criteria table · footer sync</td></tr>
+            <tr><td>Modals</td><td>Settings hub · title · summary · structure editor · chart colors</td></tr>
+            <tr><td>Reports</td><td>Email report · timegraph · sign-off</td></tr>
+            <tr><td>Data</td><td>Backup / restore · reset · localStorage + state.json</td></tr>
+            <tr><td>Server</td><td><code>server.mjs</code> · Google Doc import API · PUT state</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="title-slide">
+        <h2>Resources</h2>
+        <ul style="text-align:left;max-width:640px;margin:0 auto">
+          <li>README in repo — persistence, restore troubleshooting, env vars</li>
+          <li><code>example-evaluation.md</code> — sample markdown</li>
+          <li>Slides: <code>docs/slides/index.html</code> (this deck)</li>
+          <li>Real screenshots: <code>node scripts/capture-slide-screenshots.mjs</code></li>
+        </ul>
+        <p class="subtitle">Questions? Open an issue on GitHub.</p>
+      </section>
+
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: "c/t",
+      width: 1280,
+      height: 720,
+      margin: 0.08,
+    });
+  </script>
+</body>
+</html>

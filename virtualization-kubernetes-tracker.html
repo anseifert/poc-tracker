@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EPROD OpenShift POC Evaluation</title>
+  <title>POC Tracker</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" />
   <style>
     /* Red Hat brand palette — https://www.redhat.com/en/about/brand/standards/color */
@@ -975,6 +975,32 @@
       align-items: center;
     }
 
+    .structure-toolbar .btn-delete-workstream {
+      color: var(--rh-red-60);
+      border-color: var(--rh-red-60);
+    }
+
+    .structure-toolbar .btn-delete-workstream:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .structure-confirm-pick {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin: 0 0 1rem;
+      font-size: 0.9rem;
+    }
+
+    .structure-confirm-pick select {
+      font: inherit;
+      padding: 0.45rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
     .structure-toolbar .spacer {
       flex: 1;
     }
@@ -1024,6 +1050,14 @@
 
     .report-modal[hidden] {
       display: none !important;
+    }
+
+    .report-modal.is-front {
+      z-index: 120;
+    }
+
+    .report-modal.modal-input-blocked {
+      pointer-events: none;
     }
 
     .report-modal-backdrop {
@@ -1439,6 +1473,9 @@
           <button type="button" id="btnSettingsStructure">POC structure</button>
           <button type="button" id="btnSettingsChartColors">Chart colors</button>
         </div>
+        <p class="import-hint" style="margin:0 0 0.75rem">
+          In <strong>POC structure</strong>, use <strong>Delete Workstream</strong> to remove a tab (choose which one, then Save to apply).
+        </p>
         <div class="report-modal-actions">
           <button type="button" id="btnPocSettingsClose">Close</button>
         </div>
@@ -1560,6 +1597,22 @@
       </div>
     </div>
 
+    <div id="structureConfirmModal" class="report-modal" hidden>
+      <div class="report-modal-backdrop" id="structureConfirmBackdrop"></div>
+      <div class="report-modal-panel" role="dialog" aria-labelledby="structureConfirmTitle" aria-modal="true">
+        <h2 id="structureConfirmTitle">Confirm</h2>
+        <p id="structureConfirmMessage"></p>
+        <label id="structureConfirmPickWrap" class="structure-confirm-pick" hidden>
+          <span>Workstream to delete</span>
+          <select id="structureConfirmWorkstreamPick"></select>
+        </label>
+        <div class="report-modal-actions">
+          <button type="button" class="primary" id="btnStructureConfirmOk">Confirm</button>
+          <button type="button" id="btnStructureConfirmCancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <div id="timegraphModal" class="report-modal" hidden>
       <div class="report-modal-backdrop" id="timegraphModalBackdrop"></div>
       <div class="report-modal-panel timegraph-panel" role="dialog" aria-labelledby="timegraphModalTitle" aria-modal="true">
@@ -1678,6 +1731,8 @@
   <script id="embedded-doc-data" type="application/json">{"dataVersion":6,"title":"POC Evaluation Tracker","subtitle":"Import a Google Doc or markdown evaluation framework to get started.","workstreamOrder":["virtualization","kubernetes"],"workstreamLabels":{"virtualization":"Virtualization","kubernetes":"Kubernetes"},"sections":{"virtualization":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[],"defaultSectionTitle":"General"},"kubernetes":{"headers":["Criteria","Description","Success Criteria","Notes"],"rows":[],"defaultSectionTitle":"General"}}}</script>
   <script>
     const EMBEDDED_DOC = JSON.parse(document.getElementById('embedded-doc-data').textContent);
+    const APP_DOCUMENT_TITLE = "POC Tracker";
+    document.title = APP_DOCUMENT_TITLE;
     const STORAGE_KEY = "poc-tracker-v1";
     const STATE_JSON_URL = "state.json";
     const STATE_API_URL = "api/state";
@@ -1711,6 +1766,36 @@
     let structureEditorDraft = null;
     let structureEditorActiveWs = null;
     let structureSaveAfterWarn = null;
+    let structureConfirmPending = null;
+
+    function refreshFrontReportModal() {
+      document.querySelectorAll(".report-modal.is-front").forEach((m) => m.classList.remove("is-front"));
+      const open = [...document.querySelectorAll(".report-modal")].filter((m) => !m.hidden);
+      if (open.length) open[open.length - 1].classList.add("is-front");
+    }
+
+    function showReportModal(modalOrId) {
+      const modal =
+        typeof modalOrId === "string" ? document.getElementById(modalOrId) : modalOrId;
+      if (!modal) return;
+      document.querySelectorAll(".report-modal.is-front").forEach((m) => m.classList.remove("is-front"));
+      modal.hidden = false;
+      modal.classList.add("is-front");
+    }
+
+    function hideReportModal(modalOrId) {
+      const modal =
+        typeof modalOrId === "string" ? document.getElementById(modalOrId) : modalOrId;
+      if (!modal) return;
+      modal.hidden = true;
+      modal.classList.remove("is-front");
+      refreshFrontReportModal();
+    }
+
+    function setStructureEditorInputBlocked(blocked) {
+      const el = document.getElementById("structureEditorModal");
+      if (el) el.classList.toggle("modal-input-blocked", !!blocked);
+    }
     let globalHideCompleted = false;
     let panelHideCompleted = false;
 
@@ -1863,20 +1948,20 @@
 
     function openChartColorsModal() {
       syncStatusColorInputs();
-      document.getElementById("chartColorsModal").hidden = false;
+      showReportModal("chartColorsModal");
     }
 
     function closeChartColorsModal() {
-      document.getElementById("chartColorsModal").hidden = true;
+      hideReportModal("chartColorsModal");
       clearPocSettingsReturn();
     }
 
     function openPocSettingsModal() {
-      document.getElementById("pocSettingsModal").hidden = false;
+      showReportModal("pocSettingsModal");
     }
 
     function closePocSettingsModal() {
-      document.getElementById("pocSettingsModal").hidden = true;
+      hideReportModal("pocSettingsModal");
     }
 
     function setPocSettingsBackVisible(visible) {
@@ -1890,11 +1975,16 @@
     }
 
     function returnToPocSettings() {
-      document.getElementById("titleModal").hidden = true;
-      document.getElementById("summaryModal").hidden = true;
-      document.getElementById("chartColorsModal").hidden = true;
+      hideReportModal("titleModal");
+      hideReportModal("summaryModal");
+      hideReportModal("chartColorsModal");
+      hideReportModal("structureConfirmModal");
+      hideReportModal("structureWarnModal");
+      setStructureEditorInputBlocked(false);
+      structureSaveAfterWarn = false;
+      structureConfirmPending = null;
       if (!document.getElementById("structureEditorModal").hidden) {
-        document.getElementById("structureEditorModal").hidden = true;
+        hideReportModal("structureEditorModal");
         structureEditorDraft = null;
         structureEditorActiveWs = null;
       }
@@ -1918,7 +2008,7 @@
 
     function openTitleModal() {
       syncPocTitleInputsFromState();
-      document.getElementById("titleModal").hidden = false;
+      showReportModal("titleModal");
       const input = document.getElementById("pocTitleEditInput");
       if (input) {
         input.focus();
@@ -1927,7 +2017,7 @@
     }
 
     function closeTitleModal() {
-      document.getElementById("titleModal").hidden = true;
+      hideReportModal("titleModal");
       clearPocSettingsReturn();
     }
 
@@ -1958,12 +2048,12 @@
     function openSummaryModal() {
       const input = document.getElementById("pocSummaryEditInput");
       if (input) input.value = state.summary ?? "";
-      document.getElementById("summaryModal").hidden = false;
+      showReportModal("summaryModal");
       if (input) input.focus();
     }
 
     function closeSummaryModal() {
-      document.getElementById("summaryModal").hidden = true;
+      hideReportModal("summaryModal");
       clearPocSettingsReturn();
     }
 
@@ -5286,15 +5376,114 @@
         }
       }
       structureEditorActiveWs = structureEditorDraft.workstreamOrder[0];
-      document.getElementById("structureEditorModal").hidden = false;
+      showReportModal("structureEditorModal");
       renderStructureEditor();
     }
 
     function closeStructureEditor() {
-      document.getElementById("structureEditorModal").hidden = true;
+      hideReportModal("structureEditorModal");
+      setStructureEditorInputBlocked(false);
       structureEditorDraft = null;
       structureEditorActiveWs = null;
       clearPocSettingsReturn();
+    }
+
+    function openStructureConfirm(message, onConfirm, options = {}) {
+      const msgEl = document.getElementById("structureConfirmMessage");
+      if (msgEl) msgEl.textContent = message;
+      structureConfirmPending = typeof onConfirm === "function" ? onConfirm : null;
+      const okBtn = document.getElementById("btnStructureConfirmOk");
+      const cancelBtn = document.getElementById("btnStructureConfirmCancel");
+      const pickWrap = document.getElementById("structureConfirmPickWrap");
+      const pick = document.getElementById("structureConfirmWorkstreamPick");
+      if (options.workstreamPick && pickWrap && pick && structureEditorDraft) {
+        pick.innerHTML = "";
+        structureEditorDraft.workstreamOrder.forEach((id) => {
+          const opt = document.createElement("option");
+          opt.value = id;
+          opt.textContent = structureEditorDraft.workstreamLabels[id] || id;
+          pick.appendChild(opt);
+        });
+        const preferred =
+          structureEditorActiveWs && structureEditorDraft.workstreamOrder.includes(structureEditorActiveWs)
+            ? structureEditorActiveWs
+            : structureEditorDraft.workstreamOrder[0];
+        pick.value = preferred;
+        pickWrap.hidden = false;
+      } else if (pickWrap) {
+        pickWrap.hidden = true;
+      }
+      if (okBtn) {
+        okBtn.textContent = structureConfirmPending ? "Confirm" : "OK";
+        okBtn.classList.toggle("primary", !!structureConfirmPending);
+      }
+      if (cancelBtn) cancelBtn.hidden = !structureConfirmPending;
+      showReportModal("structureConfirmModal");
+    }
+
+    function closeStructureConfirm() {
+      hideReportModal("structureConfirmModal");
+      structureConfirmPending = null;
+      const pickWrap = document.getElementById("structureConfirmPickWrap");
+      if (pickWrap) pickWrap.hidden = true;
+    }
+
+    function confirmStructureConfirm() {
+      const fn = structureConfirmPending;
+      const pick = document.getElementById("structureConfirmWorkstreamPick");
+      const pickWrap = document.getElementById("structureConfirmPickWrap");
+      const pickedWs =
+        fn && pick && pickWrap && !pickWrap.hidden ? pick.value : null;
+      closeStructureConfirm();
+      if (fn) {
+        if (pickedWs != null) fn(pickedWs);
+        else fn();
+      }
+    }
+
+    function deleteWorkstreamIdFromDraft(wsId) {
+      if (!structureEditorDraft || !wsId) return;
+      if (!structureEditorDraft.workstreamOrder.includes(wsId)) return;
+      if (structureEditorDraft.workstreamOrder.length <= 1) return;
+      structureEditorDraft.workstreamOrder = structureEditorDraft.workstreamOrder.filter(
+        (id) => id !== wsId
+      );
+      delete structureEditorDraft.sections[wsId];
+      delete structureEditorDraft.workstreamLabels[wsId];
+      if (structureEditorActiveWs === wsId) {
+        structureEditorActiveWs = structureEditorDraft.workstreamOrder[0];
+      }
+      renderStructureEditor();
+    }
+
+    function deleteWorkstreamFromDraft() {
+      if (!structureEditorDraft) return;
+      if (structureEditorDraft.workstreamOrder.length <= 1) {
+        openStructureConfirm(
+          "Keep at least one workstream. Add another workstream before deleting one.",
+          null
+        );
+        return;
+      }
+      openStructureConfirm(
+        "All sections and criteria in the chosen workstream will be removed. Progress for those rows is cleared when you save.",
+        (wsId) => {
+          if (!wsId) return;
+          deleteWorkstreamIdFromDraft(wsId);
+        },
+        { workstreamPick: true }
+      );
+    }
+
+    function syncStructureDeleteWorkstreamButton() {
+      const btn = document.getElementById("btnStructureDeleteWorkstream");
+      if (!btn) return;
+      btn.textContent = "Delete Workstream";
+      const onlyOne = !structureEditorDraft || structureEditorDraft.workstreamOrder.length <= 1;
+      btn.disabled = onlyOne;
+      btn.title = onlyOne
+        ? "Keep at least one workstream"
+        : "Choose a workstream to remove (Save to apply)";
     }
 
     function renderStructureEditor() {
@@ -5339,6 +5528,13 @@
       toolbar.appendChild(btnAddSection);
       toolbar.appendChild(btnAddColumn);
       toolbar.appendChild(btnRenameWs);
+      const btnDeleteWs = document.createElement("button");
+      btnDeleteWs.type = "button";
+      btnDeleteWs.id = "btnStructureDeleteWorkstream";
+      btnDeleteWs.className = "btn-delete-workstream";
+      btnDeleteWs.textContent = "Delete Workstream";
+      btnDeleteWs.addEventListener("click", deleteWorkstreamFromDraft);
+      toolbar.appendChild(btnDeleteWs);
       body.appendChild(toolbar);
 
       const wsTabs = document.createElement("div");
@@ -5419,10 +5615,11 @@
         btnDelSection.type = "button";
         btnDelSection.textContent = "Remove section";
         btnDelSection.addEventListener("click", () => {
-          if (!confirm("Remove all rows in this section?")) return;
-          const toRemove = new Set(group.items.map((x) => x.index));
-          sec.rows = sec.rows.filter((_, i) => !toRemove.has(i));
-          renderStructureEditor();
+          openStructureConfirm("Remove all rows in this section?", () => {
+            const toRemove = new Set(group.items.map((x) => x.index));
+            sec.rows = sec.rows.filter((_, i) => !toRemove.has(i));
+            renderStructureEditor();
+          });
         });
         head.appendChild(titleInput);
         head.appendChild(btnAddRow);
@@ -5509,6 +5706,19 @@
         block.appendChild(table);
         body.appendChild(block);
       });
+      syncStructureDeleteWorkstreamButton();
+    }
+
+    function pruneProgressToCurrentRows() {
+      const valid = new Set();
+      allWorkstreamIds().forEach((sec) => {
+        state.sections[sec].rows.forEach((row) => {
+          if (row.uid) valid.add(row.uid);
+        });
+      });
+      Object.keys(state.progress || {}).forEach((id) => {
+        if (!valid.has(id)) delete state.progress[id];
+      });
     }
 
     function commitStructureDraft() {
@@ -5528,6 +5738,7 @@
       });
       state.workstreamOrder = [...structureEditorDraft.workstreamOrder];
       ensureRowUids();
+      pruneProgressToCurrentRows();
       const withData = workstreamsWithData();
       activeTab = withData[0] || state.workstreamOrder[0] || null;
       state.sourceImportedAt = state.sourceImportedAt || new Date().toISOString();
@@ -5536,10 +5747,38 @@
       closeStructureEditor();
     }
 
+    function closeStructureWarnModal() {
+      hideReportModal("structureWarnModal");
+      setStructureEditorInputBlocked(false);
+      structureSaveAfterWarn = false;
+    }
+
+    function confirmStructureSaveAfterWarn(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const shouldCommit = !!structureSaveAfterWarn;
+      structureSaveAfterWarn = false;
+      hideReportModal("structureWarnModal");
+      if (!shouldCommit) {
+        setStructureEditorInputBlocked(false);
+        return;
+      }
+      if (!structureEditorDraft) {
+        setStructureEditorInputBlocked(false);
+        openStructureConfirm("Could not save — reopen POC structure and try again.", null);
+        return;
+      }
+      commitStructureDraft();
+      setStructureEditorInputBlocked(false);
+    }
+
     function requestStructureSave() {
       if (hasCompletionProgress()) {
         structureSaveAfterWarn = true;
-        document.getElementById("structureWarnModal").hidden = false;
+        setStructureEditorInputBlocked(true);
+        showReportModal("structureWarnModal");
         return;
       }
       commitStructureDraft();
@@ -5857,19 +6096,13 @@
     document.getElementById("btnStructureCancel").addEventListener("click", closeStructureEditor);
     document.getElementById("structureEditorBackdrop").addEventListener("click", closeStructureEditor);
 
-    document.getElementById("btnStructureWarnConfirm").addEventListener("click", () => {
-      document.getElementById("structureWarnModal").hidden = true;
-      if (structureSaveAfterWarn) commitStructureDraft();
-      structureSaveAfterWarn = false;
-    });
-    document.getElementById("btnStructureWarnCancel").addEventListener("click", () => {
-      document.getElementById("structureWarnModal").hidden = true;
-      structureSaveAfterWarn = false;
-    });
-    document.getElementById("structureWarnBackdrop").addEventListener("click", () => {
-      document.getElementById("structureWarnModal").hidden = true;
-      structureSaveAfterWarn = false;
-    });
+    document.getElementById("btnStructureWarnConfirm").addEventListener("click", confirmStructureSaveAfterWarn);
+    document.getElementById("btnStructureWarnCancel").addEventListener("click", closeStructureWarnModal);
+    document.getElementById("structureWarnBackdrop").addEventListener("click", closeStructureWarnModal);
+
+    document.getElementById("btnStructureConfirmOk").addEventListener("click", confirmStructureConfirm);
+    document.getElementById("btnStructureConfirmCancel").addEventListener("click", closeStructureConfirm);
+    document.getElementById("structureConfirmBackdrop").addEventListener("click", closeStructureConfirm);
 
     document.getElementById("btnWorkstreamApproveConfirm").addEventListener("click", confirmWorkstreamApprove);
     document.getElementById("btnWorkstreamApproveCancel").addEventListener("click", closeWorkstreamApproveModal);
@@ -5937,11 +6170,9 @@
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
       if (!document.getElementById("resetModal").hidden) closeResetModal();
-      else if (!document.getElementById("structureEditorModal").hidden) closeStructureEditor();
-      else if (!document.getElementById("structureWarnModal").hidden) {
-        document.getElementById("structureWarnModal").hidden = true;
-        structureSaveAfterWarn = false;
-      }       else if (!document.getElementById("workstreamApproveModal").hidden) closeWorkstreamApproveModal();
+      else if (!document.getElementById("structureConfirmModal").hidden) closeStructureConfirm();
+      else if (!document.getElementById("structureWarnModal").hidden) closeStructureWarnModal(); else if (!document.getElementById("structureEditorModal").hidden) closeStructureEditor();
+      else if (!document.getElementById("workstreamApproveModal").hidden) closeWorkstreamApproveModal();
       else if (!document.getElementById("pocSettingsModal").hidden) closePocSettingsModal();
       else if (!document.getElementById("titleModal").hidden) closeTitleModal();
       else if (!document.getElementById("summaryModal").hidden) closeSummaryModal();

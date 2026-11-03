@@ -170,7 +170,9 @@ const server = http.createServer(async (req, res) => {
   try {
     const data = await fs.readFile(filePath);
     const ext = path.extname(filePath);
-    res.writeHead(200, { "Content-Type": MIME[ext] || "application/octet-stream" });
+    const headers = { "Content-Type": MIME[ext] || "application/octet-stream" };
+    if (ext === ".html") headers["Cache-Control"] = "no-cache";
+    res.writeHead(200, headers);
     res.end(data);
   } catch {
     res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });

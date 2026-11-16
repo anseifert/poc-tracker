@@ -2,7 +2,7 @@
 
 A single-page app for tracking proof-of-concept evaluation criteria: **import** from a Google Doc or markdown file, **build** a framework in the browser, mark progress by workstream, view charts and a **completion timegraph**, edit **POC settings** (title, summary, structure, colors), generate HTML **email reports**, and produce a **POC sign-off sheet**.
 
-A template for the outline when creating an importing a datafile is located [Here](https://docs.google.com/document/d/1QD0Tboo8Wm6GxObBhxqrCPG0x4lBBR9DkapDppnSBRw/edit?usp=sharing)
+A template for the outline when creating and importing a datafile is located [Here](https://docs.google.com/document/d/1QD0Tboo8Wm6GxObBhxqrCPG0x4lBBR9DkapDppnSBRw/edit?usp=sharing)
 
 ## Quick start
 
